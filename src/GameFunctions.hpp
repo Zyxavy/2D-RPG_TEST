@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include <raymath.h>
 
+
 //constants
 const int screenWidth = 800;
 const int screenHeight = 600;
@@ -100,5 +101,6 @@ void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y);
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y, float scale);
 void BattleUpdate();
 void BattleRender();
+
 
 #endif

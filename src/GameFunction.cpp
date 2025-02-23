@@ -7,6 +7,7 @@ Camera2D camera { 0 };
 bool battleMode = false;
 bool playerTurn = true; 
 bool playerDefending = false;
+
 Texture2D textures[MAX_TEXTURES];
 Sound sounds[MAX_SOUNDS];
 Music music[MAX_MUSIC];
@@ -344,10 +345,11 @@ void BattleUpdate() {
         player.isAlive = false;
         battleMode = false;
         PlaySound(sounds[SOUND_DEATH]);
+        //Continue
     }
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         //Attack 
-        if (CheckCollisionPointRec(mousePos, (Rectangle){120, 320, 150, 40}) && playerTurn) {
+        if (CheckCollisionPointRec(mousePos, (Rectangle){120, 500, 150, 40}) && playerTurn) {
             int damage = GetRandomValue(5, 15);
             orc.health -= damage;
             playerTurn = false;
@@ -355,12 +357,12 @@ void BattleUpdate() {
             PlaySound(sounds[SOUNDS_ATTACK]);
         }
         //Defend
-        else if (CheckCollisionPointRec(mousePos, (Rectangle){320, 320, 150, 40}) && playerTurn) {
+        else if (CheckCollisionPointRec(mousePos, (Rectangle){320, 500, 150, 40}) && playerTurn) {
             playerDefending = true;
             playerTurn = false;
         }
         //Run
-        else if (CheckCollisionPointRec(mousePos, (Rectangle){520, 320, 150, 40}) && playerTurn) {
+        else if (CheckCollisionPointRec(mousePos, (Rectangle){520, 500, 150, 40}) && playerTurn) {
             if (GetRandomValue(0, 1) == 1) {  
                 battleMode = false;
             }
@@ -376,25 +378,27 @@ void BattleUpdate() {
 }
 
 void BattleRender() {
-    DrawRectangle(100, 100, 600, 500, DARKGRAY);
-    DrawText("BATTLE!", 350, 120, 20, WHITE);
+    DrawRectangle(0, 0, screenWidth, screenHeight, DARKGRAY);
+    DrawText("BATTLE!", 350, 30, 20, WHITE);
 
-    DrawTile(400, 200, 5, 0, 5.0f);   //Player 
-    DrawTile(500, 200, 11, 0, 5.0f);  //Orc
+    Rectangle rec {40, 50, (screenWidth - 40) - 40, (screenHeight-50) - 150};
+    DrawRectangleLinesEx(rec, 4.5, BLACK);
 
-    DrawText(TextFormat("Orc HP: %d", orc.health), 120, 160, 20, RED);
-    DrawText(TextFormat("Player HP: %d", player.health), 120, 200, 20, GREEN);
+    DrawTile(200, 350, 5, 0, 10.0f);   //Player 
+    DrawTile(500, 350, 11, 0, 10.0f);  //Orc
+
+    DrawText(TextFormat("Orc HP: %d", orc.health), 480, 330, 20, RED);
+    DrawText(TextFormat("Player HP: %d", player.health), 180, 330, 20, GREEN);
 
     //Draw Buttons 
-    DrawRectangle(120, 320, 150, 40, LIGHTGRAY);
-    DrawRectangle(320, 320, 150, 40, LIGHTGRAY);
-    DrawRectangle(520, 320, 150, 40, LIGHTGRAY);
+    DrawRectangle(20, 470, 760, 300, BLACK);
+    DrawRectangle(120, 500, 150, 40, LIGHTGRAY);
+    DrawRectangle(320, 500, 150, 40, LIGHTGRAY);
+    DrawRectangle(520, 500, 150, 40, LIGHTGRAY);
 
-    DrawText("ATTACK", 150, 330, 20, BLACK);
-    DrawText("DEFEND", 350, 330, 20, BLACK);
-    DrawText("RUN", 570, 330, 20, BLACK);
+    DrawText("ATTACK", 150, 510, 20, BLACK);
+    DrawText("DEFEND", 350, 510, 20, BLACK);
+    DrawText("RUN", 570, 510, 20, BLACK);
 }
-
-
 
 

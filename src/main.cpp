@@ -1,4 +1,5 @@
 #include "GameFunctions.hpp"
+#include "GameMenu.hpp"
 
 
 int main(){
@@ -9,14 +10,25 @@ int main(){
 
     while(!WindowShouldClose()){
 
-        GameUpdate();
+            GameUpdate();
 
-        BeginDrawing();
-        ClearBackground(BLACK);
 
-        GameRender();
+            BeginDrawing();
 
-        EndDrawing();
+            if(inMenu)
+            {
+                GameMenu();
+            }
+
+            else{
+            
+                ClearBackground(BLACK);
+
+                GameRender();
+
+                EndDrawing();
+            }
+        
     }
 
     GameShutdown();
