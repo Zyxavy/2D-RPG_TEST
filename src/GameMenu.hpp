@@ -6,17 +6,20 @@
 
 //bools
 extern bool options;
-extern bool start_game;
 
 extern bool inMenu;
+extern bool isDead;
+extern bool inCharacterSelect;
 
 //buttons
-extern float button_width, button_height;
+extern float buttonWidth, buttonHeight;
 extern float button_x;
-extern float start_button_y;
-extern float options_button_y;
-extern float exit_button_y;
+extern float startButton_y;
+extern float optionsButton_y;
+extern float exitButton_y;
 
 void GameMenu();
+void DeathMenu();
+void CharacterSelect();
 
 #endif

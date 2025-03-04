@@ -1,5 +1,6 @@
 #include "GameFunctions.hpp"
 #include "GameMenu.hpp"
+#include "Entities.hpp"
 
 
 int main(){
@@ -13,12 +14,25 @@ int main(){
             GameUpdate();
 
 
-            BeginDrawing();
+            BeginDrawing();  
 
             if(inMenu)
             {
                 GameMenu();
             }
+
+            else if (inCharacterSelect)
+            {
+                CharacterSelect();
+            }
+
+           else if(isDead)
+            {
+
+                DeathMenu();
+
+            } 
+
 
             else{
             
@@ -27,6 +41,8 @@ int main(){
                 GameRender();
 
                 EndDrawing();
+
+              
             }
         
     }

@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 #include <raymath.h>
+#include <string>
 
 
 //constants
@@ -64,19 +65,6 @@ typedef enum
 
 } eZones;
 
-typedef struct 
-{
-    int x;
-    int y;
-    eZones zone;
-    bool isAlive;
-    bool isPassable;
-    int health;
-    int damage;
-    int money;
-    int experience;
-
-} sEntity;
 
 //externs
 extern Texture2D textures[MAX_TEXTURES];
@@ -85,11 +73,6 @@ extern Music music[MAX_MUSIC];
 extern sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
 extern Camera2D camera;
-extern sEntity player;
-extern sEntity dungeon_gate;
-extern sEntity orc;
-extern sEntity chest;
-
 
 //functions
 void GameStartup();
