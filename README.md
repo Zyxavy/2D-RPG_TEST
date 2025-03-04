@@ -4,15 +4,9 @@ Work In Progress
 
 still a bit messy but it works, I guess.
 
-<<<<<<< HEAD
+----
 2025
 
 Feb 23 - Added Menu, Fixed Battle UI
 Mar 4 - Added character selection, fixed some bugs, implemented entities
 
-=======
-____________
-2025
-_____________
-Feb 23 - Added Menu, Fixed Battle UI
->>>>>>> 13d0148350572c41dafd1c8e04b71fba08e37c79
