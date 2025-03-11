@@ -15,9 +15,15 @@ const int screenHeight = 600;
 #define TILE_WIDTH 8
 #define TILE_HEIGHT  8
 #define MAX_SOUNDS 5
-#define MAX_MUSIC 2
+#define MAX_MUSIC 9
 #define WORLD_WIDTH 25
 #define WORLD_HEIGHT 25
+
+#define WORLD_LEFT 0
+#define WORLD_RIGHT 24
+#define WORLD_TOP 0
+#define WORLD_BOTTOM 24
+
 
 //typedef & enums
 typedef enum 
@@ -37,7 +43,15 @@ typedef enum
 typedef enum 
 {
     MUSIC_LIGHT = 0,
+    MUSIC_LIGHT1,
+    MUSIC_LIGHT2,
     MUSIC_DARK,
+    MUSIC_DARK1,
+    MUSIC_DARK2,
+    MUSIC_ACTION,
+    MUSIC_ACTION1,
+    MUSIC_ACTION2,
+    
 } music_asset;
 
 typedef enum
@@ -84,6 +98,7 @@ void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y);
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y, float scale);
 void BattleUpdate();
 void BattleRender();
+bool IsBarrierCollision(int x, int y);
 
 
-#endif
+#endif // GAME_FUNCTIONS_HPP
