@@ -3,6 +3,7 @@
 #include "GameMenu.hpp"
 #include "Entities.hpp"
 #include <iostream>
+#include "MusicFunctions.hpp"
 
 
 sEntity chest = { 0 };
@@ -10,7 +11,6 @@ Camera2D camera { 0 };
 
 Texture2D textures[MAX_TEXTURES];
 Sound sounds[MAX_SOUNDS];
-Music music[MAX_MUSIC];
 sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
 
@@ -59,25 +59,17 @@ void GameStartup() {
     sounds[SOUND_DEATH]  = LoadSound("assets/death.wav");
     sounds[SOUND_COINS]  = LoadSound("assets/pickupCoin.wav");
 
-    music[MUSIC_LIGHT] = LoadMusicStream("assets/Light Ambience 3.wav");
-    music[MUSIC_LIGHT1] = LoadMusicStream("assets/Light Ambience 1.wav");
-    music[MUSIC_LIGHT2] = LoadMusicStream("assets/Light Ambience 5.wav");
-    music[MUSIC_DARK] = LoadMusicStream("assets/Dark Ambient 2.wav");
-    music[MUSIC_DARK1] = LoadMusicStream("assets/Dark Ambient 4.wav");
-    music[MUSIC_DARK2] = LoadMusicStream("assets/Dark Ambient 5.wav");
-    music[MUSIC_ACTION] = LoadMusicStream("assets/Action 1.wav");
-    music[MUSIC_ACTION1] = LoadMusicStream("assets/Action 2.wav");
-    music[MUSIC_ACTION2] = LoadMusicStream("assets/Action 3.wav");
-
-
-    
-    PlayMusicStream(music[MUSIC_LIGHT]);
+    LoadMusic();
 }
 
 void GameUpdate() {
 
-    if(player.zone == ZONE_WORLD) UpdateMusicStream(music[MUSIC_LIGHT]);
-    else if(player.zone == ZONE_DUNGEON) UpdateMusicStream(music[MUSIC_DARK]);
+    UpdateMusic();
+    if(player.zone == ZONE_WORLD && currentMusicZone != LIGHT) {PlayRandomMusic(LIGHT);}
+    else if(player.zone == ZONE_DUNGEON && currentMusicZone != DARK) {PlayRandomMusic(DARK);}
+    else if (player.zone == ZONE_BATTLE && currentMusicZone != ACTION){ PlayRandomMusic(ACTION);}
+
+
 
     if(battleMode)
     {
@@ -157,15 +149,11 @@ void GameUpdate() {
                 {
                     if(player.zone == ZONE_WORLD)
                     {
-                        player.zone = ZONE_DUNGEON;
-                        StopMusicStream(music[MUSIC_LIGHT]);
-                        PlayMusicStream(music[MUSIC_DARK]);
+                        player.zone = ZONE_DUNGEON; 
                     }
                     else if(player.zone == ZONE_DUNGEON)
                     {
                         player.zone = ZONE_WORLD;
-                        StopMusicStream(music[MUSIC_DARK]);
-                        PlayMusicStream(music[MUSIC_LIGHT]);
                     }
                 }
                 else if(player.x == chest.x &&
@@ -286,11 +274,8 @@ void GameShutdown() {
         UnloadSound(sounds[i]);
     }
 
-    for(int i = 0; i < MAX_MUSIC; i++){
-        StopMusicStream(music[i]);
-        UnloadMusicStream(music[i]);
-    }
-
+    StopCurrentMusic();
+    UnloadMusic();
     CloseAudioDevice();
     
 }
@@ -336,7 +321,5 @@ bool IsBarrierCollision(int x, int y)
 
     return false;
 }
-
-
 
 

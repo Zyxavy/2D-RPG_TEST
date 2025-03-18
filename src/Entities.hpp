@@ -5,6 +5,7 @@
 #include "GameFunctions.hpp"
 #include <string>
 
+//structs for player and enemy
 typedef struct 
 {
     int x;
@@ -41,13 +42,14 @@ typedef struct
 
 } sEnemy;
 
+//externs
 extern sEntity player;
 extern sEntity dungeon_gate;
 extern sEnemy orc;
 extern sEntity chest;
 extern sEntity Knight, Wizard, Rouge;
 
-
+//functions
 void EntitiesInit();
 void PlayerRender();
 

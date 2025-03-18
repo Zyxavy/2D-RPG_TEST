@@ -11,12 +11,15 @@ bool playerDefending = false;
 
 void BattleUpdate() {
     Vector2 mousePos = GetMousePosition();
+    player.zone = ZONE_BATTLE;
+
     if(orc.health <= 0) 
     {   
         orc.isAlive = false;
         battleMode = false;
         player.experience += orc.experience;
         PlaySound(sounds[SOUND_DEATH]);
+        player.zone = ZONE_DUNGEON;
 
         chest.x = orc.x;
             chest.y = orc.y;
@@ -29,10 +32,12 @@ void BattleUpdate() {
         battleMode = false;
         PlaySound(sounds[SOUND_DEATH]);
         isDead = true;
+        player.zone = ZONE_DUNGEON;
 
     
         //Continue
     }
+
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         //Attack 
         if (CheckCollisionPointRec(mousePos, (Rectangle){120, 500, 150, 40}) && playerTurn) {

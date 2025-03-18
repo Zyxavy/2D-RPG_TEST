@@ -1,7 +1,11 @@
 #include "GameMenu.hpp"
 #include "GameFunctions.hpp"
 #include "Entities.hpp"
+#include "MusicFunctions.hpp"
 #include <string>
+
+#define RAYGUI_IMPLEMENTATION
+#include <raygui.h>
 
 Rectangle
 		startButton = { button_x, startButton_y, buttonWidth, buttonHeight },
@@ -13,69 +17,69 @@ Rectangle
 		exitButton_lines = { button_x - 5, exitButton_y - 5, buttonWidth + 10, buttonHeight + 10 };
 
 
-
 float buttonWidth = 50, buttonHeight = 25;
 float button_x = 200;
 float startButton_y = 250;
 float optionsButton_y = 350;
 float exitButton_y = 450;
 
-
+bool inOptions = false;
 bool inMenu = true;
 bool isDead = false;
 bool inCharacterSelect = false;
 
 void GameMenu()
 {
-    //collisions
-    Vector2 mousePos = GetMousePosition();
+  //collisions
+  Vector2 mousePos = GetMousePosition();
 
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        //Start 
-        if (CheckCollisionPointRec(mousePos, startButton)) {
-           inMenu = false;
-           inCharacterSelect = true;
-        }
-        //Options
-        else if (CheckCollisionPointRec(mousePos, optionsButton)) {
-           //WIP
-        }
-        //Exit
-        else if (CheckCollisionPointRec(mousePos, exitButton) ) {
-            exit(0);
-        }
-    } else
-    {
-        //start
-        if (CheckCollisionPointRec(mousePos, startButton)) {
-            DrawRectangle(button_x, startButton_y, buttonWidth , buttonHeight, WHITE);
-         }
-         //Options
-         else if (CheckCollisionPointRec(mousePos, optionsButton)) {
-            DrawRectangle(button_x, optionsButton_y, buttonWidth , buttonHeight, WHITE);
-         }
-         //Exit
-         else if (CheckCollisionPointRec(mousePos, exitButton) ) {
-            DrawRectangle(button_x, exitButton_y, buttonWidth , buttonHeight, WHITE);
-         }
-    }
+  if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+      //Start 
+      if (CheckCollisionPointRec(mousePos, startButton)) {
+         inMenu = false;
+         inCharacterSelect = true;
+      }
+      //Options
+      else if (CheckCollisionPointRec(mousePos, optionsButton)) {
+         inOptions = true;
+         inMenu = false;
+      }
+      //Exit
+      else if (CheckCollisionPointRec(mousePos, exitButton) ) {
+          exit(0);
+      }
+  } else
+  {
+      //start
+      if (CheckCollisionPointRec(mousePos, startButton)) {
+          DrawRectangle(button_x, startButton_y, buttonWidth , buttonHeight, WHITE);
+       }
+       //Options
+       else if (CheckCollisionPointRec(mousePos, optionsButton)) {
+          DrawRectangle(button_x, optionsButton_y, buttonWidth , buttonHeight, WHITE);
+       }
+       //Exit
+       else if (CheckCollisionPointRec(mousePos, exitButton) ) {
+          DrawRectangle(button_x, exitButton_y, buttonWidth , buttonHeight, WHITE);
+       }
+  }
 
-    //shapes
-    ClearBackground(Color{ 50, 80, 110, 255 });
-	DrawRectangleLinesEx(startButton_lines, 5, BLACK);
-	DrawRectangleLinesEx(optionsButton_lines, 5, BLACK);
-	DrawRectangleLinesEx(exitButton_lines, 5, BLACK);
+  //shapes
+  ClearBackground(Color{ 50, 80, 110, 255 });
+ DrawRectangleLinesEx(startButton_lines, 5, BLACK);
+ DrawRectangleLinesEx(optionsButton_lines, 5, BLACK);
+ DrawRectangleLinesEx(exitButton_lines, 5, BLACK);
 
-	DrawText("2D RPG",  (screenWidth / 2) - 70, 100 , 50, BLACK);
-	DrawText("Start game",button_x + 70, startButton_y + 7 , 25, BLACK);
-	DrawText("Options", button_x + 70, optionsButton_y + 7 , 25, BLACK);
-	DrawText("Exit game",  button_x + 70, exitButton_y + 7 , 25, BLACK);
-	EndDrawing();
+ DrawText("2D RPG",  (screenWidth / 2) - 70, 100 , 50, BLACK);
+ DrawText("Start game",button_x + 70, startButton_y + 7 , 25, BLACK);
+ DrawText("Options", button_x + 70, optionsButton_y + 7 , 25, BLACK);
+ DrawText("Exit game",  button_x + 70, exitButton_y + 7 , 25, BLACK);
+ EndDrawing();
 }
 
 void DeathMenu(){
-    //collisions
-    Vector2 mousePos = GetMousePosition();
+
+   Vector2 mousePos = GetMousePosition();
 
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         //Start 
@@ -90,7 +94,13 @@ void DeathMenu(){
         }
         //Options
         else if (CheckCollisionPointRec(mousePos, optionsButton)) {
-           //WIP
+           inOptions = true;
+           isDead = false;
+           orc.isAlive = true;
+           orc.health = 100;
+           player.isAlive = true;
+           player.zone = ZONE_WORLD;
+           player.health = 100;
         }
         //Exit
         else if (CheckCollisionPointRec(mousePos, exitButton) ) {
@@ -203,7 +213,7 @@ void CharacterSelect()
     }
 
     //shapes
-   ClearBackground(Color{ 100, 50, 110, 255 });
+   ClearBackground(Color{ 50, 80, 110, 255 });
 	DrawRectangleLinesEx(knightButton_lines, 5, BLACK);
 	DrawRectangleLinesEx(wizardButton_lines, 5, BLACK);
 	DrawRectangleLinesEx(rougeButton_lines, 5, BLACK);
@@ -219,4 +229,54 @@ void CharacterSelect()
 	EndDrawing();
 }
 
+void OptionsMenu()
+{
+   Vector2 mousePos = GetMousePosition();
+   Rectangle backButton = { 50, 50, 180, 50 };
+   ClearBackground(Color{ 50, 80, 110, 255 });
 
+   DrawRectangle(backButton.x, backButton.y, backButton.width, backButton.height, GRAY);
+
+
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        //Start 
+        if (CheckCollisionPointRec(mousePos, backButton)) {
+            inOptions = false;
+            inMenu = true;   
+        }
+    } else
+    {
+        //start
+        if (CheckCollisionPointRec(mousePos, backButton)) {
+            DrawRectangle(backButton.x, backButton.y, backButton.width , backButton.height, WHITE);
+         }
+    }
+	
+   //sliders for volume
+   if(GuiSliderBar((Rectangle){ 600, 40, 150, 40}, "Master Volume", TextFormat("%.2f", masterVolume), &masterVolume, 0.0f, 1.0f))
+   {
+      UpdateAudioVolumes();
+   }
+
+   if(GuiSliderBar((Rectangle){ 600, 100, 150, 40}, "Music Volume", TextFormat("%.2f", musicVolume), &musicVolume, 0.0f, 1.0f))
+   {
+      for(int i = 0; i < MAX_LIGHT_MUSIC; i++)
+      {
+         SetMusicVolume(musicLight[i], musicVolume);
+         SetMusicVolume(musicDark[i], musicVolume);
+         SetMusicVolume(musicAction[i], musicVolume);
+      }
+   }
+
+   if(GuiSliderBar((Rectangle){ 600, 160, 160, 40}, "SoundFX Volume", TextFormat("%.2f", soundFXVolume), &soundFXVolume, 0.0f, 1.0f))
+   {
+      for(int i = 0; i < MAX_SOUNDS; i++)
+      {
+        SetSoundVolume(sounds[i], soundFXVolume);
+      }
+   }
+
+   DrawText("Back to Menu", backButton.x, backButton.y, 25, BLACK);
+
+	EndDrawing();
+}

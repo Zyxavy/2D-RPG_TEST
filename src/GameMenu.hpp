@@ -5,8 +5,7 @@
 #include <raymath.h>
 
 //bools
-extern bool options;
-
+extern bool inOptions;
 extern bool inMenu;
 extern bool isDead;
 extern bool inCharacterSelect;
@@ -18,8 +17,13 @@ extern float startButton_y;
 extern float optionsButton_y;
 extern float exitButton_y;
 
+//functionjs
 void GameMenu();
 void DeathMenu();
 void CharacterSelect();
+void OptionsMenu();
+
+
+
 
 #endif

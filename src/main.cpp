@@ -3,6 +3,7 @@
 #include "Entities.hpp"
 
 
+
 int main(){
     InitWindow(screenWidth, screenHeight, "2D RPG");
     SetTargetFPS(60);
@@ -12,8 +13,7 @@ int main(){
     while(!WindowShouldClose()){
 
             GameUpdate();
-
-
+            
             BeginDrawing();  
 
             if(inMenu)
@@ -24,6 +24,11 @@ int main(){
             else if (inCharacterSelect)
             {
                 CharacterSelect();
+            }
+
+            else if(inOptions)
+            {
+                OptionsMenu();
             }
 
            else if(isDead)
