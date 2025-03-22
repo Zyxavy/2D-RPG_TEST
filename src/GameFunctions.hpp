@@ -74,6 +74,7 @@ extern Sound sounds[MAX_SOUNDS];
 extern sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
 extern Camera2D camera;
+extern bool isInventory;
 
 //functions
 void GameStartup();
@@ -84,6 +85,7 @@ void GameShutdown();
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y);
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y, float scale);
 bool IsBarrierCollision(int x, int y);
+void Inventory();
 
 
 #endif // GAME_FUNCTIONS_HPP

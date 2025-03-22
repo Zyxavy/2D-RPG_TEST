@@ -13,8 +13,7 @@ Texture2D textures[MAX_TEXTURES];
 Sound sounds[MAX_SOUNDS];
 sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
-
-
+bool isInventory = false;
 
 void GameStartup() {
 
@@ -69,11 +68,13 @@ void GameUpdate() {
     else if(player.zone == ZONE_DUNGEON && currentMusicZone != DARK) {PlayRandomMusic(DARK);}
     else if (player.zone == ZONE_BATTLE && currentMusicZone != ACTION){ PlayRandomMusic(ACTION);}
 
-
-
     if(battleMode)
     {
         BattleUpdate();
+    }
+    else if(isInventory)
+    {
+        if(IsKeyPressed(KEY_Q)) {isInventory = false;}
     }
     else
     {
@@ -164,6 +165,10 @@ void GameUpdate() {
                     PlaySound(sounds[SOUND_COINS]);
                     }
         }
+        else if(IsKeyPressed(KEY_Q))
+        {
+            if(isInventory == false) {isInventory = true;}
+        }
     
     }
 
@@ -174,6 +179,10 @@ void GameRender() {
     if(battleMode)
     {
         BattleRender();
+    }
+    else if(isInventory)
+    {
+        Inventory();
     }
     else{
         BeginMode2D(camera);
@@ -259,8 +268,8 @@ void GameRender() {
         DrawText(TextFormat("Arrow Keys to move "), 180, 30, 15, WHITE);
         DrawText(TextFormat("Press E to interact"), 180, 50, 15, WHITE);
         DrawText(TextFormat("Mouse Wheel to zoom"), 180, 70, 15, WHITE);
+        DrawText(TextFormat("Press Q to Open Invetory"), 140, 90, 15, WHITE);
 
-        if(orc.isAlive) DrawText(TextFormat("Orc Health: %d", orc.health), 15, 90, 14, WHITE);
     }
 }
 
@@ -322,4 +331,31 @@ bool IsBarrierCollision(int x, int y)
     return false;
 }
 
+void Inventory()
+{
+    Vector2 mousePos = GetMousePosition();
 
+    Rectangle outer {20, 20, 760, 560};
+    Rectangle inner {40, 40, 720, 520};
+    Rectangle header {300, 40, 250, 50};
+    Rectangle exitButton {20, 20, 50, 50};
+
+    DrawRectangleRounded(outer, 0.2, 2, GRAY);
+    DrawRectangleRounded(inner, 0.2, 2, LIGHTGRAY);
+    DrawRectangleRounded(header, 0.1, 1, BLACK);
+    DrawRectangleRounded(exitButton, 0.2, 4, WHITE);
+
+    DrawText("INVENTORY", 320, 45, 30, WHITE); // header
+    DrawText("X", 28, 22, 46, BLACK); // exit Buttoon
+
+    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        if(CheckCollisionPointRec(mousePos, exitButton))
+        {
+            isInventory = false;
+        }
+    }
+
+
+
+}

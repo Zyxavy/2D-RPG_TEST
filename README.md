@@ -14,4 +14,6 @@ Mar 4 - Added character selection| fixed some bugs| implemented entities
 Mar 11 - Added Barriers| imported more music.
 <br>
 Mar 18 - Added more music| implemented MusicFunctions.cpp & hpp | implemented slider for audio adjustments.
+<br>
+Mar 23 - Inventory Gui -WIP-
 

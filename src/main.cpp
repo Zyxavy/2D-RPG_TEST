@@ -2,8 +2,6 @@
 #include "GameMenu.hpp"
 #include "Entities.hpp"
 
-
-
 int main(){
     InitWindow(screenWidth, screenHeight, "2D RPG");
     SetTargetFPS(60);
