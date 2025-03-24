@@ -15,6 +15,7 @@ sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
 bool isInventory = false;
 
+
 void GameStartup() {
 
     InitAudioDevice();
@@ -120,29 +121,28 @@ void GameUpdate() {
             if(camera.zoom > 9.0f) camera.zoom = 9.0f;
         }
 
-        //CHECK BATTLE
+        //CHECK Contact with orc
         if (player.zone == orc.zone && orc.x == x && orc.y == y && orc.isAlive) {
+            enemy = orc;
             battleMode = true;
+            
         }
-            
-            else
+
+        else
+        {
+            if(hasKeyPressed) 
             {
+                if(player.zone == ZONE_WORLD) PlaySound(sounds[SOUND_FOOT_GRASS]);
+                else if (player.zone == ZONE_DUNGEON) PlaySound(sounds[SOUND_FOOT_STONE]);
 
-                if(hasKeyPressed) 
-                {
-                    if(player.zone == ZONE_WORLD) PlaySound(sounds[SOUND_FOOT_GRASS]);
-                    else if (player.zone == ZONE_DUNGEON) PlaySound(sounds[SOUND_FOOT_STONE]);
-
-                }
-                player.x = x;
-                player.y = y;
-            
-                camera.target = (Vector2) {(float)player.x, (float)player.y};
             }
+            player.x = x;
+            player.y = y;
+            
+            camera.target = (Vector2) {(float)player.x, (float)player.y};
+        }
 
-        
-
-
+    
         if(IsKeyPressed(KEY_E))
         {
             if(player.x == dungeon_gate.x &&
@@ -157,8 +157,7 @@ void GameUpdate() {
                         player.zone = ZONE_WORLD;
                     }
                 }
-                else if(player.x == chest.x &&
-                    player.y == chest.y)
+                else if(player.x == chest.x && player.y == chest.y && chest.isAlive)
                     {
                     player.money += chest.money;
                     chest.isAlive = false;
@@ -245,15 +244,9 @@ void GameRender() {
         DrawTile(dungeon_gate.x, dungeon_gate.y, 8, 9); 
 
         // orc
-        if(orc.zone == player.zone)
-        {
-            if(orc.isAlive == true) DrawTile(orc.x, orc.y, 11, 0);
-
-            //Draw chest
-            if(chest.isAlive) { DrawTile(chest.x, chest.y, 9 ,3);}
-        }
+        EnemyRender();
         // player
-       PlayerRender();
+        PlayerRender();
 
 
         EndMode2D();
@@ -337,16 +330,39 @@ void Inventory()
 
     Rectangle outer {20, 20, 760, 560};
     Rectangle inner {40, 40, 720, 520};
-    Rectangle header {300, 40, 250, 50};
+    Rectangle header {270, 20, 250, 50};
     Rectangle exitButton {20, 20, 50, 50};
+    Rectangle charBorder {530, 60, 220, 500};
+    Rectangle health{ 535, 275, 25, 25};
+    Rectangle defense{ 650, 280, 25, 25};
+    Rectangle damage{ 535, 340, 25, 25};
+    
 
     DrawRectangleRounded(outer, 0.2, 2, GRAY);
     DrawRectangleRounded(inner, 0.2, 2, LIGHTGRAY);
     DrawRectangleRounded(header, 0.1, 1, BLACK);
     DrawRectangleRounded(exitButton, 0.2, 4, WHITE);
 
-    DrawText("INVENTORY", 320, 45, 30, WHITE); // header
+    DrawRectangleLinesEx(charBorder, 4, BLACK);
+
+    DrawText("INVENTORY", 300, 25, 30, WHITE); // header
     DrawText("X", 28, 22, 46, BLACK); // exit Buttoon
+    
+    if(player.name == Knight.name)  DrawTile(560, 80, 6, 0, 20.0f);
+    else if(player.name == Wizard.name)  DrawTile(560, 80, 9, 0, 20.0f); 
+    else if(player.name == Rouge.name)  DrawTile(560, 80, 8, 0, 20.0f);
+
+    DrawText(TextFormat("Type: %s ", player.type.c_str()), 535, 240, 20, BLACK);
+
+    DrawText(TextFormat("%d", player.health), 580, 290, 25, BLACK );
+    DrawTile(535, 280, 6, 6, 5.0f);
+
+    DrawText(TextFormat("%d", player.defense), 700, 290, 25, BLACK );
+    DrawTile(650, 280, 9, 6, 5.0f);
+
+    DrawText(TextFormat("Avg: %d", (player.damageMax + player.damageMin) / 2), 580, 340, 25, BLACK );
+    DrawTile(535, 330, 6, 4, 5.0f);
+    
 
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
@@ -355,6 +371,27 @@ void Inventory()
             isInventory = false;
         }
     }
+
+    if(CheckCollisionPointRec(mousePos, health))
+    {
+        DrawRectangle(500, 290, 200, 200, BLACK);
+        DrawText(TextFormat("Current health: %d", player.health), 510, 300, 18, WHITE );
+        DrawText(TextFormat("Max health: %d", player.maxHealth), 510, 320, 18, WHITE );
+        DrawText(TextFormat("The amount of hits a \nHero can recieve"), 510, 345, 18, WHITE );
+    } 
+    else if (CheckCollisionPointRec(mousePos, defense))
+    {
+        DrawRectangle(550, 290, 200, 200, BLACK);
+        DrawText(TextFormat("%d damage is reduced \nfrom enemy attacks", player.defense), 555, 300, 18, WHITE );
+    }
+    else if (CheckCollisionPointRec(mousePos, damage))
+    {
+        DrawRectangle(500, 300, 220, 200, BLACK);
+        DrawText(TextFormat("Minimun Attack damage: %d", player.damageMin ), 510, 310, 15, WHITE );
+        DrawText(TextFormat("Maximum Attack damage: %d", player.damageMax ), 510, 330, 15, WHITE );
+        DrawText(TextFormat("The hero deals %d - %d \namount of damage \ndepending on RNG", player.damageMin, player.damageMax), 510, 370, 18, WHITE );
+    }
+    
 
 
 

@@ -10,46 +10,32 @@ int main(){
 
     while(!WindowShouldClose()){
 
-            GameUpdate();
+            GameUpdate();     
+            BeginDrawing() ;  
             
-            BeginDrawing();  
-
             if(inMenu)
             {
                 GameMenu();
             }
-
             else if (inCharacterSelect)
             {
                 CharacterSelect();
             }
-
             else if(inOptions)
             {
                 OptionsMenu();
             }
-
            else if(isDead)
             {
-
                 DeathMenu();
-
             } 
-
-
             else{
             
                 ClearBackground(BLACK);
-
                 GameRender();
-
                 EndDrawing();
-
-              
             }
-        
     }
-
     GameShutdown();
     return 0;
 }

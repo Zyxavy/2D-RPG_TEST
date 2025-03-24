@@ -13,18 +13,20 @@ void BattleUpdate() {
     Vector2 mousePos = GetMousePosition();
     player.zone = ZONE_BATTLE;
 
-    if(orc.health <= 0) 
+    if(enemy.health <= 0) 
     {   
-        orc.isAlive = false;
+        orc.isAlive = false; // WIP
         battleMode = false;
-        player.experience += orc.experience;
+        player.experience += enemy.experience;
         PlaySound(sounds[SOUND_DEATH]);
         player.zone = ZONE_DUNGEON;
+        PlayerLevelUp();
+        
 
-        chest.x = orc.x;
-            chest.y = orc.y;
-            chest.isAlive = true;
-            chest.money = GetRandomValue(23, 205);
+        chest.x = enemy.x;
+        chest.y = enemy.y;
+        chest.isAlive = true;
+        chest.money = GetRandomValue(23, 205);
     } 
     else if(player.health <= 0)
     {
@@ -41,10 +43,10 @@ void BattleUpdate() {
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         //Attack 
         if (CheckCollisionPointRec(mousePos, (Rectangle){120, 500, 150, 40}) && playerTurn) {
-            int damage = GetRandomValue(player.damageMin, player.damageMax) - orc.defense;
-            if(orc.weakness == player.type) damage *= 2;
+            int damage = GetRandomValue(player.damageMin, player.damageMax) - enemy.defense;
+            if(enemy.weakness == player.type) damage *= 2;
             if(damage <= 0) damage = 1;
-            orc.health -= damage;
+            enemy.health -= damage;
             playerTurn = false;
             playerDefending = false;
             PlaySound(sounds[SOUNDS_ATTACK]);
@@ -62,11 +64,11 @@ void BattleUpdate() {
             playerTurn = false;
         }
     }
-    if (!playerTurn && orc.health > 0) {
-        int orcDamage = GetRandomValue(orc.damageMin, orc.damageMax) -  player.defense;
-        if (playerDefending) orcDamage /= 2;
-        if(orcDamage <= 0) orcDamage = 1;
-        player.health -= orcDamage;
+    if (!playerTurn && enemy.health > 0) {
+        int enemyDamage = GetRandomValue(enemy.damageMin, enemy.damageMax) -  player.defense;
+        if (playerDefending) enemyDamage /= 2;
+        if(enemyDamage <= 0) enemyDamage = 1;
+        player.health -= enemyDamage;
         playerTurn = true;
     } 
 }
@@ -78,14 +80,15 @@ void BattleRender() {
     Rectangle rec {40, 50, (screenWidth - 40) - 40, (screenHeight-50) - 150};
     DrawRectangleLinesEx(rec, 4.5, BLACK);
 
-
+    //Player
     if(player.name == Knight.name)  DrawTile(200, 350, 6, 0, 10.0f);
     else if(player.name == Wizard.name)  DrawTile(200, 350, 9, 0, 10.0f); 
     else if(player.name == Rouge.name)  DrawTile(200, 350, 8, 0, 10.0f); 
     
-    DrawTile(500, 350, 11, 0, 10.0f);  //Orc
+    //Enemy
+    DrawTile(500, 350, 11, 0, 10.0f);  
 
-    DrawText(TextFormat("Orc HP: %d", orc.health), 480, 330, 20, RED);
+    DrawText(TextFormat("%s HP: %d", enemy.name.c_str(), enemy.health), 480, 330, 20, RED);
     DrawText(TextFormat("%s HP: %d", player.name.c_str(), player.health), 180, 330, 20, GREEN);
 
     //Draw Buttons 
