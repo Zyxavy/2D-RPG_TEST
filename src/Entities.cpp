@@ -1,14 +1,24 @@
 #include "Entities.hpp"
 #include "GameFunctions.hpp"
+#include "Enemy.hpp"
 #include <raylib.h>
 #include <iostream>
 
 
 sEntity player, dungeon_gate;
-sEnemy enemy, orc;
 sEntity Knight, Wizard, Rouge;
 int levelCap = 100;
 bool playerLeveledUp = false;
+
+Enemy orc(
+    "Orc",
+    TILE_WIDTH * 5, TILE_HEIGHT * 5,
+    100, ZONE_DUNGEON, 25, 30, 12,
+    GetRandomValue(10, 100),
+    1, "Intelligence"
+);
+
+Enemy enemy = orc;
 
 void EntitiesInit() { 
 
@@ -30,23 +40,6 @@ void EntitiesInit() {
         .type = " ",
     };
 
-    //default states
-    enemy = (sEnemy) {
-        .x = TILE_WIDTH * 5,
-        .y = TILE_HEIGHT * 5,
-        .zone = ZONE_DUNGEON,
-        .isAlive = true,
-        .isPassable = false,
-        .health = 100,
-        .maxHealth = 100,
-        .damageMin = 25,
-        .damageMax = 30,
-        .defense = 13, 
-        .experience = GetRandomValue(10,100),
-        .level = 1,
-        .name = "enemy",
-        .weakness = "",
-    };
 ////
     Knight = (sEntity) {
         .x = TILE_WIDTH * 3,
@@ -106,22 +99,7 @@ void EntitiesInit() {
         .zone = ZONE_ALL,
     };
 
-    orc = (sEnemy) {
-        .x = TILE_WIDTH * 5,
-        .y = TILE_HEIGHT * 5,
-        .zone = ZONE_DUNGEON,
-        .isAlive = true,
-        .isPassable = false,
-        .health = 100,
-        .maxHealth = 100,
-        .damageMin = 25,
-        .damageMax = 30,
-        .defense = 13, 
-        .experience = GetRandomValue(10,100),
-        .level = 1,
-        .name = "Orc",
-        .weakness = "Intelligence",
-    };
+
 
 }
 
@@ -134,13 +112,12 @@ void PlayerRender()
 
 void EnemyRender()
 {
-    if(orc.zone == player.zone)
-        {
-            if(orc.isAlive == true) DrawTile(orc.x, orc.y, 11, 0);
-
-            //Draw chest
-            if(chest.isAlive) { DrawTile(chest.x, chest.y, 9 ,3);}
-        }
+    if(orc.GetZone() == player.zone)
+    {
+        if(orc.IsAlive()) DrawTile(orc.GetX(), orc.GetY(), 11, 0); 
+        //Draw chest
+        if(chest.isAlive) { DrawTile(chest.x, chest.y, 9 ,3);}
+    }
 }
 
 void PlayerLevelUp()
@@ -157,3 +134,4 @@ void PlayerLevelUp()
         levelCap += 100;
     }
 }
+

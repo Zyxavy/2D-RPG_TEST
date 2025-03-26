@@ -4,6 +4,7 @@
 #include "Entities.hpp"
 #include <iostream>
 #include "MusicFunctions.hpp"
+#include "Enemy.hpp"
 
 
 sEntity chest = { 0 };
@@ -113,6 +114,11 @@ void GameUpdate() {
             }
         }
 
+        if (hasKeyPressed) {
+            orc.MoveAI(player.x, player.y);
+        }
+        
+
         float wheel = GetMouseWheelMove();
         if(wheel != 0) { 
             const float zoomIncrement = 0.125f;
@@ -122,10 +128,9 @@ void GameUpdate() {
         }
 
         //CHECK Contact with orc
-        if (player.zone == orc.zone && orc.x == x && orc.y == y && orc.isAlive) {
-            enemy = orc;
+        if (player.zone == orc.GetZone() && player.x == orc.GetX() && player.y == orc.GetY() && orc.IsAlive()) {
+            enemy = Enemy(orc); 
             battleMode = true;
-            
         }
 
         else

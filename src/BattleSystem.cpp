@@ -2,6 +2,7 @@
 #include "GameFunctions.hpp"
 #include "GameMenu.hpp"
 #include "Entities.hpp"
+#include "Enemy.hpp"
 #include "raylib.h"
 #include <iostream>
 
@@ -13,18 +14,18 @@ void BattleUpdate() {
     Vector2 mousePos = GetMousePosition();
     player.zone = ZONE_BATTLE;
 
-    if(enemy.health <= 0) 
-    {   
-        orc.isAlive = false; // WIP
-        battleMode = false;
-        player.experience += enemy.experience;
+    if (enemy.GetHealth() <= 0)  
+    {
+    orc.SetAlive(false); 
+    battleMode = false;
+    player.experience += enemy.GetExperience(); 
         PlaySound(sounds[SOUND_DEATH]);
         player.zone = ZONE_DUNGEON;
         PlayerLevelUp();
         
 
-        chest.x = enemy.x;
-        chest.y = enemy.y;
+        chest.x = enemy.GetX();
+        chest.y = enemy.GetY();
         chest.isAlive = true;
         chest.money = GetRandomValue(23, 205);
     } 
@@ -43,10 +44,10 @@ void BattleUpdate() {
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         //Attack 
         if (CheckCollisionPointRec(mousePos, (Rectangle){120, 500, 150, 40}) && playerTurn) {
-            int damage = GetRandomValue(player.damageMin, player.damageMax) - enemy.defense;
-            if(enemy.weakness == player.type) damage *= 2;
+            int damage = GetRandomValue(player.damageMin, player.damageMax) - enemy.GetDefense();  
+            if (enemy.GetWeakness() == player.type) damage *= 2;  
             if(damage <= 0) damage = 1;
-            enemy.health -= damage;
+            enemy.TakeDamage(damage); 
             playerTurn = false;
             playerDefending = false;
             PlaySound(sounds[SOUNDS_ATTACK]);
@@ -64,8 +65,8 @@ void BattleUpdate() {
             playerTurn = false;
         }
     }
-    if (!playerTurn && enemy.health > 0) {
-        int enemyDamage = GetRandomValue(enemy.damageMin, enemy.damageMax) -  player.defense;
+    if (!playerTurn && enemy.GetHealth() > 0) {
+        int enemyDamage = GetRandomValue(enemy.GetDamageMin(), enemy.GetDamageMax()) -  player.defense;
         if (playerDefending) enemyDamage /= 2;
         if(enemyDamage <= 0) enemyDamage = 1;
         player.health -= enemyDamage;
@@ -88,7 +89,7 @@ void BattleRender() {
     //Enemy
     DrawTile(500, 350, 11, 0, 10.0f);  
 
-    DrawText(TextFormat("%s HP: %d", enemy.name.c_str(), enemy.health), 480, 330, 20, RED);
+    DrawText(TextFormat("%s HP: %d", enemy.GetName().c_str(), enemy.GetHealth()), 480, 330, 20, RED);
     DrawText(TextFormat("%s HP: %d", player.name.c_str(), player.health), 180, 330, 20, GREEN);
 
     //Draw Buttons 

@@ -2,6 +2,7 @@
 #include "GameFunctions.hpp"
 #include "Entities.hpp"
 #include "MusicFunctions.hpp"
+#include "Enemy.hpp"
 #include <string>
 
 #define RAYGUI_IMPLEMENTATION
@@ -85,8 +86,8 @@ void DeathMenu(){
         //Start 
         if (CheckCollisionPointRec(mousePos, startButton)) {
            isDead = false;
-           orc.isAlive = true;
-           orc.health = 100;
+           orc.SetAlive(true);
+           orc.SetHealth(100);
            player.isAlive = true;
            player.zone = ZONE_WORLD;
            player.health = 100;
@@ -96,8 +97,8 @@ void DeathMenu(){
         else if (CheckCollisionPointRec(mousePos, optionsButton)) {
            inOptions = true;
            isDead = false;
-           orc.isAlive = true;
-           orc.health = 100;
+           orc.SetAlive(true);
+           orc.SetHealth(100);
            player.isAlive = true;
            player.zone = ZONE_WORLD;
            player.health = 100;

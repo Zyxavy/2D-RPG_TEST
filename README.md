@@ -16,4 +16,5 @@ Mar 11 - Added Barriers| imported more music.
 Mar 18 - Added more music| implemented MusicFunctions.cpp & hpp | implemented slider for audio adjustments.
 <br>
 Mar 23 - Inventory Gui -WIP-
-
+<br>
+Mar 26 - Replaced Enemy struct with Enemy class, Added movement to the enemy, if player is within range the enemy will chase, else it will wander.
