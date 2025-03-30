@@ -10,15 +10,25 @@ sEntity Knight, Wizard, Rouge;
 int levelCap = 100;
 bool playerLeveledUp = false;
 
+
 Enemy orc(
     "Orc",
     TILE_WIDTH * 5, TILE_HEIGHT * 5,
-    100, ZONE_DUNGEON, 25, 30, 12,
+    130, ZONE_DUNGEON, 25, 30, 12,
     GetRandomValue(10, 100),
     1, "Intelligence"
 );
 
+Enemy wanderingEye(
+    "Wandering Eye",
+    TILE_WIDTH * 10, TILE_HEIGHT * 20,
+    100, ZONE_WORLD, 20, 45, 8,
+    GetRandomValue(30, 120),
+    1, "Strenght"
+);
+
 Enemy enemy = orc;
+
 
 void EntitiesInit() { 
 
@@ -36,6 +46,7 @@ void EntitiesInit() {
         .defense = 4, 
         .money = 1000,
         .experience = 0,
+        .level = 1,
         .name = "Player",
         .type = " ",
     };
@@ -54,6 +65,7 @@ void EntitiesInit() {
         .defense = 17,
         .money = 1000,
         .experience = 0,
+        .level = 1,
         .name = "Knight", 
         .type = "Strength",
     };
@@ -71,6 +83,7 @@ void EntitiesInit() {
         .defense = 13,
         .money = 1000,
         .experience = 0, 
+        .level = 1,
         .name = "Wizard",
         .type = "Intelligence", 
     };
@@ -99,7 +112,7 @@ void EntitiesInit() {
         .zone = ZONE_ALL,
     };
 
-
+    player.zone = ZONE_WORLD;
 
 }
 
@@ -114,7 +127,14 @@ void EnemyRender()
 {
     if(orc.GetZone() == player.zone)
     {
-        if(orc.IsAlive()) DrawTile(orc.GetX(), orc.GetY(), 11, 0); 
+        if(orc.IsAlive() == true) DrawTile(orc.GetX(), orc.GetY(), 11, 0); 
+        //Draw chest
+        if(chest.isAlive) { DrawTile(chest.x, chest.y, 9 ,3);}
+    }
+
+    if(wanderingEye.GetZone() == player.zone)
+    {
+        if(wanderingEye.IsAlive() == true) DrawTile(wanderingEye.GetX(), wanderingEye.GetY(), 13, 0); 
         //Draw chest
         if(chest.isAlive) { DrawTile(chest.x, chest.y, 9 ,3);}
     }

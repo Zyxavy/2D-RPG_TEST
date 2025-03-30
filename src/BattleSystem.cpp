@@ -10,24 +10,47 @@ bool battleMode = false;
 bool playerTurn = true;
 bool playerDefending = false;
 
-void BattleUpdate() {
+void BattleUpdate(Enemy &enemy) {
+
     Vector2 mousePos = GetMousePosition();
     player.zone = ZONE_BATTLE;
 
     if (enemy.GetHealth() <= 0)  
     {
-    orc.SetAlive(false); 
-    battleMode = false;
-    player.experience += enemy.GetExperience(); 
+        enemy.SetAlive(false); 
+        battleMode = false;
+        player.experience += enemy.GetExperience(); 
         PlaySound(sounds[SOUND_DEATH]);
-        player.zone = ZONE_DUNGEON;
+
+        player.zone = enemy.GetZone();
+
+        player.x = enemy.GetX() + TILE_WIDTH;
+        
+        if (enemy.GetName() == "Orc") {
+            orc.SetAlive(false);
+        } else if (enemy.GetName() == "Wandering Eye") {
+            wanderingEye.SetAlive(false);
+        }
+
+        if (IsBarrierCollision(player.x, player.y)) {
+            player.x = enemy.GetX() - TILE_WIDTH;  
+            if (IsBarrierCollision(player.x, player.y)) {
+                player.x = enemy.GetX();  
+                player.y = enemy.GetY() + TILE_HEIGHT;  
+                if (IsBarrierCollision(player.x, player.y)) {
+                    player.y = enemy.GetY() - TILE_HEIGHT;  
+                }
+            }
+    }
+
         PlayerLevelUp();
         
-
         chest.x = enemy.GetX();
         chest.y = enemy.GetY();
         chest.isAlive = true;
         chest.money = GetRandomValue(23, 205);
+        return;
+
     } 
     else if(player.health <= 0)
     {
@@ -35,7 +58,7 @@ void BattleUpdate() {
         battleMode = false;
         PlaySound(sounds[SOUND_DEATH]);
         isDead = true;
-        player.zone = ZONE_DUNGEON;
+        player.zone = enemy.GetZone();
 
     
         //Continue
@@ -48,6 +71,7 @@ void BattleUpdate() {
             if (enemy.GetWeakness() == player.type) damage *= 2;  
             if(damage <= 0) damage = 1;
             enemy.TakeDamage(damage); 
+            std::cout << "Player attacked! Damage dealt: " << damage << std::endl;
             playerTurn = false;
             playerDefending = false;
             PlaySound(sounds[SOUNDS_ATTACK]);
@@ -61,6 +85,8 @@ void BattleUpdate() {
         else if (CheckCollisionPointRec(mousePos, (Rectangle){520, 500, 150, 40}) && playerTurn) {
             if (GetRandomValue(0, 1) == 1) {  
                 battleMode = false;
+                player.zone = ZONE_DUNGEON;
+                
             }
             playerTurn = false;
         }
@@ -74,7 +100,7 @@ void BattleUpdate() {
     } 
 }
 
-void BattleRender() {
+void BattleRender(Enemy &enemy) {
     DrawRectangle(0, 0, screenWidth, screenHeight, DARKGRAY);
     DrawText("BATTLE!", 350, 30, 20, WHITE);
 
@@ -87,7 +113,9 @@ void BattleRender() {
     else if(player.name == Rouge.name)  DrawTile(200, 350, 8, 0, 10.0f); 
     
     //Enemy
-    DrawTile(500, 350, 11, 0, 10.0f);  
+    
+    if(enemy.GetName() == "Orc") DrawTile(500, 350, 11, 0, 10.0f);
+    else if(enemy.GetName() == "Wandering Eye") DrawTile(500, 350, 13, 0, 10.0f);
 
     DrawText(TextFormat("%s HP: %d", enemy.GetName().c_str(), enemy.GetHealth()), 480, 330, 20, RED);
     DrawText(TextFormat("%s HP: %d", player.name.c_str(), player.health), 180, 330, 20, GREEN);

@@ -72,7 +72,7 @@ void GameUpdate() {
 
     if(battleMode)
     {
-        BattleUpdate();
+        BattleUpdate(enemy);
     }
     else if(isInventory)
     {
@@ -116,6 +116,7 @@ void GameUpdate() {
 
         if (hasKeyPressed) {
             orc.MoveAI(player.x, player.y);
+            wanderingEye.MoveAI(player.x, player.y);
         }
         
 
@@ -127,9 +128,14 @@ void GameUpdate() {
             if(camera.zoom > 9.0f) camera.zoom = 9.0f;
         }
 
-        //CHECK Contact with orc
-        if (player.zone == orc.GetZone() && player.x == orc.GetX() && player.y == orc.GetY() && orc.IsAlive()) {
-            enemy = Enemy(orc); 
+        //CHECK Contact with enemies
+        if (player.zone == orc.GetZone() && player.x == orc.GetX() && player.y == orc.GetY() && orc.IsAlive() == true) {
+            enemy = orc; 
+            battleMode = true;
+            
+        }
+        else if (player.zone == wanderingEye.GetZone() && player.x == wanderingEye.GetX() && player.y == wanderingEye.GetY() && wanderingEye.IsAlive() == true) {
+            enemy = wanderingEye; 
             battleMode = true;
         }
 
@@ -182,7 +188,7 @@ void GameRender() {
     
     if(battleMode)
     {
-        BattleRender();
+        BattleRender(enemy);
     }
     else if(isInventory)
     {
@@ -247,8 +253,7 @@ void GameRender() {
 
         //Gate
         DrawTile(dungeon_gate.x, dungeon_gate.y, 8, 9); 
-
-        // orc
+        // enemies
         EnemyRender();
         // player
         PlayerRender();
@@ -367,6 +372,9 @@ void Inventory()
 
     DrawText(TextFormat("Avg: %d", (player.damageMax + player.damageMin) / 2), 580, 340, 25, BLACK );
     DrawTile(535, 330, 6, 4, 5.0f);
+
+    DrawText(TextFormat("Level: %d", player.level ), 580, 390, 25, BLACK );
+    DrawTile(535, 390, 8, 5, 5.0f);
     
 
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))

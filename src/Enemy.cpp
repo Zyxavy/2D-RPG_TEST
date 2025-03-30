@@ -31,7 +31,7 @@ void Enemy::TakeDamage(int amount)
     health -= amount;
     if (health <= 0) {
         health = 0;
-        isAlive = false;
+        SetAlive(false);
     }
 }
 
@@ -67,7 +67,7 @@ void Enemy::MoveAI(int playerX, int playerY)
     int newX = x;
     int newY = y;
 
-    if(player.zone == enemy.GetZone()){
+    if(player.zone == zone){
 
         if (distanceX + distanceY > 5) 
         {
@@ -99,22 +99,11 @@ void Enemy::Wander()
 
     switch (direction)
     {
-    case 1:
-        newX += TILE_WIDTH;
-        break;
-    case 2:
-        newX -= TILE_WIDTH;
-        break;
-    case 3:
-        newY += TILE_HEIGHT;
-        break;
-    case 4:
-        newY -= TILE_HEIGHT;
-        break;
-    default:
-        break;
+        case 1: newX += TILE_WIDTH; break;  
+        case 2: newX -= TILE_WIDTH; break;  
+        case 3: newY += TILE_HEIGHT; break;
+        case 4: newY -= TILE_HEIGHT; break; 
     }
-
 
     if (!IsBarrierCollision(newX, newY)) {
         x = newX;
