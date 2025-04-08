@@ -5,8 +5,7 @@
 #include "GameFunctions.hpp"
 #include <string>
 
-
-//structs for player and enemy
+//structs for player and enemy (OLD)
 typedef struct 
 {
     int x;
@@ -29,10 +28,8 @@ typedef struct
 
 
 //externs
-extern sEntity player;
 extern sEntity dungeon_gate;
 extern sEntity chest;
-extern sEntity Knight, Wizard, Rouge;
 extern int levelCap;
 extern bool playerLeveledUp;
 

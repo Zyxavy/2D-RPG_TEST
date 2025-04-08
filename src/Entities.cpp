@@ -1,12 +1,12 @@
 #include "Entities.hpp"
 #include "GameFunctions.hpp"
 #include "Enemy.hpp"
+#include "Heroes.hpp"
 #include <raylib.h>
 #include <iostream>
 
 
-sEntity player, dungeon_gate;
-sEntity Knight, Wizard, Rouge;
+sEntity dungeon_gate;
 int levelCap = 100;
 bool playerLeveledUp = false;
 
@@ -27,130 +27,78 @@ Enemy wanderingEye(
     1, "Strenght"
 );
 
+Hero Knight (
+    "Knight", "Strength", 
+    TILE_WIDTH * 3, TILE_HEIGHT * 3,
+    200, 200, 18, 37, 22, 0, 1, 1000, ZONE_WORLD, true, true
+);
+
+Hero Wizard (
+    "Wizard", "Intelligence", 
+    TILE_WIDTH * 3, TILE_HEIGHT * 3,
+    100, 100, 45, 55, 12, 0, 1, 1000, ZONE_WORLD, true, true
+);
+
+Hero Rouge (
+    "Rouge", "Dexterity", 
+    TILE_WIDTH * 3, TILE_HEIGHT * 3,
+    140, 140, 35, 44, 15, 0, 1, 1300, ZONE_WORLD, true, true
+);
+
+
 Enemy enemy = orc;
+Hero Player = Knight;
 
 
 void EntitiesInit() { 
-
-    //default states
-    player = (sEntity) {
-        .x = TILE_WIDTH * 3,
-        .y = TILE_HEIGHT * 3,
-        .zone = ZONE_WORLD,
-        .isAlive = true,
-        .isPassable = false,
-        .health = 100,
-        .maxHealth = 100,
-        .damageMin = 30,
-        .damageMax = 40,
-        .defense = 4, 
-        .money = 1000,
-        .experience = 0,
-        .level = 1,
-        .name = "Player",
-        .type = " ",
-    };
-
-////
-    Knight = (sEntity) {
-        .x = TILE_WIDTH * 3,
-        .y = TILE_HEIGHT * 3,
-        .zone = ZONE_WORLD,
-        .isAlive = true,
-        .isPassable = false,
-        .health = 200,
-        .maxHealth = 200,
-        .damageMin = 18,
-        .damageMax = 37,
-        .defense = 17,
-        .money = 1000,
-        .experience = 0,
-        .level = 1,
-        .name = "Knight", 
-        .type = "Strength",
-    };
-
-    Wizard = (sEntity) {
-        .x = TILE_WIDTH * 3,
-        .y = TILE_HEIGHT * 3,
-        .zone = ZONE_WORLD,
-        .isAlive = true,
-        .isPassable = false,
-        .health = 100,
-        .maxHealth = 100,
-        .damageMin = 45,
-        .damageMax = 60,
-        .defense = 13,
-        .money = 1000,
-        .experience = 0, 
-        .level = 1,
-        .name = "Wizard",
-        .type = "Intelligence", 
-    };
-
-    Rouge = (sEntity) {
-        .x = TILE_WIDTH * 3,
-        .y = TILE_HEIGHT * 3,
-        .zone = ZONE_WORLD,
-        .isAlive = true,
-        .isPassable = false,
-        .health = 140,
-        .maxHealth = 140,
-        .damageMin = 35,
-        .damageMax = 44,
-        .defense = 14,
-        .money = 1200,
-        .experience = 0, 
-        .level = 1,
-        .name = "Rouge",
-        .type = "Dexterity", 
-    };
-
     dungeon_gate = (sEntity) {
         .x = TILE_WIDTH * 10,
         .y = TILE_HEIGHT * 10,
         .zone = ZONE_ALL,
     };
 
-    player.zone = ZONE_WORLD;
+    Player.SetZone(ZONE_WORLD);
 
 }
 
 void PlayerRender()
 {
-    if(player.name == Knight.name)  DrawTile(camera.target.x, camera.target.y, 6, 0);
-    else if(player.name == Wizard.name)  DrawTile(camera.target.x, camera.target.y, 9, 0); 
-    else if(player.name == Rouge.name)  DrawTile(camera.target.x, camera.target.y, 8, 0);  
+    if(Player.GetName() == Knight.GetName())  DrawTile(camera.target.x, camera.target.y, 6, 0);
+    else if(Player.GetName() == Wizard.GetName())  DrawTile(camera.target.x, camera.target.y, 9, 0); 
+    else if(Player.GetName() == Rouge.GetName())  DrawTile(camera.target.x, camera.target.y, 8, 0);  
 }
 
 void EnemyRender()
 {
-    if(orc.GetZone() == player.zone)
+    if(orc.GetZone() == Player.GetZone())
     {
         if(orc.IsAlive() == true) DrawTile(orc.GetX(), orc.GetY(), 11, 0); 
         //Draw chest
         if(chest.isAlive) { DrawTile(chest.x, chest.y, 9 ,3);}
     }
 
-    if(wanderingEye.GetZone() == player.zone)
+    
+    if(wanderingEye.GetZone() == Player.GetZone())
     {
         if(wanderingEye.IsAlive() == true) DrawTile(wanderingEye.GetX(), wanderingEye.GetY(), 13, 0); 
         //Draw chest
         if(chest.isAlive) { DrawTile(chest.x, chest.y, 9 ,3);}
+
     }
+    
 }
 
 void PlayerLevelUp()
 {
-    if(player.experience == levelCap)
+    if(Player.GetExperience() == levelCap)
     {
         playerLeveledUp = true;
-        player.level++;
-        player.damageMin += 10;
-        player.damageMax += 10;
-        player.defense += 2;
-        player.health += 50;
-        player.experience = 0;
+        Player.SetLevel(Player.GetLevel() + 1);
+        Player.SetDamageMin(Player.GetDamageMin() + 10);
+        Player.SetDamageMax(Player.GetDamageMax() + 10);
+        Player.SetDefense(Player.GetDefense() + 1);
+        Player.SetMaxHealth(Player.GetMaxHealth() + 50);
+        Player.GiveExperience(0);
         levelCap += 100;
     }
 }

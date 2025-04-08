@@ -2,9 +2,10 @@
 #include "BattleSystem.hpp"
 #include "GameMenu.hpp"
 #include "Entities.hpp"
-#include <iostream>
 #include "MusicFunctions.hpp"
 #include "Enemy.hpp"
+#include "Heroes.hpp"
+#include <iostream>
 
 
 sEntity chest = { 0 };
@@ -15,6 +16,7 @@ Sound sounds[MAX_SOUNDS];
 sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
 bool isInventory = false;
+int count;
 
 
 void GameStartup() {
@@ -48,7 +50,7 @@ void GameStartup() {
     EntitiesInit();
 
     //cameras
-    camera.target = (Vector2) { (float)player.x, (float)player.y};
+    camera.target = (Vector2) { (float)Player.GetX(), (float)Player.GetY()};
     camera.offset = (Vector2) { (float)screenWidth / 2, (float)screenHeight / 2};
     camera.rotation = 0.0f;
     camera.zoom = 4.0f;
@@ -66,9 +68,9 @@ void GameStartup() {
 void GameUpdate() {
 
     UpdateMusic();
-    if(player.zone == ZONE_WORLD && currentMusicZone != LIGHT) {PlayRandomMusic(LIGHT);}
-    else if(player.zone == ZONE_DUNGEON && currentMusicZone != DARK) {PlayRandomMusic(DARK);}
-    else if (player.zone == ZONE_BATTLE && currentMusicZone != ACTION){ PlayRandomMusic(ACTION);}
+    if(Player.GetZone() == ZONE_WORLD && currentMusicZone != LIGHT) {PlayRandomMusic(LIGHT);}
+    else if(Player.GetZone() == ZONE_DUNGEON && currentMusicZone != DARK) {PlayRandomMusic(DARK);}
+    else if (Player.GetZone() == ZONE_BATTLE && currentMusicZone != ACTION){ PlayRandomMusic(ACTION);}
 
     if(battleMode)
     {
@@ -81,33 +83,33 @@ void GameUpdate() {
     else
     {
 
-        float x = player.x;
-        float y = player.y;
+        float x = Player.GetX();
+        float y = Player.GetY();
         bool hasKeyPressed = false;
     
         if(IsKeyPressed(KEY_LEFT)) {
-            if (!IsBarrierCollision(player.x - TILE_WIDTH, player.y)) 
+            if (!IsBarrierCollision(Player.GetX() - TILE_WIDTH, Player.GetY())) 
             { 
                 x -= TILE_WIDTH;
                 hasKeyPressed = true;
             }
         }
         else if(IsKeyPressed(KEY_RIGHT)) {
-            if (!IsBarrierCollision(player.x + TILE_WIDTH, player.y))
+            if (!IsBarrierCollision(Player.GetX() + TILE_WIDTH, Player.GetY()))
             {  
                 x += TILE_WIDTH;
                 hasKeyPressed = true;
             }
         }
         else if(IsKeyPressed(KEY_UP)) {
-            if (!IsBarrierCollision(player.x, player.y - TILE_HEIGHT))
+            if (!IsBarrierCollision(Player.GetX(), Player.GetY() - TILE_HEIGHT))
             {  
                 y -= TILE_HEIGHT;
                 hasKeyPressed = true;
             }
         }
         else if(IsKeyPressed(KEY_DOWN)) {
-            if (!IsBarrierCollision(player.x, player.y + TILE_HEIGHT))
+            if (!IsBarrierCollision(Player.GetX(), Player.GetY() + TILE_HEIGHT))
             {  
                 y += TILE_HEIGHT;
                 hasKeyPressed = true;
@@ -115,8 +117,32 @@ void GameUpdate() {
         }
 
         if (hasKeyPressed) {
-            orc.MoveAI(player.x, player.y);
-            wanderingEye.MoveAI(player.x, player.y);
+            if(!orc.GetStunStatus())  orc.MoveAI(Player.GetX(), Player.GetY());
+            else{
+                
+                orc.SetStunCounter(count);
+                if(count > 3) 
+                {
+                    orc.SetStunStatus(false);
+                    count = 0;
+                    
+                }
+            }
+            if(!wanderingEye.GetStunStatus()) wanderingEye.MoveAI(Player.GetX(), Player.GetY());
+            else{
+                
+                wanderingEye.SetStunCounter(count);
+                if(count > 3) 
+                {
+                    wanderingEye.SetStunStatus(false);
+                    count = 0;
+                }
+            }
+            if(wanderingEye.GetStunStatus() )
+            {
+                count++;
+                std::cout << count;
+            }
         }
         
 
@@ -129,48 +155,40 @@ void GameUpdate() {
         }
 
         //CHECK Contact with enemies
-        if (player.zone == orc.GetZone() && player.x == orc.GetX() && player.y == orc.GetY() && orc.IsAlive() == true) {
-            enemy = orc; 
-            battleMode = true;
-            
-        }
-        else if (player.zone == wanderingEye.GetZone() && player.x == wanderingEye.GetX() && player.y == wanderingEye.GetY() && wanderingEye.IsAlive() == true) {
-            enemy = wanderingEye; 
-            battleMode = true;
-        }
+        CheckContactWithEnemies();
 
-        else
-        {
             if(hasKeyPressed) 
             {
-                if(player.zone == ZONE_WORLD) PlaySound(sounds[SOUND_FOOT_GRASS]);
-                else if (player.zone == ZONE_DUNGEON) PlaySound(sounds[SOUND_FOOT_STONE]);
+                if(Player.GetZone() == ZONE_WORLD) PlaySound(sounds[SOUND_FOOT_GRASS]);
+                else if (Player.GetZone() == ZONE_DUNGEON) PlaySound(sounds[SOUND_FOOT_STONE]);
 
             }
-            player.x = x;
-            player.y = y;
+
+            Player.SetX(x);
+            Player.SetY(y);
             
-            camera.target = (Vector2) {(float)player.x, (float)player.y};
-        }
+            camera.target = (Vector2) {(float)Player.GetX(), (float)Player.GetY()};
+        
 
     
         if(IsKeyPressed(KEY_E))
         {
-            if(player.x == dungeon_gate.x &&
-                player.y == dungeon_gate.y)
+            std::cout << "Key pressed to enter\n";
+            if(Player.GetX() == dungeon_gate.x &&
+                Player.GetY() == dungeon_gate.y)
                 {
-                    if(player.zone == ZONE_WORLD)
+                    if(Player.GetZone() == ZONE_WORLD)
                     {
-                        player.zone = ZONE_DUNGEON; 
+                        Player.SetZone(ZONE_DUNGEON);
                     }
-                    else if(player.zone == ZONE_DUNGEON)
+                    else if(Player.GetZone() == ZONE_DUNGEON)
                     {
-                        player.zone = ZONE_WORLD;
+                        Player.SetZone(ZONE_WORLD);
                     }
                 }
-                else if(player.x == chest.x && player.y == chest.y && chest.isAlive)
+                else if(Player.GetX() == chest.x && Player.GetY() == chest.y && chest.isAlive)
                     {
-                    player.money += chest.money;
+                    Player.SetMoney(chest.money);
                     chest.isAlive = false;
                     PlaySound(sounds[SOUND_COINS]);
                     }
@@ -203,11 +221,11 @@ void GameRender() {
 
         for(int i = 0; i < WORLD_WIDTH; i++){
             for (int j = 0; j < WORLD_HEIGHT; j++){
-                if(player.zone == ZONE_WORLD)
+                if(Player.GetZone() == ZONE_WORLD)
                 {
                     tile = world[i][j];
                 }
-                else if (player.zone == ZONE_DUNGEON)
+                else if (Player.GetZone() == ZONE_DUNGEON)
                 {
                     tile = dungeon[i][j];
                 }
@@ -264,9 +282,9 @@ void GameRender() {
         DrawRectangle(5, 5, 330, 120, Fade(GRAY, 2.0f));
         DrawRectangleLines(5, 5, 330, 120, BLACK);
         DrawText(TextFormat("Coordinates: (X: %06.2f, Y: %06.2f)", camera.target.x, camera.target.y), 15, 10, 14, WHITE);
-        DrawText(TextFormat("Health: %d", player.health), 15, 30, 14, WHITE);
-        DrawText(TextFormat("Player XP: %d", player.experience), 15, 50, 14, WHITE);
-        DrawText(TextFormat("Money: %d", player.money), 15, 70, 14, WHITE);
+        DrawText(TextFormat("Health: %d", Player.GetHealth()), 15, 30, 14, WHITE);
+        DrawText(TextFormat("Player XP: %d", Player.GetExperience()), 15, 50, 14, WHITE);
+        DrawText(TextFormat("Money: %d", Player.GetMoney()), 15, 70, 14, WHITE);
 
         DrawText(TextFormat("Arrow Keys to move "), 180, 30, 15, WHITE);
         DrawText(TextFormat("Press E to interact"), 180, 50, 15, WHITE);
@@ -358,22 +376,22 @@ void Inventory()
     DrawText("INVENTORY", 300, 25, 30, WHITE); // header
     DrawText("X", 28, 22, 46, BLACK); // exit Buttoon
     
-    if(player.name == Knight.name)  DrawTile(560, 80, 6, 0, 20.0f);
-    else if(player.name == Wizard.name)  DrawTile(560, 80, 9, 0, 20.0f); 
-    else if(player.name == Rouge.name)  DrawTile(560, 80, 8, 0, 20.0f);
+    if(Player.GetName() == Knight.GetName())  DrawTile(560, 80, 6, 0, 20.0f);
+    else if(Player.GetName() == Wizard.GetName())  DrawTile(560, 80, 9, 0, 20.0f); 
+    else if(Player.GetName() == Rouge.GetName())  DrawTile(560, 80, 8, 0, 20.0f);
 
-    DrawText(TextFormat("Type: %s ", player.type.c_str()), 535, 240, 20, BLACK);
+    DrawText(TextFormat("Type: %s ", Player.GetType().c_str()), 535, 240, 20, BLACK);
 
-    DrawText(TextFormat("%d", player.health), 580, 290, 25, BLACK );
+    DrawText(TextFormat("%d", Player.GetHealth()), 580, 290, 25, BLACK );
     DrawTile(535, 280, 6, 6, 5.0f);
 
-    DrawText(TextFormat("%d", player.defense), 700, 290, 25, BLACK );
+    DrawText(TextFormat("%d", Player.GetDefense()), 700, 290, 25, BLACK );
     DrawTile(650, 280, 9, 6, 5.0f);
 
-    DrawText(TextFormat("Avg: %d", (player.damageMax + player.damageMin) / 2), 580, 340, 25, BLACK );
+    DrawText(TextFormat("Avg: %d", (Player.GetDamageMin() + Player.GetDamageMax()) / 2), 580, 340, 25, BLACK );
     DrawTile(535, 330, 6, 4, 5.0f);
 
-    DrawText(TextFormat("Level: %d", player.level ), 580, 390, 25, BLACK );
+    DrawText(TextFormat("Level: %d", Player.GetLevel() ), 580, 390, 25, BLACK );
     DrawTile(535, 390, 8, 5, 5.0f);
     
 
@@ -388,24 +406,40 @@ void Inventory()
     if(CheckCollisionPointRec(mousePos, health))
     {
         DrawRectangle(500, 290, 200, 200, BLACK);
-        DrawText(TextFormat("Current health: %d", player.health), 510, 300, 18, WHITE );
-        DrawText(TextFormat("Max health: %d", player.maxHealth), 510, 320, 18, WHITE );
+        DrawText(TextFormat("Current health: %d", Player.GetHealth()), 510, 300, 18, WHITE );
+        DrawText(TextFormat("Max health: %d", Player.GetMaxHealth()), 510, 320, 18, WHITE );
         DrawText(TextFormat("The amount of hits a \nHero can recieve"), 510, 345, 18, WHITE );
     } 
     else if (CheckCollisionPointRec(mousePos, defense))
     {
         DrawRectangle(550, 290, 200, 200, BLACK);
-        DrawText(TextFormat("%d damage is reduced \nfrom enemy attacks", player.defense), 555, 300, 18, WHITE );
+        DrawText(TextFormat("%d damage is reduced \nfrom enemy attacks", Player.GetDefense()), 555, 300, 18, WHITE );
     }
     else if (CheckCollisionPointRec(mousePos, damage))
     {
         DrawRectangle(500, 300, 220, 200, BLACK);
-        DrawText(TextFormat("Minimun Attack damage: %d", player.damageMin ), 510, 310, 15, WHITE );
-        DrawText(TextFormat("Maximum Attack damage: %d", player.damageMax ), 510, 330, 15, WHITE );
-        DrawText(TextFormat("The hero deals %d - %d \namount of damage \ndepending on RNG", player.damageMin, player.damageMax), 510, 370, 18, WHITE );
+        DrawText(TextFormat("Minimun Attack damage: %d", Player.GetDamageMin() ), 510, 310, 15, WHITE );
+        DrawText(TextFormat("Maximum Attack damage: %d", Player.GetDamageMax() ), 510, 330, 15, WHITE );
+        DrawText(TextFormat("The hero deals %d - %d \namount of damage \ndepending on RNG", Player.GetDamageMin(), Player.GetDamageMax()), 510, 370, 18, WHITE );
     }
     
 
 
 
 }
+
+void CheckContactWithEnemies()
+{
+    if (Player.GetZone() == orc.GetZone() && Player.GetX() == orc.GetX() && Player.GetY() == orc.GetY() && orc.IsAlive() == true) {
+        enemy = orc; 
+        battleMode = true;
+        
+    }
+    else if (Player.GetZone() == wanderingEye.GetZone() && Player.GetX() == wanderingEye.GetX() && Player.GetY() == wanderingEye.GetY() && wanderingEye.IsAlive() == true) {
+        enemy = wanderingEye; 
+        battleMode = true;
+    }
+
+
+}
+

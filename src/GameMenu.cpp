@@ -3,6 +3,7 @@
 #include "Entities.hpp"
 #include "MusicFunctions.hpp"
 #include "Enemy.hpp"
+#include "Heroes.hpp"
 #include <string>
 
 #define RAYGUI_IMPLEMENTATION
@@ -88,9 +89,9 @@ void DeathMenu(){
            isDead = false;
            orc.SetAlive(true);
            orc.SetHealth(100);
-           player.isAlive = true;
-           player.zone = ZONE_WORLD;
-           player.health = 100;
+           Player.SetAlive(true);
+           Player.SetZone(ZONE_WORLD);
+           Player.SetHealth(100);
 
         }
         //Options
@@ -99,9 +100,9 @@ void DeathMenu(){
            isDead = false;
            orc.SetAlive(true);
            orc.SetHealth(100);
-           player.isAlive = true;
-           player.zone = ZONE_WORLD;
-           player.health = 100;
+           Player.SetAlive(true);
+           Player.SetZone(ZONE_WORLD);
+           Player.SetHealth(100);
         }
         //Exit
         else if (CheckCollisionPointRec(mousePos, exitButton) ) {
@@ -161,18 +162,18 @@ void CharacterSelect()
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         //Knight
         if (CheckCollisionPointRec(mousePos, knightButton)) {
-         player = Knight;     
+         Player = Knight;     
          inCharacterSelect = false;                
         }
         //Wizard
         else if (CheckCollisionPointRec(mousePos, wizardButton)) {
-         player = Wizard;
+         Player = Wizard;
          inCharacterSelect = false;
          
         }
         //Rouge
         else if (CheckCollisionPointRec(mousePos, rougeButton) ) {
-         player = Rouge;
+         Player = Rouge;
          inCharacterSelect = false;
         }
     } else
@@ -182,10 +183,10 @@ void CharacterSelect()
             DrawRectangle(knightButton_x, button_y, buttonWidth , buttonHeight, WHITE);
             DrawRectangle(knightButton_x - 40, button_y + 130 , buttonWidth + 200, buttonHeight + 150, GRAY);
 
-            DrawText(TextFormat("Health: %d", Knight.health), knightButton_x - 30, button_y + 140, 25, WHITE);
-            DrawText(TextFormat("Damage: %d - %d", Knight.damageMin, Knight.damageMax), knightButton_x - 30, button_y + 180, 25, WHITE);
-            DrawText(TextFormat("Defense: %d", Knight.defense), knightButton_x - 30, button_y + 220, 25, WHITE);
-            DrawText(TextFormat("Type: %s ", Knight.type.c_str()), knightButton_x - 30, button_y + 260, 25, WHITE);
+            DrawText(TextFormat("Health: %d", Knight.GetMaxHealth()), knightButton_x - 30, button_y + 140, 25, WHITE);
+            DrawText(TextFormat("Damage: %d - %d", Knight.GetDamageMin(), Knight.GetDamageMax()), knightButton_x - 30, button_y + 180, 25, WHITE);
+            DrawText(TextFormat("Defense: %d", Knight.GetDefense()), knightButton_x - 30, button_y + 220, 25, WHITE);
+            DrawText(TextFormat("Type: %s ", Knight.GetType().c_str()), knightButton_x - 30, button_y + 260, 25, WHITE);
             
          }
          //Wizard
@@ -193,20 +194,20 @@ void CharacterSelect()
             DrawRectangle(wizardButton_x, button_y, buttonWidth , buttonHeight, WHITE);
             DrawRectangle(wizardButton_x - 100, button_y + 130 , buttonWidth + 200, buttonHeight + 150, GRAY);
 
-            DrawText(TextFormat("Health: %d", Wizard.health), wizardButton_x - 80, button_y + 140, 25, WHITE);
-            DrawText(TextFormat("Damage: %d - %d", Wizard.damageMin, Wizard.damageMax), wizardButton_x - 80, button_y + 180, 25, WHITE);
-            DrawText(TextFormat("Defense: %d", Wizard.defense), wizardButton_x - 80, button_y + 220, 25, WHITE);
-            DrawText(TextFormat("Type: %s ", Wizard.type.c_str()), wizardButton_x - 80, button_y + 260, 25, WHITE);
+            DrawText(TextFormat("Health: %d", Wizard.GetMaxHealth()), wizardButton_x - 80, button_y + 140, 25, WHITE);
+            DrawText(TextFormat("Damage: %d - %d", Wizard.GetDamageMin(), Wizard.GetDamageMax()), wizardButton_x - 80, button_y + 180, 25, WHITE);
+            DrawText(TextFormat("Defense: %d", Wizard.GetDefense()), wizardButton_x - 80, button_y + 220, 25, WHITE);
+            DrawText(TextFormat("Type: %s ", Wizard.GetType().c_str()), wizardButton_x - 80, button_y + 260, 25, WHITE);
          }
          //Rouge
          else if (CheckCollisionPointRec(mousePos, rougeButton) ) {
             DrawRectangle(rougeButton_x, button_y, buttonWidth , buttonHeight, WHITE);
             DrawRectangle(rougeButton_x - 140, button_y + 130 , buttonWidth + 200, buttonHeight + 150, GRAY);
 
-            DrawText(TextFormat("Health: %d", Rouge.health), rougeButton_x - 120, button_y + 140, 25, WHITE);
-            DrawText(TextFormat("Damage: %d - %d", Rouge.damageMin, Rouge.damageMax), rougeButton_x - 120, button_y + 180, 25, WHITE);
-            DrawText(TextFormat("Defense: %d", Rouge.defense), rougeButton_x - 120, button_y + 220, 25, WHITE);
-            DrawText(TextFormat("Type: %s ", Rouge.type.c_str()), rougeButton_x - 120, button_y + 260, 25, WHITE);
+            DrawText(TextFormat("Health: %d", Rouge.GetMaxHealth()), rougeButton_x - 120, button_y + 140, 25, WHITE);
+            DrawText(TextFormat("Damage: %d - %d", Rouge.GetDamageMin(), Rouge.GetDamageMax()), rougeButton_x - 120, button_y + 180, 25, WHITE);
+            DrawText(TextFormat("Defense: %d", Rouge.GetDefense()), rougeButton_x - 120, button_y + 220, 25, WHITE);
+            DrawText(TextFormat("Type: %s ", Rouge.GetType().c_str()), rougeButton_x - 120, button_y + 260, 25, WHITE);
 
             
 

@@ -20,3 +20,5 @@ Mar 23 - Inventory Gui -WIP-
 Mar 26 - Replaced Enemy struct with Enemy class, Added movement to the enemy, if player is within range the enemy will chase, else it will wander.
 <br>
 Mar 30 - Added new Enemy, fixed some bugs
+<br>
+Apr 8 - Replaced Hero struct with Hero class, fixed battle bug, Enemies are now stunned for a bit when escaping (Buggy).

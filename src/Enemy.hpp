@@ -16,6 +16,8 @@ private:
     int level;
     bool isAlive;
     std::string weakness;
+    bool stunned;
+    int stunCounter;
 
 public:
     // Constructor
@@ -35,6 +37,8 @@ public:
     eZones GetZone() const;
     int GetX() const;
     int GetY() const;
+    bool GetStunStatus() const;
+    int GetStunCounter() const;
 
     // Setters
     void TakeDamage(int amount);
@@ -42,6 +46,8 @@ public:
     void Render(int tileX, int tileY) const;
     void SetAlive(bool state);
     void SetHealth(int hp);
+    void SetStunStatus(int state);
+    void SetStunCounter(int num);
 
     void MoveAI(int playerX, int playerY);  
     void Wander();

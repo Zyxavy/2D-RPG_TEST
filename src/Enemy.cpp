@@ -1,13 +1,14 @@
 #include "GameFunctions.hpp"
 #include "Enemy.hpp"
 #include "Entities.hpp"
+#include "Heroes.hpp"
 #include <string>
 #include <cmath>
 
 Enemy::Enemy(std::string name, int x, int y, int health, eZones zone, int damageMin, int damageMax, int defense, int experience, int level, std::string weakness)
     : name(name), x(x), y(y), health(health), maxHealth(health), zone(zone),
       damageMin(damageMin), damageMax(damageMax), defense(defense), experience(experience), 
-      level(level), isAlive(true), weakness(weakness) {}
+      level(level), isAlive(true), weakness(weakness), stunned(false), stunCounter(0) {}
 
 
 //getters
@@ -24,6 +25,8 @@ bool Enemy::IsAlive() const { return isAlive; }
 eZones Enemy::GetZone() const {return zone;}
 int Enemy::GetX() const {return x;}
 int Enemy::GetY() const {return y;}
+bool Enemy::GetStunStatus() const {return stunned;}
+int Enemy::GetStunCounter() const{return stunCounter;}
 
 //setters
 void Enemy::TakeDamage(int amount) 
@@ -56,10 +59,21 @@ void Enemy::SetHealth(int hp)
     health = hp;
 }
 
+void Enemy::SetStunStatus(int state)
+{
+    stunned = state;
+}
+
+void Enemy::SetStunCounter(int num)
+{
+    stunCounter = num;
+}
+
 //movement
 void Enemy::MoveAI(int playerX, int playerY) 
 {
     if (!isAlive) return;  
+    if(stunned) return;
 
     int distanceX = std::abs(playerX - x) / TILE_WIDTH;
     int distanceY = std::abs(playerY - y) / TILE_HEIGHT;
@@ -67,7 +81,7 @@ void Enemy::MoveAI(int playerX, int playerY)
     int newX = x;
     int newY = y;
 
-    if(player.zone == zone){
+    if(Player.GetZone() == zone){
 
         if (distanceX + distanceY > 5) 
         {

@@ -86,6 +86,7 @@ void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y);
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y, float scale);
 bool IsBarrierCollision(int x, int y);
 void Inventory();
+void CheckContactWithEnemies();
 
 
 #endif // GAME_FUNCTIONS_HPP
