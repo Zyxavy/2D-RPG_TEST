@@ -30,7 +30,7 @@ Enemy wanderingEye(
 Hero Knight (
     "Knight", "Strength", 
     TILE_WIDTH * 3, TILE_HEIGHT * 3,
-    200, 200, 18, 37, 22, 0, 1, 1000, ZONE_WORLD, true, true
+    200, 200, 18, 37, 24, 0, 1, 1000, ZONE_WORLD, true, true
 );
 
 Hero Wizard (
@@ -42,7 +42,7 @@ Hero Wizard (
 Hero Rouge (
     "Rouge", "Dexterity", 
     TILE_WIDTH * 3, TILE_HEIGHT * 3,
-    140, 140, 35, 44, 15, 0, 1, 1300, ZONE_WORLD, true, true
+    140, 140, 35, 44, 17, 0, 1, 1300, ZONE_WORLD, true, true
 );
 
 

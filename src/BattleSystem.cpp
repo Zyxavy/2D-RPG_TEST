@@ -86,13 +86,14 @@ void BattleUpdate(Enemy &enemy) {
 
                 Player.SetX(enemy.GetX() + (TILE_WIDTH * 2));
                 Player.SetZone(enemy.GetZone());
+                return;
                 
                 
             }
             playerTurn = false;
         }
     }
-    if (!playerTurn && enemy.GetHealth() > 0) {
+    if (!playerTurn && enemy.GetHealth() > 0 ) {
         //enemy attacks
         int enemyDamage = GetRandomValue(enemy.GetDamageMin(), enemy.GetDamageMax()) -  Player.GetDefense();
         if (playerDefending) enemyDamage /= 2;

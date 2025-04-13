@@ -10,6 +10,7 @@ extern bool inMenu;
 extern bool isDead;
 extern bool inCharacterSelect;
 
+
 //buttons
 extern float buttonWidth, buttonHeight;
 extern float button_x;
@@ -22,6 +23,8 @@ void GameMenu();
 void DeathMenu();
 void CharacterSelect();
 void OptionsMenu();
+void Inventory();
+void ShowItemInfos();
 
 
 

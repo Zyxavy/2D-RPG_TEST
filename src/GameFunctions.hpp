@@ -15,7 +15,7 @@ const int screenHeight = 600;
 #define MAX_TEXTURES 1
 #define TILE_WIDTH 8
 #define TILE_HEIGHT  8
-#define MAX_SOUNDS 5
+#define MAX_SOUNDS 6
 #define WORLD_WIDTH 25
 #define WORLD_HEIGHT 25
 
@@ -39,6 +39,7 @@ typedef enum
     SOUNDS_ATTACK,
     SOUND_DEATH,
     SOUND_COINS,
+    SOUND_HOVER_ITEMS,
 } sound_asset;
 
 typedef enum
@@ -85,8 +86,9 @@ void GameShutdown();
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y);
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y, float scale);
 bool IsBarrierCollision(int x, int y);
-void Inventory();
+
 void CheckContactWithEnemies();
+
 
 
 #endif // GAME_FUNCTIONS_HPP

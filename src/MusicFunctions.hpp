@@ -35,5 +35,6 @@ void PlayRandomMusic(MusicZone zone);
 void UpdateMusic();
 void StopCurrentMusic();
 void UpdateAudioVolumes();
+void PlaySoundWhenHoveringItem(bool &hoveringOverItems, double currentTime, double &lastHoverSoundTime, double cooldownDuration);
 
 #endif // MUSIC_FUNCTIONS_HPP

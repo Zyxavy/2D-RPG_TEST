@@ -22,3 +22,5 @@ Mar 26 - Replaced Enemy struct with Enemy class, Added movement to the enemy, if
 Mar 30 - Added new Enemy, fixed some bugs
 <br>
 Apr 8 - Replaced Hero struct with Hero class, fixed battle bug, Enemies are now stunned for a bit when escaping (Buggy).
+<br>
+Apr 13 - Added Health Potions, Added Sound Fx when hovering over items/status in inventory.

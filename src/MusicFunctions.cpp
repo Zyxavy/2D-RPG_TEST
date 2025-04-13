@@ -100,4 +100,13 @@ void UpdateAudioVolumes()
     SetMasterVolume(masterVolume);
 }
 
+void PlaySoundWhenHoveringItem(bool &hoveringOverItems, double currentTime, double &lastHoverSoundTime, double cooldownDuration)
+{
+    if (!hoveringOverItems || (currentTime - lastHoverSoundTime >= cooldownDuration)) {
+        PlaySound(sounds[SOUND_HOVER_ITEMS]);
+        lastHoverSoundTime = currentTime;
+        hoveringOverItems = true;
+    }
+}
+
 

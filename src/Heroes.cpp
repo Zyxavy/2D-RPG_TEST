@@ -8,7 +8,7 @@
 Hero::Hero(std::string name, std::string type, int x, int y, int health, int maxHealth, int damageMin, int damageMax, int defense, int experience,
     int level, int money, eZones zone, bool isAlive, bool isPassable )
     :
-    name(name), type(type), x(x), y(y), health(health), maxHealth(maxHealth), damageMin(damageMin), damageMax(damageMax), defense(defense),
+    name(name), type(type), x(x), y(y), health(health), maxHealth(maxHealth), healthPotions(3), damageMin(damageMin), damageMax(damageMax), defense(defense),
     experience(0), level(1), money(1000), zone(ZONE_WORLD), isAlive(true), isPassable(true) {}
 
 
@@ -20,6 +20,7 @@ int Hero::GetX() const {return x;}
 int Hero::GetY() const {return y;}
 int Hero::GetHealth() const { return health; }
 int Hero::GetMaxHealth() const { return maxHealth; }
+int Hero::GetRemainingHealthPotions() const{return healthPotions;}
 int Hero::GetDamageMin() const { return damageMin; }
 int Hero::GetDamageMax() const { return damageMax; }
 int Hero::GetDefense() const { return defense; }
@@ -47,6 +48,8 @@ void Hero::SetMaxHealth(int amount) {maxHealth = amount;}
 void Hero::SetDamageMin(int amount) {damageMin = amount;}
 
 void Hero::SetDamageMax(int amount) {damageMax = amount;}
+
+void Hero::SetHealthPotions(int amount){healthPotions = amount;}
 
 void Hero::SetDefense(int amount) {defense = amount;}
 

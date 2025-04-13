@@ -61,6 +61,7 @@ void GameStartup() {
     sounds[SOUNDS_ATTACK]  = LoadSound("assets/hitHurt.wav");
     sounds[SOUND_DEATH]  = LoadSound("assets/death.wav");
     sounds[SOUND_COINS]  = LoadSound("assets/pickupCoin.wav");
+    sounds[SOUND_HOVER_ITEMS] = LoadSound("assets/HoverItems.wav");
 
     LoadMusic();
 }
@@ -138,7 +139,7 @@ void GameUpdate() {
                     count = 0;
                 }
             }
-            if(wanderingEye.GetStunStatus() )
+            if(wanderingEye.GetStunStatus() || orc.GetStunStatus() )
             {
                 count++;
                 std::cout << count;
@@ -352,82 +353,6 @@ bool IsBarrierCollision(int x, int y)
     return false;
 }
 
-void Inventory()
-{
-    Vector2 mousePos = GetMousePosition();
-
-    Rectangle outer {20, 20, 760, 560};
-    Rectangle inner {40, 40, 720, 520};
-    Rectangle header {270, 20, 250, 50};
-    Rectangle exitButton {20, 20, 50, 50};
-    Rectangle charBorder {530, 60, 220, 500};
-    Rectangle health{ 535, 275, 25, 25};
-    Rectangle defense{ 650, 280, 25, 25};
-    Rectangle damage{ 535, 340, 25, 25};
-    
-
-    DrawRectangleRounded(outer, 0.2, 2, GRAY);
-    DrawRectangleRounded(inner, 0.2, 2, LIGHTGRAY);
-    DrawRectangleRounded(header, 0.1, 1, BLACK);
-    DrawRectangleRounded(exitButton, 0.2, 4, WHITE);
-
-    DrawRectangleLinesEx(charBorder, 4, BLACK);
-
-    DrawText("INVENTORY", 300, 25, 30, WHITE); // header
-    DrawText("X", 28, 22, 46, BLACK); // exit Buttoon
-    
-    if(Player.GetName() == Knight.GetName())  DrawTile(560, 80, 6, 0, 20.0f);
-    else if(Player.GetName() == Wizard.GetName())  DrawTile(560, 80, 9, 0, 20.0f); 
-    else if(Player.GetName() == Rouge.GetName())  DrawTile(560, 80, 8, 0, 20.0f);
-
-    DrawText(TextFormat("Type: %s ", Player.GetType().c_str()), 535, 240, 20, BLACK);
-
-    DrawText(TextFormat("%d", Player.GetHealth()), 580, 290, 25, BLACK );
-    DrawTile(535, 280, 6, 6, 5.0f);
-
-    DrawText(TextFormat("%d", Player.GetDefense()), 700, 290, 25, BLACK );
-    DrawTile(650, 280, 9, 6, 5.0f);
-
-    DrawText(TextFormat("Avg: %d", (Player.GetDamageMin() + Player.GetDamageMax()) / 2), 580, 340, 25, BLACK );
-    DrawTile(535, 330, 6, 4, 5.0f);
-
-    DrawText(TextFormat("Level: %d", Player.GetLevel() ), 580, 390, 25, BLACK );
-    DrawTile(535, 390, 8, 5, 5.0f);
-    
-
-    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-    {
-        if(CheckCollisionPointRec(mousePos, exitButton))
-        {
-            isInventory = false;
-        }
-    }
-
-    if(CheckCollisionPointRec(mousePos, health))
-    {
-        DrawRectangle(500, 290, 200, 200, BLACK);
-        DrawText(TextFormat("Current health: %d", Player.GetHealth()), 510, 300, 18, WHITE );
-        DrawText(TextFormat("Max health: %d", Player.GetMaxHealth()), 510, 320, 18, WHITE );
-        DrawText(TextFormat("The amount of hits a \nHero can recieve"), 510, 345, 18, WHITE );
-    } 
-    else if (CheckCollisionPointRec(mousePos, defense))
-    {
-        DrawRectangle(550, 290, 200, 200, BLACK);
-        DrawText(TextFormat("%d damage is reduced \nfrom enemy attacks", Player.GetDefense()), 555, 300, 18, WHITE );
-    }
-    else if (CheckCollisionPointRec(mousePos, damage))
-    {
-        DrawRectangle(500, 300, 220, 200, BLACK);
-        DrawText(TextFormat("Minimun Attack damage: %d", Player.GetDamageMin() ), 510, 310, 15, WHITE );
-        DrawText(TextFormat("Maximum Attack damage: %d", Player.GetDamageMax() ), 510, 330, 15, WHITE );
-        DrawText(TextFormat("The hero deals %d - %d \namount of damage \ndepending on RNG", Player.GetDamageMin(), Player.GetDamageMax()), 510, 370, 18, WHITE );
-    }
-    
-
-
-
-}
-
 void CheckContactWithEnemies()
 {
     if (Player.GetZone() == orc.GetZone() && Player.GetX() == orc.GetX() && Player.GetY() == orc.GetY() && orc.IsAlive() == true) {
@@ -442,4 +367,5 @@ void CheckContactWithEnemies()
 
 
 }
+
 

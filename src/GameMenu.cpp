@@ -9,6 +9,13 @@
 #define RAYGUI_IMPLEMENTATION
 #include <raygui.h>
 
+//for SoundFx
+static bool hoveringOverItems = false;
+static double lastHoverSoundTime = 0.0;
+
+static bool showItemInfo = false;
+static bool healthPotionsWasClicked = false;
+
 Rectangle
 		startButton = { button_x, startButton_y, buttonWidth, buttonHeight },
 		optionsButton = { button_x, optionsButton_y, buttonWidth, buttonHeight },
@@ -282,3 +289,221 @@ void OptionsMenu()
 
 	EndDrawing();
 }
+
+void Inventory()
+{
+   //for sound FX
+   const double cooldownDuration = 100.0;
+   bool isCurrentlyHovering = false;
+   double currentTime = GetTime();
+
+   Vector2 mousePos = GetMousePosition();
+
+   Rectangle outer {20, 20, 760, 560};
+   Rectangle inner {40, 40, 720, 520};
+   Rectangle header {270, 20, 250, 50};
+   Rectangle exitButton {20, 20, 50, 50};
+   Rectangle charBorder {530, 60, 220, 500};
+   Rectangle health{ 535, 275, 30, 30};
+   Rectangle defense{ 650, 280, 30, 30};
+   Rectangle damage{ 535, 340, 30, 30};
+   Rectangle level {535, 390, 30, 30};
+
+   //items-blahblah
+   Rectangle healthPotion{41, 71, 45, 45};
+   
+
+   DrawRectangleRounded(outer, 0.2, 2, GRAY);
+   DrawRectangleRounded(inner, 0.2, 2, LIGHTGRAY);
+   DrawRectangleRounded(header, 0.1, 1, BLACK);
+   DrawRectangleRounded(exitButton, 0.2, 4, WHITE);
+
+   //Grids - Horizontal
+   int distance = 50;
+   DrawLine(40, 70, 530, 70, BLACK);
+   for(int i = 0; i < 9; i++)
+   {
+      DrawLine(40, 70 + distance, 530, 70 + distance, BLACK);
+      distance += 50;
+   }
+
+   //Grids - Vertical
+   distance = 50;
+   DrawLine(40, 70, 40, 520, BLACK);
+   for (int i = 0; i < 9; i++)
+   {
+      DrawLine(40 + distance, 70, 40 + distance, 520, BLACK);
+      distance += 50;
+   }
+
+   //Items / Consumable
+   DrawTile(41, 71, 7, 8, 5.8f);
+   
+   //Player Status
+   DrawRectangleLinesEx(charBorder, 4, BLACK);
+
+   DrawText("INVENTORY", 300, 25, 30, WHITE); // header
+   DrawText("X", 28, 22, 46, BLACK); // exit Buttoon
+   
+   if(Player.GetName() == Knight.GetName())  DrawTile(560, 80, 6, 0, 20.0f);
+   else if(Player.GetName() == Wizard.GetName())  DrawTile(560, 80, 9, 0, 20.0f); 
+   else if(Player.GetName() == Rouge.GetName())  DrawTile(560, 80, 8, 0, 20.0f);
+
+   DrawText(TextFormat("Type: %s ", Player.GetType().c_str()), 535, 240, 20, BLACK);
+
+   DrawText(TextFormat("%d", Player.GetHealth()), 580, 290, 25, BLACK );
+   DrawTile(535, 280, 6, 6, 5.0f);
+
+   DrawText(TextFormat("%d", Player.GetDefense()), 700, 290, 25, BLACK );
+   DrawTile(650, 280, 9, 6, 5.0f);
+
+   DrawText(TextFormat("Avg: %d", (Player.GetDamageMin() + Player.GetDamageMax()) / 2), 580, 340, 25, BLACK );
+   DrawTile(535, 330, 6, 4, 5.0f);
+
+   DrawText(TextFormat("Level: %d", Player.GetLevel() ), 580, 390, 25, BLACK );
+   DrawTile(535, 390, 8, 5, 5.0f);
+   
+
+   if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+   {
+      // X button
+      if(CheckCollisionPointRec(mousePos, exitButton))
+      {
+         isInventory = false;
+      }
+
+      //Items/Consumables
+      if(CheckCollisionPointRec(mousePos, healthPotion))
+      {
+         showItemInfo = true;  
+         healthPotionsWasClicked = true;       
+      }
+
+   }
+
+   if(CheckCollisionPointRec(mousePos, health))
+   {
+
+      DrawRectangle(500, 290, 200, 200, BLACK);
+      DrawText(TextFormat("Current health: %d", Player.GetHealth()), 510, 300, 18, WHITE );
+      DrawText(TextFormat("Max health: %d", Player.GetMaxHealth()), 510, 320, 18, WHITE );
+      DrawText(TextFormat("The amount of hits a \nHero can recieve"), 510, 345, 18, WHITE );
+      
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+
+   } 
+   
+
+   if (CheckCollisionPointRec(mousePos, defense))
+   {
+      DrawRectangle(550, 290, 200, 200, BLACK);
+      DrawText(TextFormat("%d damage is reduced \nfrom enemy attacks", Player.GetDefense()), 555, 300, 18, WHITE );
+      
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+   }
+   else if (CheckCollisionPointRec(mousePos, damage))
+   {
+      DrawRectangle(500, 300, 220, 200, BLACK);
+      DrawText(TextFormat("Minimun Attack damage: %d", Player.GetDamageMin() ), 510, 310, 15, WHITE );
+      DrawText(TextFormat("Maximum Attack damage: %d", Player.GetDamageMax() ), 510, 330, 15, WHITE );
+      DrawText(TextFormat("The hero deals %d - %d \namount of damage \ndepending on RNG", Player.GetDamageMin(), Player.GetDamageMax()), 510, 370, 18, WHITE );
+      
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+   }
+   else if (CheckCollisionPointRec(mousePos, level))
+   {
+      DrawRectangle(500, 360, 220, 200, BLACK);
+      DrawText(TextFormat("Experience Points: %d", Player.GetExperience()),  510, 370, 15, WHITE);
+      DrawText(TextFormat("Experience Till Level Up:\n   %d / %d ", Player.GetExperience(), levelCap),  510, 390, 15, WHITE);
+      
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+   }
+
+   //Items Consumables
+   else if (CheckCollisionPointRec(mousePos, healthPotion))
+   {
+      DrawRectangle(40, 70, 50, 50, {255, 255, 255, 150});
+      
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+      
+   }
+
+   if(showItemInfo)
+   {
+      ShowItemInfos();
+   }
+
+
+   //plays sound fx only once when hovering over an item
+   if (!isCurrentlyHovering) 
+   {
+      hoveringOverItems = false;
+   }
+
+            
+}
+
+void ShowItemInfos()
+{
+   Vector2 mousePos = GetMousePosition();
+
+   Rectangle shadowBackground{0,0,screenWidth,screenHeight};
+   Rectangle interactItem{250, 300, 300, 50};
+   Rectangle itemRectBox {150, 170, 500, 200};
+   Rectangle exitItemRectBox{150, 170, 25,25};
+
+   DrawRectangleRec(shadowBackground, {0, 0, 0, 100});
+   DrawRectangleRounded(itemRectBox, 0.1, 1, BLACK);
+   DrawRectangleRounded(exitItemRectBox, 0.1, 1, WHITE);
+   DrawText(" X", exitItemRectBox.x, exitItemRectBox.y, 25, BLACK);
+
+   //identify what item
+   if(healthPotionsWasClicked)
+   {
+      DrawText("Health Potions provides 25-75 points of health \nwhen consumed.",  itemRectBox.x + 30, itemRectBox.y + 30, 15, WHITE);
+      DrawText(TextFormat(" X %d", Player.GetRemainingHealthPotions()), itemRectBox.x + 440, itemRectBox.y + 30, 30, WHITE);
+      DrawTile(itemRectBox.x + 400, itemRectBox.y + 20, 7, 8, 5.8f);
+
+      DrawRectangleRec(interactItem, DARKGRAY);
+      DrawText("Consume Potion", interactItem.x + 30, interactItem.y + 10, 25, WHITE);
+
+
+   }
+
+
+
+   if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+   {
+      if(CheckCollisionPointRec(mousePos, exitItemRectBox))
+      {
+         showItemInfo = false;
+      }
+
+      //items or consumables
+      if(CheckCollisionPointRec(mousePos, interactItem) && healthPotionsWasClicked)
+      {
+         if(Player.GetRemainingHealthPotions() <= 0) return;
+
+         int hpAmount = GetRandomValue(25, 75);
+         Player.SetHealth(Player.GetHealth() + hpAmount);
+         Player.SetHealthPotions(Player.GetRemainingHealthPotions() - 1);
+         
+         if(Player.GetHealth() > Player.GetMaxHealth())
+         {
+            Player.SetHealth(Player.GetMaxHealth());
+         }
+      }
+
+      
+   }
+}
+
+
+
+
+
