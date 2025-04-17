@@ -7,7 +7,7 @@ int main(){
     SetTargetFPS(60);
 
     GameStartup();
-
+    
     while(!WindowShouldClose()){
 
             GameUpdate();     

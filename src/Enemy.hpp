@@ -53,8 +53,14 @@ public:
     void Wander();
 };
 
-extern Enemy orc, enemy, wanderingEye;
+extern Enemy orc, wanderingEye;
 
+extern Enemy* orc1;
+extern Enemy* orc2;
+
+extern Enemy* wanderingEye1;
+
+extern Enemy* enemy;
 
 #endif // ENTITIES_HPP
 

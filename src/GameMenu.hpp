@@ -25,6 +25,7 @@ void CharacterSelect();
 void OptionsMenu();
 void Inventory();
 void ShowItemInfos();
+void LevelUpScreen();
 
 
 

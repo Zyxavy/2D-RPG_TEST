@@ -485,9 +485,9 @@ void ShowItemInfos()
       }
 
       //items or consumables
-      if(CheckCollisionPointRec(mousePos, interactItem) && healthPotionsWasClicked)
+      if(CheckCollisionPointRec(mousePos, interactItem) && healthPotionsWasClicked) // Health Potion
       {
-         if(Player.GetRemainingHealthPotions() <= 0) return;
+         if(Player.GetRemainingHealthPotions() <= 0 || Player.GetHealth() == Player.GetMaxHealth()) return;
 
          int hpAmount = GetRandomValue(25, 75);
          Player.SetHealth(Player.GetHealth() + hpAmount);
@@ -503,7 +503,20 @@ void ShowItemInfos()
    }
 }
 
+void LevelUpScreen()
+{
+   if(playerLeveledUp)
+    {
+      
+      PlaySpecificMusic();
 
+      BeginDrawing();
+
+      DrawRectangle( 15, 15, 200, 300, WHITE);
+ 
+    }
+
+}
 
 
 

@@ -18,15 +18,16 @@ sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
 bool isInventory = false;
 int count;
 
-
 void GameStartup() {
 
     InitAudioDevice();
 
+    //init tiles/graphics
     Image image = LoadImage("assets/colored_tilemap_packed.png");
     textures[TEXTURE_TILEMAP] = LoadTextureFromImage(image);
     UnloadImage(image);
 
+    //generate World/Zones
     for(int i = 0; i < WORLD_WIDTH; i++){
         for(int j = 0; j < WORLD_HEIGHT; j++){
             world[i][j] = (sTile)
@@ -68,6 +69,7 @@ void GameStartup() {
 
 void GameUpdate() {
 
+    //Music
     UpdateMusic();
     if(Player.GetZone() == ZONE_WORLD && currentMusicZone != LIGHT) {PlayRandomMusic(LIGHT);}
     else if(Player.GetZone() == ZONE_DUNGEON && currentMusicZone != DARK) {PlayRandomMusic(DARK);}
@@ -81,13 +83,17 @@ void GameUpdate() {
     {
         if(IsKeyPressed(KEY_Q)) {isInventory = false;}
     }
+    else if (playerLeveledUp)
+    {
+        LevelUpScreen();
+    }
     else
     {
-
+        //Movement
         float x = Player.GetX();
         float y = Player.GetY();
         bool hasKeyPressed = false;
-    
+
         if(IsKeyPressed(KEY_LEFT)) {
             if (!IsBarrierCollision(Player.GetX() - TILE_WIDTH, Player.GetY())) 
             { 
@@ -117,33 +123,60 @@ void GameUpdate() {
             }
         }
 
+        //Player Escapes and stuns enemy
         if (hasKeyPressed) {
-            if(!orc.GetStunStatus())  orc.MoveAI(Player.GetX(), Player.GetY());
-            else{
-                
-                orc.SetStunCounter(count);
-                if(count > 3) 
-                {
-                    orc.SetStunStatus(false);
-                    count = 0;
-                    
-                }
-            }
-            if(!wanderingEye.GetStunStatus()) wanderingEye.MoveAI(Player.GetX(), Player.GetY());
-            else{
-                
-                wanderingEye.SetStunCounter(count);
-                if(count > 3) 
-                {
-                    wanderingEye.SetStunStatus(false);
-                    count = 0;
-                }
-            }
-            if(wanderingEye.GetStunStatus() || orc.GetStunStatus() )
+
+            for(int i = 0; i < MAX_ORCS_INSTANCES; i++) 
             {
-                count++;
-                std::cout << count;
+                if(!orcArr[i]->GetStunStatus()) 
+                {
+                    orcArr[i]->MoveAI(Player.GetX(), Player.GetY());
+                }
+                else
+                {
+                    
+                    orcArr[i]->SetStunCounter(count);
+                    if(count > 3) 
+                    {
+                        orcArr[i]->SetStunStatus(false);
+                        count = 0;
+                        
+                    }
+                }
+
+                if(orcArr[i]->GetStunStatus())
+                {
+                    count++;
+                    std::cout << count;
+                }
             }
+           
+            for(int i = 0; i < MAX_WANDERING_EYE_INSTANCES; i++) 
+            {
+                if(!eyeArr[i]->GetStunStatus()) 
+                {
+                    eyeArr[i]->MoveAI(Player.GetX(), Player.GetY());
+                }
+                else
+                {
+                    
+                    eyeArr[i]->SetStunCounter(count);
+                    if(count > 3) 
+                    {
+                        eyeArr[i]->SetStunStatus(false);
+                        count = 0;
+                        
+                    }
+                }
+
+                if(eyeArr[i]->GetStunStatus())
+                {
+                    count++;
+                    std::cout << count;
+                }
+            }
+
+            
         }
         
 
@@ -158,23 +191,25 @@ void GameUpdate() {
         //CHECK Contact with enemies
         CheckContactWithEnemies();
 
-            if(hasKeyPressed) 
+            if(hasKeyPressed) // Play FootSteps FX
             {
                 if(Player.GetZone() == ZONE_WORLD) PlaySound(sounds[SOUND_FOOT_GRASS]);
                 else if (Player.GetZone() == ZONE_DUNGEON) PlaySound(sounds[SOUND_FOOT_STONE]);
 
             }
 
+            //confirm and set the X&Y coords
             Player.SetX(x);
             Player.SetY(y);
-            
+
+            //Camera Follows Player
             camera.target = (Vector2) {(float)Player.GetX(), (float)Player.GetY()};
         
 
     
         if(IsKeyPressed(KEY_E))
         {
-            std::cout << "Key pressed to enter\n";
+            //Enter dungeon
             if(Player.GetX() == dungeon_gate.x &&
                 Player.GetY() == dungeon_gate.y)
                 {
@@ -187,9 +222,11 @@ void GameUpdate() {
                         Player.SetZone(ZONE_WORLD);
                     }
                 }
+                //interact with chest
                 else if(Player.GetX() == chest.x && Player.GetY() == chest.y && chest.isAlive)
                     {
-                    Player.SetMoney(chest.money);
+                    Player.SetMoney(Player.GetMoney() + chest.money);
+                    Player.SetHealthPotions(Player.GetRemainingHealthPotions() + chest.healthPotions);
                     chest.isAlive = false;
                     PlaySound(sounds[SOUND_COINS]);
                     }
@@ -200,6 +237,7 @@ void GameUpdate() {
         }
     
     }
+
 
 }
 
@@ -214,8 +252,10 @@ void GameRender() {
         Inventory();
     }
     else{
-        BeginMode2D(camera);
 
+        BeginMode2D(camera);
+        
+        //renders Zones
         sTile tile;
         int texture_index_x = 0;
         int texture_index_y = 0;
@@ -277,9 +317,9 @@ void GameRender() {
         // player
         PlayerRender();
 
-
         EndMode2D();
 
+        // Top-left thingy
         DrawRectangle(5, 5, 330, 120, Fade(GRAY, 2.0f));
         DrawRectangleLines(5, 5, 330, 120, BLACK);
         DrawText(TextFormat("Coordinates: (X: %06.2f, Y: %06.2f)", camera.target.x, camera.target.y), 15, 10, 14, WHITE);
@@ -297,12 +337,24 @@ void GameRender() {
 
 void GameShutdown() {
 
-    for(int i = 0; i < MAX_TEXTURES; i++){
+    for(int i = 0; i < MAX_TEXTURES; i++)
+    {
         UnloadTexture(textures[i]);
     }
 
-    for(int i = 0; i < MAX_SOUNDS; i++){
+    for(int i = 0; i < MAX_SOUNDS; i++)
+    {
         UnloadSound(sounds[i]);
+    }
+
+    for(int i = 0; i < MAX_ORCS_INSTANCES; i++)
+    {
+        delete orcArr[i];
+    }
+    
+    for(int i = 0; i < MAX_WANDERING_EYE_INSTANCES; i++)
+    {
+        delete eyeArr[i];
     }
 
     StopCurrentMusic();
@@ -312,13 +364,16 @@ void GameShutdown() {
 }
 
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y){
+
     Rectangle source = { (float)texture_index_x * TILE_WIDTH, (float)texture_index_y * TILE_HEIGHT, (float)TILE_WIDTH, (float)TILE_HEIGHT};
     Rectangle dest = { (float)(pos_x), (float)(pos_y), (float)TILE_WIDTH, (float)TILE_HEIGHT};
     Vector2 origin { 0, 0};
     DrawTexturePro(textures[TEXTURE_TILEMAP], source, dest, origin, 0.0f, WHITE );
 }
 
-void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y, float scale) {
+void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y, float scale) 
+{
+
     Rectangle source = {
         (float)texture_index_x * TILE_WIDTH,
         (float)texture_index_y * TILE_HEIGHT,
@@ -345,6 +400,7 @@ bool IsBarrierCollision(int x, int y)
     int tileX = x / TILE_WIDTH;
     int tileY = y / TILE_HEIGHT;
 
+    //check if collides with barriers
     if (tileX < WORLD_LEFT + 1 || tileX > WORLD_RIGHT - 1 || tileY < WORLD_TOP + 1 || tileY > WORLD_BOTTOM - 1) {
         std::cout << "Barrier Collision!\n";
         return true; 
@@ -355,16 +411,26 @@ bool IsBarrierCollision(int x, int y)
 
 void CheckContactWithEnemies()
 {
-    if (Player.GetZone() == orc.GetZone() && Player.GetX() == orc.GetX() && Player.GetY() == orc.GetY() && orc.IsAlive() == true) {
-        enemy = orc; 
-        battleMode = true;
-        
-    }
-    else if (Player.GetZone() == wanderingEye.GetZone() && Player.GetX() == wanderingEye.GetX() && Player.GetY() == wanderingEye.GetY() && wanderingEye.IsAlive() == true) {
-        enemy = wanderingEye; 
-        battleMode = true;
+
+    //check contact with orc
+    for(int i = 0; i < MAX_ORCS_INSTANCES; i++)
+    {
+        if (orcArr[i] != nullptr && Player.GetZone() == orcArr[i]->GetZone() && Player.GetX() == orcArr[i]->GetX() && Player.GetY() == orcArr[i]->GetY() && orcArr[i]->IsAlive() == true) 
+        {
+            enemy = orcArr[i];
+            battleMode = true;
+        }
     }
 
+    //check contact with Eye
+    for(int i = 0; i < MAX_WANDERING_EYE_INSTANCES; i++)
+    {
+        if (eyeArr[i] != nullptr && Player.GetZone() == eyeArr[i]->GetZone() && Player.GetX() == eyeArr[i]->GetX() && Player.GetY() == eyeArr[i]->GetY() && eyeArr[i]->IsAlive() == true) 
+        {
+            enemy = eyeArr[i];
+            battleMode = true;
+        }
+    }
 
 }
 

@@ -20,7 +20,7 @@ int Hero::GetX() const {return x;}
 int Hero::GetY() const {return y;}
 int Hero::GetHealth() const { return health; }
 int Hero::GetMaxHealth() const { return maxHealth; }
-int Hero::GetRemainingHealthPotions() const{return healthPotions;}
+int Hero::GetRemainingHealthPotions() const {return healthPotions;}
 int Hero::GetDamageMin() const { return damageMin; }
 int Hero::GetDamageMax() const { return damageMax; }
 int Hero::GetDefense() const { return defense; }
@@ -49,7 +49,7 @@ void Hero::SetDamageMin(int amount) {damageMin = amount;}
 
 void Hero::SetDamageMax(int amount) {damageMax = amount;}
 
-void Hero::SetHealthPotions(int amount){healthPotions = amount;}
+void Hero::SetHealthPotions(int amount) {healthPotions = amount;}
 
 void Hero::SetDefense(int amount) {defense = amount;}
 

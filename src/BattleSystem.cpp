@@ -11,35 +11,35 @@ bool battleMode = false;
 bool playerTurn = true;
 bool playerDefending = false;
 
-void BattleUpdate(Enemy &enemy) {
+void BattleUpdate(Enemy *enemy) {
 
+    playerTurn = true;
     Vector2 mousePos = GetMousePosition();
     Player.SetZone(ZONE_BATTLE);
 
-    if (enemy.GetHealth() <= 0)  
+    if (enemy->GetHealth() <= 0)  
     {
-        enemy.SetAlive(false); 
+        enemy->SetAlive(false); 
         battleMode = false;
-        Player.GiveExperience(enemy.GetExperience());
+        Player.GiveExperience(Player.GetExperience() + GetRandomValue(5, enemy->GetExperience()));
         PlaySound(sounds[SOUND_DEATH]);
 
-        Player.SetZone(enemy.GetZone());
+        Player.SetZone(enemy->GetZone());
 
-        Player.SetX(enemy.GetX() + TILE_WIDTH);
+        Player.SetX(enemy->GetX() + TILE_WIDTH);
         
-        if (enemy.GetName() == "Orc") {
-            orc.SetAlive(false);
-        } else if (enemy.GetName() == "Wandering Eye") {
-            wanderingEye.SetAlive(false);
-        }
-
+        
+        enemy->SetAlive(false);
         
         PlayerLevelUp();
         //spawn chest
-        chest.x = enemy.GetX();
-        chest.y = enemy.GetY();
+        chest.x = enemy->GetX();
+        chest.y = enemy->GetY();
         chest.isAlive = true;
         chest.money = GetRandomValue(23, 205);
+        chest.healthPotions = GetRandomValue(1,4);
+
+
         return;
 
     } 
@@ -49,7 +49,7 @@ void BattleUpdate(Enemy &enemy) {
         battleMode = false;
         PlaySound(sounds[SOUND_DEATH]);
         isDead = true;
-        Player.SetZone(enemy.GetZone());
+        Player.SetZone(enemy->GetZone());
 
     
         //Continue
@@ -59,10 +59,10 @@ void BattleUpdate(Enemy &enemy) {
         //Attack 
         if (CheckCollisionPointRec(mousePos, (Rectangle){120, 500, 150, 40}) && playerTurn) {
         
-            int damage = GetRandomValue(Player.GetDamageMin(), Player.GetDamageMax()) - enemy.GetDefense();  
-            if (enemy.GetWeakness() == Player.GetType()) damage *= 2;  
+            int damage = GetRandomValue(Player.GetDamageMin(), Player.GetDamageMax()) - enemy->GetDefense();  
+            if (enemy->GetWeakness() == Player.GetType()) damage *= 2;  
             if(damage <= 0) damage = 1;
-            enemy.TakeDamage(damage); 
+            enemy->TakeDamage(damage); 
             std::cout << "Player attacked! Damage dealt: " << damage << std::endl;
             playerTurn = false;
             playerDefending = false;
@@ -81,11 +81,10 @@ void BattleUpdate(Enemy &enemy) {
                 battleMode = false;
                 
                 //stun enemies
-                if(enemy.GetName() == wanderingEye.GetName()) wanderingEye.SetStunStatus(true);
-                else if(enemy.GetName() == orc.GetName())  orc.SetStunStatus(true);
+                enemy->SetStunStatus(true);
 
-                Player.SetX(enemy.GetX() + (TILE_WIDTH * 2));
-                Player.SetZone(enemy.GetZone());
+                Player.SetX(enemy->GetX() + (TILE_WIDTH * 2));
+                Player.SetZone(enemy->GetZone());
                 return;
                 
                 
@@ -93,9 +92,9 @@ void BattleUpdate(Enemy &enemy) {
             playerTurn = false;
         }
     }
-    if (!playerTurn && enemy.GetHealth() > 0 ) {
+    if (!playerTurn && enemy->GetHealth() > 0 ) {
         //enemy attacks
-        int enemyDamage = GetRandomValue(enemy.GetDamageMin(), enemy.GetDamageMax()) -  Player.GetDefense();
+        int enemyDamage = GetRandomValue(enemy->GetDamageMin(), enemy->GetDamageMax()) -  Player.GetDefense();
         if (playerDefending) enemyDamage /= 2;
         if(enemyDamage <= 0) enemyDamage = 1;
         Player.SetHealth( Player.GetHealth() - enemyDamage);
@@ -103,7 +102,7 @@ void BattleUpdate(Enemy &enemy) {
     } 
 }
 
-void BattleRender(Enemy &enemy) {
+void BattleRender(Enemy *enemy) {
 
     DrawRectangle(0, 0, screenWidth, screenHeight, DARKGRAY);
     DrawText("BATTLE!", 350, 30, 20, WHITE);
@@ -118,10 +117,10 @@ void BattleRender(Enemy &enemy) {
     
     //Enemy
     
-    if(enemy.GetName() == "Orc") DrawTile(500, 350, 11, 0, 10.0f);
-    else if(enemy.GetName() == "Wandering Eye") DrawTile(500, 350, 13, 0, 10.0f);
+    if(enemy->GetName() == "Orc") DrawTile(500, 350, 11, 0, 10.0f);
+    else if(enemy->GetName() == "Wandering Eye") DrawTile(500, 350, 13, 0, 10.0f);
 
-    DrawText(TextFormat("%s HP: %d", enemy.GetName().c_str(), enemy.GetHealth()), 480, 330, 20, RED);
+    DrawText(TextFormat("%s HP: %d", enemy->GetName().c_str(), enemy->GetHealth()), 480, 330, 20, RED);
     DrawText(TextFormat("%s HP: %d", Player.GetName().c_str(), Player.GetHealth()), 180, 330, 20, GREEN);
 
     //Draw Buttons 
@@ -135,3 +134,4 @@ void BattleRender(Enemy &enemy) {
     DrawText("DEFEND", 350, 510, 20, BLACK);
     DrawText("RUN", 570, 510, 20, BLACK);
 }
+

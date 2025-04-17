@@ -17,10 +17,12 @@ Mar 18 - Added more music| implemented MusicFunctions.cpp & hpp | implemented sl
 <br>
 Mar 23 - Inventory Gui -WIP-
 <br>
-Mar 26 - Replaced Enemy struct with Enemy class, Added movement to the enemy, if player is within range the enemy will chase, else it will wander.
+Mar 26 - Replaced Enemy struct with Enemy class | Added movement to the enemy, if player is within range the enemy will chase, else it will wander.
 <br>
-Mar 30 - Added new Enemy, fixed some bugs
+Mar 30 - Added new Enemy | fixed some bugs
 <br>
-Apr 8 - Replaced Hero struct with Hero class, fixed battle bug, Enemies are now stunned for a bit when escaping (Buggy).
+Apr 8 - Replaced Hero struct with Hero class | fixed battle bug, Enemies are now stunned for a bit when escaping (Buggy).
 <br>
-Apr 13 - Added Health Potions, Added Sound Fx when hovering over items/status in inventory.
+Apr 13 - Added Health Potions | Added Sound Fx when hovering over items/status in inventory.
+<br>
+Apr 17 - Added multiple instances of Enemies | Level Up screen -WIP-

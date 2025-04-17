@@ -2,31 +2,31 @@
 #include "GameFunctions.hpp"
 #include "Enemy.hpp"
 #include "Heroes.hpp"
+#include "MusicFunctions.hpp"
 #include <raylib.h>
 #include <iostream>
-
+#include <vector>
 
 sEntity dungeon_gate;
 int levelCap = 100;
 bool playerLeveledUp = false;
 
-
+//Init enemies
 Enemy orc(
     "Orc",
     TILE_WIDTH * 5, TILE_HEIGHT * 5,
     130, ZONE_DUNGEON, 25, 30, 12,
-    GetRandomValue(10, 100),
-    1, "Intelligence"
+    100, 1, "Intelligence"
 );
 
 Enemy wanderingEye(
     "Wandering Eye",
     TILE_WIDTH * 10, TILE_HEIGHT * 20,
     100, ZONE_WORLD, 20, 45, 8,
-    GetRandomValue(30, 120),
-    1, "Strenght"
+    120, 1, "Strenght"
 );
 
+//Init Heroes
 Hero Knight (
     "Knight", "Strength", 
     TILE_WIDTH * 3, TILE_HEIGHT * 3,
@@ -45,19 +45,51 @@ Hero Rouge (
     140, 140, 35, 44, 17, 0, 1, 1300, ZONE_WORLD, true, true
 );
 
-
-Enemy enemy = orc;
 Hero Player = Knight;
+//enemy pointers
+Enemy* orc1 = nullptr;
+Enemy* orc2 = nullptr;
+
+Enemy* wanderingEye1 = nullptr;
+Enemy* wanderingEye2 = nullptr;
+
+Enemy* enemy = nullptr;
+//enemy arrays
+Enemy* orcArr[MAX_ORCS_INSTANCES];
+Enemy* eyeArr[MAX_WANDERING_EYE_INSTANCES];
 
 
 void EntitiesInit() { 
-    dungeon_gate = (sEntity) {
+
+    dungeon_gate = (sEntity) 
+    {
         .x = TILE_WIDTH * 10,
         .y = TILE_HEIGHT * 10,
         .zone = ZONE_ALL,
     };
 
+    //Place enemy instances
+    orc1 = new Enemy(orc);
+    orc1->Move( TILE_WIDTH * 5, TILE_HEIGHT * 5);
+
+    orc2 = new Enemy(orc);
+    orc2->Move(TILE_WIDTH * 6, TILE_HEIGHT * 5);
+
+    wanderingEye1 = new Enemy(wanderingEye);
+    wanderingEye1->Move(TILE_WIDTH * 10, TILE_HEIGHT * 20);
+
+    wanderingEye2 = new Enemy(wanderingEye);
+    wanderingEye2->Move(TILE_WIDTH * 14, TILE_HEIGHT * 20);
+
+    //array of enemies
+    orcArr[0] = orc1;
+    orcArr[1] = orc2;
+
+    eyeArr[0] = wanderingEye1;
+    eyeArr[1] = wanderingEye2;
+
     Player.SetZone(ZONE_WORLD);
+    
 
 }
 
@@ -70,27 +102,37 @@ void PlayerRender()
 
 void EnemyRender()
 {
-    if(orc.GetZone() == Player.GetZone())
-    {
-        if(orc.IsAlive() == true) DrawTile(orc.GetX(), orc.GetY(), 11, 0); 
-        //Draw chest
-        if(chest.isAlive) { DrawTile(chest.x, chest.y, 9 ,3);}
-    }
 
+    for(int i = 0; i < MAX_ORCS_INSTANCES; i++) 
+    {
+        if(orcArr[i]->GetZone() == Player.GetZone()) 
+        {
+            if(orcArr[i]->IsAlive() == true) 
+            {
+                DrawTile(orcArr[i]->GetX(), orcArr[i]->GetY(), 11, 0);
+            }
+        }
+    }
     
-    if(wanderingEye.GetZone() == Player.GetZone())
+    for(int i = 0; i < MAX_WANDERING_EYE_INSTANCES; i++)
     {
-        if(wanderingEye.IsAlive() == true) DrawTile(wanderingEye.GetX(), wanderingEye.GetY(), 13, 0); 
-        //Draw chest
-        if(chest.isAlive) { DrawTile(chest.x, chest.y, 9 ,3);}
-
+        if(eyeArr[i]->GetZone() == Player.GetZone())
+        {
+            if(eyeArr[i]->IsAlive() == true) 
+            {
+                DrawTile(eyeArr[i]->GetX(), eyeArr[i]->GetY(), 13, 0); 
+            }
+        }   
     }
+
+    //spawn chest
+    if(chest.isAlive) { DrawTile(chest.x, chest.y, 9 ,3);}
     
 }
 
 void PlayerLevelUp()
 {
-    if(Player.GetExperience() == levelCap)
+    if(Player.GetExperience() >= levelCap)
     {
         playerLeveledUp = true;
         Player.SetLevel(Player.GetLevel() + 1);
@@ -101,5 +143,5 @@ void PlayerLevelUp()
         Player.GiveExperience(0);
         levelCap += 100;
     }
-}
 
+}
