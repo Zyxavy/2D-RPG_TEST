@@ -504,17 +504,75 @@ void ShowItemInfos()
 }
 
 void LevelUpScreen()
-{
-   if(playerLeveledUp)
-    {
-      
-      PlaySpecificMusic();
+{  
+   //Image Positions
+   Vector2 StarPos1 = {330, 5};
+   Vector2 StarPos2 = {210, 45};
+   Vector2 StarPos3 = {490, 45};
 
-      BeginDrawing();
+   Rectangle LayoutBox {50, 50, 700, 500};
+   Rectangle LayoutBoxInner {70, 70, 660, 460};
+   Rectangle ExitBox { 300, 480, 200, 50};
 
-      DrawRectangle( 15, 15, 200, 300, WHITE);
- 
-    }
+   //Colors
+   Color layoutColorInner = {97, 62, 25, 255};
+   Color layoutColorOuter = {189, 104, 34, 255};
+   Color ExitBoxColor = {61, 168, 75, 255};
+   Color LevelUpColor = {227, 220, 32, 255};
+
+   Vector2 mousePos = GetMousePosition();
+
+   //Shapes
+   ClearBackground({237, 225, 211, 255});
+   DrawRectangleRounded(LayoutBox, 0.1, 1, layoutColorOuter);
+   DrawRectangleRounded(LayoutBoxInner,0.2, 1, layoutColorInner);
+   DrawRectangleRounded(ExitBox, 0.2, 2, ExitBoxColor);
+
+
+   //Text
+   DrawText("Continue", ExitBox.x + 50, ExitBox.y + 15, 25, WHITE);
+   DrawText("LEVELED UP!", 290, 190, 40, LevelUpColor );
+   DrawText(TextFormat("LEVEL: %d -> %d", Player.GetLevel(), Player.GetLevel() + 1), 100, 250, 35, WHITE);
+   DrawText(TextFormat("MINIMUM DAMAGE: %d -> %d", Player.GetDamageMin(), Player.GetDamageMin() + 10), 115, 300, 30, BLACK);
+   DrawText(TextFormat("MAXIMUM DAMAGE: %d -> %d", Player.GetDamageMax(), Player.GetDamageMax() + 10), 115, 340, 30, BLACK);
+   DrawText(TextFormat("DEFENSE: %d -> %d", Player.GetDefense(), Player.GetDefense() + 1), 115, 380, 30, BLACK);
+   DrawText(TextFormat("MAX HEALTH: %d -> %d", Player.GetMaxHealth(), Player.GetMaxHealth() + 50), 115, 420, 30, BLACK);
+
+   //Texture or Image
+   DrawTextureEx(textures[TEXTURE_STAR], StarPos1, 0.0f, 0.4f, WHITE);
+   DrawTextureEx(textures[TEXTURE_STAR], StarPos2, 0.0f, 0.3f, WHITE);
+   DrawTextureEx(textures[TEXTURE_STAR], StarPos3, 0.0f, 0.3f, WHITE);
+
+
+   //Collisions
+   if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+   {
+      if(CheckCollisionPointRec(mousePos, ExitBox))
+      {
+         playerLeveledUp = false;
+
+         for(int i = 0; i < MAX_LIGHT_MUSIC; i++)
+        {
+            SetMusicVolume(musicLight[i], musicVolume );
+            SetMusicVolume(musicDark[i], musicVolume);
+            SetMusicVolume(musicAction[i], musicVolume);
+        }
+
+          //Upgrade Stats
+         if(Player.GetExperience() >= levelCap)
+         {
+            Player.SetLevel(Player.GetLevel() + 1);
+            Player.SetDamageMin(Player.GetDamageMin() + 10);
+            Player.SetDamageMax(Player.GetDamageMax() + 10);
+            Player.SetDefense(Player.GetDefense() + 1);
+            Player.SetMaxHealth(Player.GetMaxHealth() + 50);
+            Player.GiveExperience(0);
+            levelCap += 100;
+         }
+         
+      }
+   }
+
 
 }
 

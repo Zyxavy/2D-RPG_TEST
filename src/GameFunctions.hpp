@@ -12,10 +12,10 @@ const int screenHeight = 600;
 
 
 //definitions
-#define MAX_TEXTURES 1
+#define MAX_TEXTURES 2
 #define TILE_WIDTH 8
 #define TILE_HEIGHT  8
-#define MAX_SOUNDS 6
+#define MAX_SOUNDS 7
 #define WORLD_WIDTH 25
 #define WORLD_HEIGHT 25
 
@@ -29,7 +29,8 @@ const int screenHeight = 600;
 //typedef & enums
 typedef enum 
 {
-    TEXTURE_TILEMAP = 0
+    TEXTURE_TILEMAP = 0,
+    TEXTURE_STAR = 1
 } texture_asset;
 
 typedef enum 
@@ -40,6 +41,7 @@ typedef enum
     SOUND_DEATH,
     SOUND_COINS,
     SOUND_HOVER_ITEMS,
+    SOUNDS_LEVEL_UP,
 } sound_asset;
 
 typedef enum

@@ -28,7 +28,7 @@ int main(){
            else if(isDead)
             {
                 DeathMenu();
-            } 
+            }
             else{
             
                 ClearBackground(BLACK);

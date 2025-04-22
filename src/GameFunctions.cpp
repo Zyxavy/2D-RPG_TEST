@@ -27,6 +27,12 @@ void GameStartup() {
     textures[TEXTURE_TILEMAP] = LoadTextureFromImage(image);
     UnloadImage(image);
 
+    Image StarImage = LoadImage("assets/Star.png");
+    textures[TEXTURE_STAR]= LoadTextureFromImage(StarImage);
+    UnloadImage(StarImage);
+ 
+
+
     //generate World/Zones
     for(int i = 0; i < WORLD_WIDTH; i++){
         for(int j = 0; j < WORLD_HEIGHT; j++){
@@ -63,6 +69,8 @@ void GameStartup() {
     sounds[SOUND_DEATH]  = LoadSound("assets/death.wav");
     sounds[SOUND_COINS]  = LoadSound("assets/pickupCoin.wav");
     sounds[SOUND_HOVER_ITEMS] = LoadSound("assets/HoverItems.wav");
+    sounds[SOUNDS_LEVEL_UP] = LoadSound("assets/LevelUp FX.wav");
+    
 
     LoadMusic();
 }
@@ -83,10 +91,6 @@ void GameUpdate() {
     {
         if(IsKeyPressed(KEY_Q)) {isInventory = false;}
     }
-    else if (playerLeveledUp)
-    {
-        LevelUpScreen();
-    }
     else
     {
         //Movement
@@ -106,6 +110,7 @@ void GameUpdate() {
             {  
                 x += TILE_WIDTH;
                 hasKeyPressed = true;
+                Player.GiveExperience(100);
             }
         }
         else if(IsKeyPressed(KEY_UP)) {
@@ -250,6 +255,10 @@ void GameRender() {
     else if(isInventory)
     {
         Inventory();
+    }
+    else if (playerLeveledUp)
+    {
+        LevelUpScreen();
     }
     else{
 

@@ -26,3 +26,5 @@ Apr 8 - Replaced Hero struct with Hero class | fixed battle bug, Enemies are now
 Apr 13 - Added Health Potions | Added Sound Fx when hovering over items/status in inventory.
 <br>
 Apr 17 - Added multiple instances of Enemies | Level Up screen -WIP-
+<br>
+Apr 22 - Finished Level Up Screen | added Level up Sound Fx

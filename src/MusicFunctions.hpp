@@ -9,7 +9,7 @@
 #define MAX_LIGHT_MUSIC 3
 #define MAX_DARK_MUSIC 3
 #define MAX_ACTION_MUSIC 3
-#define MAX_FX_MUSIC 1
+
 
 //enums
 enum MusicZone
@@ -23,7 +23,7 @@ enum MusicZone
 extern Music musicLight[MAX_LIGHT_MUSIC];
 extern Music musicDark[MAX_DARK_MUSIC];
 extern Music musicAction[MAX_ACTION_MUSIC];
-extern Music musicFX[MAX_FX_MUSIC];
+
 
 extern Music* currentMusic;
 extern int currentMusicZone;
@@ -38,7 +38,6 @@ void PlayRandomMusic(MusicZone zone);
 void UpdateMusic();
 void StopCurrentMusic();
 void UpdateAudioVolumes();
-void PlaySpecificMusic();
 void PlaySoundWhenHoveringItem(bool &hoveringOverItems, double currentTime, double &lastHoverSoundTime, double cooldownDuration);
 
 #endif // MUSIC_FUNCTIONS_HPP

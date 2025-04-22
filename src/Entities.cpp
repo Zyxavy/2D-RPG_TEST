@@ -3,6 +3,7 @@
 #include "Enemy.hpp"
 #include "Heroes.hpp"
 #include "MusicFunctions.hpp"
+#include "GameMenu.hpp"
 #include <raylib.h>
 #include <iostream>
 #include <vector>
@@ -135,13 +136,15 @@ void PlayerLevelUp()
     if(Player.GetExperience() >= levelCap)
     {
         playerLeveledUp = true;
-        Player.SetLevel(Player.GetLevel() + 1);
-        Player.SetDamageMin(Player.GetDamageMin() + 10);
-        Player.SetDamageMax(Player.GetDamageMax() + 10);
-        Player.SetDefense(Player.GetDefense() + 1);
-        Player.SetMaxHealth(Player.GetMaxHealth() + 50);
-        Player.GiveExperience(0);
-        levelCap += 100;
-    }
+        
+        for(int i = 0; i < MAX_LIGHT_MUSIC; i++)
+        {
+            SetMusicVolume(musicLight[i], 0.2f );
+            SetMusicVolume(musicDark[i], 0.2f);
+            SetMusicVolume(musicAction[i], 0.2f);
+        }
 
+        PlaySound(sounds[SOUNDS_LEVEL_UP]);
+    
+    }
 }

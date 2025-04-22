@@ -9,7 +9,6 @@
 Music musicLight[MAX_LIGHT_MUSIC];
 Music musicDark[MAX_DARK_MUSIC];
 Music musicAction[MAX_ACTION_MUSIC];
-Music musicFX[MAX_FX_MUSIC];
 
 Music* currentMusic = nullptr;
 int currentMusicZone = -1;
@@ -31,8 +30,6 @@ void LoadMusic()
     musicAction[0] = LoadMusicStream("assets/Action 1.wav");
     musicAction[1] = LoadMusicStream("assets/Action 2.wav");
     musicAction[2] = LoadMusicStream("assets/Action 3.wav");
-
-    musicFX[0] = LoadMusicStream("assets/Fx 1.mp3");
 }
 
 void UnloadMusic()
@@ -44,7 +41,7 @@ void UnloadMusic()
         UnloadMusicStream(musicAction[i]);
         
     }
-    UnloadMusicStream(musicFX[0]);
+   
 }
 
 void StopCurrentMusic()
@@ -114,11 +111,3 @@ void PlaySoundWhenHoveringItem(bool &hoveringOverItems, double currentTime, doub
     }
 }
 
-void PlaySpecificMusic()
-{
-    StopCurrentMusic();
-
-    currentMusic = &musicFX[0];
-
-    PlayMusicStream(*currentMusic);
-}

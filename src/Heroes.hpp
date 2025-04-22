@@ -16,6 +16,7 @@ class Hero
     bool isAlive, isPassable;
 
     public:
+    
     //Constructors
     Hero(std::string name, std::string type, int x, int y, int health, int maxHealth, int damageMin, int damageMax, int defense, int experience,
        int level, int money, eZones zone, bool isAlive, bool isPassable );
