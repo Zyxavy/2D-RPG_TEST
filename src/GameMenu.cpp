@@ -558,7 +558,7 @@ void LevelUpScreen()
             SetMusicVolume(musicAction[i], musicVolume);
         }
 
-          //Upgrade Stats
+         //Upgrade Stats
          if(Player.GetExperience() >= levelCap)
          {
             Player.SetLevel(Player.GetLevel() + 1);

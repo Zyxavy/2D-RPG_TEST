@@ -110,7 +110,7 @@ void GameUpdate() {
             {  
                 x += TILE_WIDTH;
                 hasKeyPressed = true;
-                Player.GiveExperience(100);
+                
             }
         }
         else if(IsKeyPressed(KEY_UP)) {
@@ -184,7 +184,7 @@ void GameUpdate() {
             
         }
         
-
+        //mouse wheel zoom
         float wheel = GetMouseWheelMove();
         if(wheel != 0) { 
             const float zoomIncrement = 0.125f;
