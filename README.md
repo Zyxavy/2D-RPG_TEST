@@ -21,10 +21,12 @@ Mar 26 - Replaced Enemy struct with Enemy class | Added movement to the enemy, i
 <br>
 Mar 30 - Added new Enemy | fixed some bugs
 <br>
-Apr 8 - Replaced Hero struct with Hero class | fixed battle bug, Enemies are now stunned for a bit when escaping (Buggy).
+Apr 8 - Replaced Hero struct with Hero class | fixed battle bug, Enemies are now stunned for a bit when escaping.
 <br>
 Apr 13 - Added Health Potions | Added Sound Fx when hovering over items/status in inventory.
 <br>
 Apr 17 - Added multiple instances of Enemies | Level Up screen -WIP-
 <br>
 Apr 22 - Finished Level Up Screen | added Level up Sound Fx
+<br>
+May 3 - Fixed some bugs on battle UI | added animations for battle -buggy as hek-

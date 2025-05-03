@@ -31,7 +31,7 @@ int main(){
             }
             else{
             
-                ClearBackground(DARKGRAY);
+                ClearBackground({34,35,35,255});
                 GameRender();
                 EndDrawing();
             }

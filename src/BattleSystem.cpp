@@ -7,6 +7,28 @@
 #include "raylib.h"
 #include <iostream>
 
+Vector2 playerOriginalPos = {160, 192}; //Original pos of player 
+Vector2 enemyOriginalPos = {576, 192};  //Original pos of enemy 
+Vector2 playerCurrentPos = playerOriginalPos;
+Vector2 enemyCurrentPos = enemyOriginalPos;
+
+//animation states
+bool playerAnimating = false;
+bool enemyAnimating = false;
+bool showDamage = false;
+bool showText = false;
+int damageToShow = 0;
+int textToShow = 0;
+Vector2 damagePosition = {0, 0};
+Vector2 textPosition = {0,0};
+float animationTimer = 0;
+float damageDisplayTime = 0;
+float textDisplayTime = 0;
+const float ANIMATION_SPEED = 5.0f;
+const float ANIMATION_DURATION = 0.5f;
+const float DAMAGE_DISPLAY_DURATION = 1.0f;
+
+//bools
 bool battleMode = false;
 bool playerTurn = true;
 bool playerDefending = false;
@@ -14,7 +36,6 @@ bool actionButtonIsPressed = false;
 bool itemButtonIsPressed = false;
 bool skillButtonIsPressed = false;
 bool attackButtonIsPressed = false;
-
 
 //main rects
 Rectangle battleScreen = {48, 56, 712, 288};
@@ -36,11 +57,13 @@ Rectangle actionDefendButton = {actionButtonMore.x +24, actionButtonMore.y + 152
 Color buttonColor = {36, 38, 36, 255};
 
 
-void BattleUpdate(Enemy *enemy) {
-
-    playerTurn = true;
+void BattleUpdate(Enemy *enemy)
+{
     Vector2 mousePos = GetMousePosition();
     Player.SetZone(ZONE_BATTLE);
+
+    //Update animations
+    UpdateBattleAnimations(GetFrameTime(), enemy);
 
     if (enemy->GetHealth() <= 0)  
     {
@@ -52,6 +75,20 @@ void BattleUpdate(Enemy *enemy) {
         Player.SetX(enemy->GetX() + TILE_WIDTH);
         
         PlayerLevelUp();
+        battleMode = false;
+        playerTurn = true;
+        playerDefending = false;
+        actionButtonIsPressed = false;
+        itemButtonIsPressed = false;
+        skillButtonIsPressed = false;
+        attackButtonIsPressed = false;
+        playerAnimating = false;
+        enemyAnimating = false;
+        showDamage = false;
+        showText = false;
+        playerCurrentPos = playerOriginalPos;
+        enemyCurrentPos = enemyOriginalPos;
+
         //spawn chest
         chest.x = enemy->GetX();
         chest.y = enemy->GetY();
@@ -59,88 +96,105 @@ void BattleUpdate(Enemy *enemy) {
         chest.money = GetRandomValue(23, 205);
         chest.healthPotions = GetRandomValue(1,4);
 
-        battleMode = false;
         return;
-
     } 
     else if(Player.GetHealth() <= 0) // player dies
     {
         Player.SetAlive(false);
         battleMode = false;
+        playerTurn = true;
+        playerDefending = false;
+        actionButtonIsPressed = false;
+        itemButtonIsPressed = false;
+        skillButtonIsPressed = false;
+        attackButtonIsPressed = false;
+        playerAnimating = false;
+        enemyAnimating = false;
+        showDamage = false;
+        showText = false;
+        playerCurrentPos = playerOriginalPos;
+        enemyCurrentPos = enemyOriginalPos;
+
         PlaySound(sounds[SOUND_DEATH]);
         isDead = true;
         Player.SetZone(enemy->GetZone());
-
-    
-        //Continue
     }
 
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        //Action 
-        if (CheckCollisionPointRec(mousePos, actionButton) && playerTurn) {
-            actionButtonIsPressed = true;
-            PlaySound(sounds[SOUND_HOVER_ITEMS]);
-        
-        }
-
-        //Run
-        else if (CheckCollisionPointRec(mousePos, runButton) && playerTurn) {
-            if (GetRandomValue(0, 1) == 1) {  
-                PlaySound(sounds[SOUND_HOVER_ITEMS]);
-                battleMode = false;
-                
-                //stun enemies
-                enemy->SetStunStatus(true);
-
-                Player.SetX(enemy->GetX() + (TILE_WIDTH * 2));
-                Player.SetZone(enemy->GetZone());
-                return;
-                
-                
-            }
-            playerTurn = false;
-        }
-    }
-    
-    if(actionButtonIsPressed)
+    if (!playerAnimating && !enemyAnimating) 
     {
-        if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
-        {
-            if(CheckCollisionPointRec(mousePos, actionAttackButton)) // attack
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            //Action 
+            if (CheckCollisionPointRec(mousePos, actionButton) && playerTurn) 
             {
-                attackButtonIsPressed = true;
-                PlayerAttacks(enemy);
-            }
-            else if(CheckCollisionPointRec(mousePos, actionDefendButton)) //defend
-            {
+                actionButtonIsPressed = true;
                 PlaySound(sounds[SOUND_HOVER_ITEMS]);
-                playerDefending = true;
+            }
+
+            //Run
+            else if (CheckCollisionPointRec(mousePos, runButton) && playerTurn) 
+            {
+                if (GetRandomValue(0, 1) == 1) {  
+                    PlaySound(sounds[SOUND_HOVER_ITEMS]);
+                    battleMode = false;
+                    
+                    //stun enemies
+                    enemy->SetStunStatus(true);
+
+                    Player.SetX(enemy->GetX() + (TILE_WIDTH * 2));
+                    Player.SetZone(enemy->GetZone());
+                    return;
+                }
                 playerTurn = false;
             }
-            else if(CheckCollisionPointRec(mousePos, actionBackButton)) // back
+        }
+    
+        if(actionButtonIsPressed)
+        {
+            if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
             {
-                actionButtonIsPressed = false;
-                PlaySound(sounds[SOUND_HOVER_ITEMS]);
+                if(CheckCollisionPointRec(mousePos, actionAttackButton)) // attack
+                {
+                    attackButtonIsPressed = true;
+                    playerAnimating = true;
+                    animationTimer = 0;
+                    showDamage = false;
+                    actionButtonIsPressed = false;  
+                    PlaySound(sounds[SOUND_HOVER_ITEMS]);
+    
+                }
+                else if(CheckCollisionPointRec(mousePos, actionDefendButton)) //defend
+                {
+                    playerDefending = true;
+                    showText = false;
+                    playerTurn = false; 
+                    actionButtonIsPressed = false;  
+                    PlaySound(sounds[SOUND_HOVER_ITEMS]);
+                }
+                else if(CheckCollisionPointRec(mousePos, actionBackButton)) // back
+                {
+                    actionButtonIsPressed = false;
+                    PlaySound(sounds[SOUND_HOVER_ITEMS]);
+                }
             }
         }
-    }
 
-    if (!playerTurn && enemy->GetHealth() > 0 ) 
-    {
-        //enemy attacks
-        EnemyAttacks(enemy);
-    } 
+        if (!playerTurn && enemy->GetHealth() > 0 && !enemyAnimating) 
+        {
+            //enemy attacks
+            enemyAnimating = true;
+            animationTimer = 0;
+            showDamage = false;
+            showText = false;
+        }
+    }
 }
 
-void BattleRender(Enemy *enemy) {
-
-    //player tile placement = {160, 184, 96, 88}
-    //enemy tile placement = {576, 192, 112, 80}
-
-
-    //Draw
+void BattleRender(Enemy *enemy) 
+{
+    //layout
     ClearBackground(DARKGRAY);
-    DrawRectangleRec(battleScreen, BLACK);
+    DrawRectangleRec(battleScreen, {34,35,35,255});
+    RenderBackground(enemy);
     DrawRectangleRounded(actionButton, 0.2f, 1, buttonColor);
     DrawRectangleRounded(skillButton, 0.2f, 1, buttonColor);
     DrawRectangleRounded(itemsButton, 0.2f, 1, buttonColor);
@@ -153,13 +207,13 @@ void BattleRender(Enemy *enemy) {
     DrawTile(runButton.x + 39, runButton.y + 8, 3, 7, 7.0f);
 
     //Player tile
-    if(Player.GetName() == Knight.GetName())  DrawTile(160, 192, 6, 0, 10.0f);
-    else if(Player.GetName() == Wizard.GetName())  DrawTile(160, 192, 9, 0, 10.0f); 
-    else if(Player.GetName() == Rouge.GetName())  DrawTile(160, 192, 8, 0, 10.0f); 
+    if(Player.GetName() == Knight.GetName())  DrawTile(playerCurrentPos.x, playerCurrentPos.y, 6, 0, 10.0f);
+    else if(Player.GetName() == Wizard.GetName())  DrawTile(playerCurrentPos.x, playerCurrentPos.y, 9, 0, 10.0f); 
+    else if(Player.GetName() == Rouge.GetName())  DrawTile(playerCurrentPos.x, playerCurrentPos.y, 8, 0, 10.0f); 
 
     //enemy Tile
-    if(enemy->GetName() == "Orc") DrawTile(576, 192, 11, 0, 10.0f);
-    else if(enemy->GetName() == "Wandering Eye") DrawTile(576, 192, 13, 0, 10.0f);
+    if(enemy->GetName() == "Orc") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 11, 0, 10.0f);
+    else if(enemy->GetName() == "Wandering Eye") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 13, 0, 10.0f);
 
     if(actionButtonIsPressed)
     {
@@ -173,61 +227,205 @@ void BattleRender(Enemy *enemy) {
         DrawText("DEFEND", actionDefendButton.x + 50, actionDefendButton.y + 15, 15 ,WHITE);
     }
 
+    //Display damage numbers 
+    if (showDamage) 
+    {
+        float yOffset = -10.0f * (damageDisplayTime / DAMAGE_DISPLAY_DURATION);
+        char damageText[20];
+        sprintf(damageText, "%d", damageToShow);
+        
+        Color textColor = damageToShow > 0 ? RED : GREEN;
+        DrawText(damageText, damagePosition.x, damagePosition.y + yOffset, 24, textColor);
+    }
+    //display Text
+    if (playerDefending)
+    {
+        DrawText("DEFENDING", playerCurrentPos.x - 20, playerCurrentPos.y - 50, 20, GRAY);
+    }
+    if (showText) 
+    {
+        float yOffset = -10.0f * (damageDisplayTime / DAMAGE_DISPLAY_DURATION);
+        
+        Color textColor = WHITE;
+        switch (textToShow)
+        {
+        case 1:
+            textColor = YELLOW;
+            DrawText("Attack Blocked", textPosition.x, textPosition.y + yOffset, 24, textColor);
+            break;
+        
+        case 2:
+            DrawText("Attack Partially Blocked", textPosition.x, textPosition.y + yOffset, 24, textColor);
+            break;
+        case 3:
+            textColor = YELLOW;
+            DrawText("Countered!", textPosition.x, textPosition.y + yOffset, 24, textColor);
+            break;
+        case 4:
+            textColor = RED;
+            DrawText("Failed to Block", textPosition.x, textPosition.y + yOffset, 24, textColor);
+            break;  
+        }
+    }
 }
 
-void RenderBackground()
+void RenderBackground(Enemy *enemy) 
 {
+  
+}
 
+void UpdateBattleAnimations(float frameTime, Enemy *enemy) 
+{
+    //Player attack animation
+    if (playerAnimating) 
+    {
+        animationTimer += frameTime;
+        
+        if (animationTimer < ANIMATION_DURATION)
+        {
+            //move toward enemy
+            float progress = animationTimer / ANIMATION_DURATION;
+            playerCurrentPos.x = playerOriginalPos.x + (enemyOriginalPos.x - playerOriginalPos.x - 112) * progress;
+        } 
+        else if (animationTimer < ANIMATION_DURATION * 2) 
+        {
+            //play attack sound and show damage
+            if (!showDamage) 
+            { 
+                PlaySound(sounds[SOUNDS_ATTACK]);
+                PlayerAttacks(enemy);
+            }
+            
+            //back to original pos
+            float progress = (animationTimer - ANIMATION_DURATION) / ANIMATION_DURATION;
+            playerCurrentPos.x = enemyOriginalPos.x - 112 + (playerOriginalPos.x - (enemyOriginalPos.x - 112)) * progress;
+        } 
+        else 
+        {
+            //complete
+            playerCurrentPos = playerOriginalPos;
+            playerAnimating = false;
+            playerTurn = false;
+            attackButtonIsPressed = false;
+            actionButtonIsPressed = false;
+        }
+    }
+    
+    //enemy attack animation
+    if (enemyAnimating) 
+    {
+        animationTimer += frameTime;
+        
+        if (animationTimer < ANIMATION_DURATION) 
+        {
+            //move to player
+            float progress = animationTimer / ANIMATION_DURATION;
+            enemyCurrentPos.x = enemyOriginalPos.x - (enemyOriginalPos.x - playerOriginalPos.x - 96) * progress;
+        } 
+        else if (animationTimer < ANIMATION_DURATION * 2) 
+        {
+            if (!showDamage) 
+            {
+                PlaySound(sounds[SOUNDS_ATTACK]);
+                bool wasDefending = playerDefending;
+                EnemyAttacks(enemy);
+                playerDefending = wasDefending;
+            }
+            
+            //back to original pos
+            float progress = (animationTimer - ANIMATION_DURATION) / ANIMATION_DURATION;
+            enemyCurrentPos.x = playerOriginalPos.x + 96 + (enemyOriginalPos.x - (playerOriginalPos.x + 96)) * progress;
+        } 
+        else 
+        {
+            enemyCurrentPos = enemyOriginalPos;
+            enemyAnimating = false;
+            playerTurn = true;
+            playerDefending = false;
+        }
+    }
+    
+    //update damage display timer
+    if (showDamage) 
+    {
+        damageDisplayTime += frameTime;
+        if (damageDisplayTime >= DAMAGE_DISPLAY_DURATION) 
+        {
+            showDamage = false;
+        }
+    }
+
+    if (showText) 
+    {
+        textDisplayTime += frameTime;
+        if (textDisplayTime >= DAMAGE_DISPLAY_DURATION) 
+        {
+            showText = false;
+        }
+    }
 }
 
 void PlayerAttacks(Enemy *enemy)
 {
-    int damage = GetRandomValue(Player.GetDamageMin(), Player.GetDamageMax()) - enemy->GetDefense();  
-    if (enemy->GetWeakness() == Player.GetType()) damage *= 2;  
-    if(damage <= 0) damage = 1;
-    enemy->TakeDamage(damage); 
-    std::cout << "Player attacked! Damage dealt: " << damage << std::endl;
-
-    playerTurn = false;
-    playerDefending = false;
-    PlaySound(sounds[SOUNDS_ATTACK]);
+    showDamage = true;
+    damageToShow = GetRandomValue(Player.GetDamageMin(), Player.GetDamageMax()) - enemy->GetDefense();
+    if (enemy->GetWeakness() == Player.GetType()) damageToShow *= 2;
+    if (damageToShow <= 0) damageToShow = 1;
+    enemy->TakeDamage(damageToShow);
+    damagePosition = (Vector2){enemyCurrentPos.x + 50, enemyCurrentPos.y - 30};
+    damageDisplayTime = 0;
 }
 
 void EnemyAttacks(Enemy *enemy)
-{   
-    int dmg;
-    int enemyDamage = GetRandomValue(enemy->GetDamageMin(), enemy->GetDamageMax()) -  Player.GetDefense();
-
+{
+    showDamage = true;
+    
+    int enemyDamage = GetRandomValue(enemy->GetDamageMin(), enemy->GetDamageMax()) - Player.GetDefense();
+    
     if (playerDefending) 
     {
-        int act = GetRandomValue(0,3);
-
-        switch (act)
+        showText = true;
+        int act = GetRandomValue(0, 3);
+        switch (act) 
         {
-        case 0:
-            enemyDamage =  0;
-            std::cout << "Completely Blocked off the attack\n"; 
-            return;
-        case 1:
-            enemyDamage /= 2;
-            std::cout << "Blocked off some damage!\n";
-            break;
-        case 2:
-            dmg = Player.GetDamageMin() / 2;
-            enemyDamage = 0;
-            enemy->TakeDamage(dmg);
-            std::cout << "Attack Parried!\n";
-            std::cout << "Player Dealt " << dmg << " Damage!\n";
-            return;
-        case 3:
-            std::cout << "Blocked Failed!\n";
-            break;
+            case 0:
+                enemyDamage = 0; // Completely blocked
+                textToShow = 1;
+                break;
+            case 1:
+                enemyDamage /= 2; // Partial block
+                if (enemyDamage <= 0) enemyDamage = 3;
+                textToShow = 2;
+                break;
+            case 2:
+                // Parry 
+                damageToShow = Player.GetDamageMin() / 2;
+                if (damageToShow <= 0) damageToShow = 1;
+                enemy->TakeDamage(damageToShow);
+                damagePosition = (Vector2){playerCurrentPos.x + 50, playerCurrentPos.y - 70};
+                enemyDamage = damageToShow;
+                textToShow = 3;
+                break;
+
+            case 3:
+                // Block failed 
+                textToShow = 4;
+                break;
         }
     }
+    else
+    {
+        textToShow = 0;
+        showText = false;
+    }
+    
+    if (enemyDamage <= 0) enemyDamage = 0;
+    else Player.SetHealth(Player.GetHealth() - enemyDamage);
+    
+    damageToShow = enemyDamage;
+    damagePosition = (Vector2){playerCurrentPos.x + 50, playerCurrentPos.y - 30};
+    damageDisplayTime = 0;
 
-    if(enemyDamage <= 0) enemyDamage = 1;
-    Player.SetHealth( Player.GetHealth() - enemyDamage);
-    playerTurn = true;
+    textPosition = (Vector2) {playerCurrentPos.x + 30, playerCurrentPos.y - 70};
+    textDisplayTime = 0;
 }
-
-
