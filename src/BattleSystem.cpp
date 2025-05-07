@@ -36,6 +36,7 @@ bool actionButtonIsPressed = false;
 bool itemButtonIsPressed = false;
 bool skillButtonIsPressed = false;
 bool attackButtonIsPressed = false;
+bool aTabIsOpen = false;
 
 //main rects
 Rectangle battleScreen = {48, 56, 712, 288};
@@ -47,11 +48,19 @@ Rectangle actionButtonMore = {24, 352, 360, 224};
 Rectangle skillOrItemsButtonMore = {112, 360, 592, 216};
 Rectangle textBoxPlayer = {104, 64, 200, 72};
 Rectangle textBoxEnemy = {520, 64, 200, 72};
+Rectangle playerHealthBox = { playerOriginalPos.x - 100, playerOriginalPos.y + 100, 250, 40};
+Rectangle enemyHealthBox = { enemyOriginalPos.x - 90, enemyOriginalPos.y + 100, 250, 40};
 
 //Action Button Rects
 Rectangle actionBackButton = {actionButtonMore.x + 216, actionButtonMore.y + 120, 120, 36};
 Rectangle actionAttackButton = {actionButtonMore.x +24, actionButtonMore.y + 72, 160, 64};
 Rectangle actionDefendButton = {actionButtonMore.x +24, actionButtonMore.y + 152, 160, 56};
+
+//Skills Button Rects
+Rectangle skillsBackButton = {skillOrItemsButtonMore.x + 10, skillOrItemsButtonMore.y + 5, 120, 40};
+Rectangle skills1 = {skillOrItemsButtonMore.x + 10, skillOrItemsButtonMore.y + 65, 160, 60};
+Rectangle skills2 = {skillOrItemsButtonMore.x + 190, skillOrItemsButtonMore.y + 65, 160, 60};
+Rectangle skills3 = {skillOrItemsButtonMore.x + 380, skillOrItemsButtonMore.y + 65, 160, 60};
 
 //colors
 Color buttonColor = {36, 38, 36, 255};
@@ -124,14 +133,29 @@ void BattleUpdate(Enemy *enemy)
     {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             //Action 
-            if (CheckCollisionPointRec(mousePos, actionButton) && playerTurn) 
+            if (CheckCollisionPointRec(mousePos, actionButton) && playerTurn && !aTabIsOpen) 
             {
                 actionButtonIsPressed = true;
+                aTabIsOpen = true;
                 PlaySound(sounds[SOUND_HOVER_ITEMS]);
             }
-
+            //skill
+            else if(CheckCollisionPointRec(mousePos, skillButton) && playerTurn && !aTabIsOpen)
+            {
+                skillButtonIsPressed = true;
+                aTabIsOpen = true;
+                PlaySound(sounds[SOUND_HOVER_ITEMS]);
+            }
+            //Items
+            else if(CheckCollisionPointRec(mousePos, itemsButton) && playerTurn && !aTabIsOpen)
+            {
+                itemButtonIsPressed = true;
+                //aTabIsOpen = true;
+                PlaySound(sounds[SOUND_HOVER_ITEMS]);
+                playerTurn = false;
+            }
             //Run
-            else if (CheckCollisionPointRec(mousePos, runButton) && playerTurn) 
+            else if (CheckCollisionPointRec(mousePos, runButton) && playerTurn && !aTabIsOpen) 
             {
                 if (GetRandomValue(0, 1) == 1) {  
                     PlaySound(sounds[SOUND_HOVER_ITEMS]);
@@ -148,9 +172,9 @@ void BattleUpdate(Enemy *enemy)
             }
         }
     
-        if(actionButtonIsPressed)
+        if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
-            if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+            if(actionButtonIsPressed)
             {
                 if(CheckCollisionPointRec(mousePos, actionAttackButton)) // attack
                 {
@@ -159,24 +183,50 @@ void BattleUpdate(Enemy *enemy)
                     animationTimer = 0;
                     showDamage = false;
                     actionButtonIsPressed = false;  
+                    aTabIsOpen = false;
                     PlaySound(sounds[SOUND_HOVER_ITEMS]);
-    
+
                 }
                 else if(CheckCollisionPointRec(mousePos, actionDefendButton)) //defend
                 {
                     playerDefending = true;
                     showText = false;
                     playerTurn = false; 
-                    actionButtonIsPressed = false;  
+                    actionButtonIsPressed = false; 
+                    aTabIsOpen = false; 
                     PlaySound(sounds[SOUND_HOVER_ITEMS]);
                 }
                 else if(CheckCollisionPointRec(mousePos, actionBackButton)) // back
                 {
                     actionButtonIsPressed = false;
+                    aTabIsOpen = false;
+                    PlaySound(sounds[SOUND_HOVER_ITEMS]);
+                }
+            }
+
+            if(skillButtonIsPressed)
+            {
+                if(CheckCollisionPointRec(mousePos, skillsBackButton))
+                {
+                    skillButtonIsPressed = false;
+                    aTabIsOpen = false;
+                    PlaySound(sounds[SOUND_HOVER_ITEMS]);
+                }
+                else if(CheckCollisionPointRec(mousePos, skills1))
+                {
+                    PlaySound(sounds[SOUND_HOVER_ITEMS]);
+                }
+                else if(CheckCollisionPointRec(mousePos, skills2))
+                {
+                    PlaySound(sounds[SOUND_HOVER_ITEMS]);
+                }
+                else if(CheckCollisionPointRec(mousePos, skills3))
+                {
                     PlaySound(sounds[SOUND_HOVER_ITEMS]);
                 }
             }
         }
+    
 
         if (!playerTurn && enemy->GetHealth() > 0 && !enemyAnimating) 
         {
@@ -202,8 +252,8 @@ void BattleRender(Enemy *enemy)
 
     //tiles
     DrawTile(actionButton.x + 39, actionButton.y + 8, 6, 4, 7.0f);
-    DrawTile(skillButton.x + 39, skillButton.y + 8, 9, 8, 7.0f);
-    DrawTile(itemsButton.x + 39, itemsButton.y + 8, 8, 8, 7.0f);
+    DrawTile(skillButton.x + 39, skillButton.y + 8, 8, 8, 7.0f);
+    DrawTile(itemsButton.x + 39, itemsButton.y + 8, 7, 8, 7.0f);
     DrawTile(runButton.x + 39, runButton.y + 8, 3, 7, 7.0f);
 
     //Player tile
@@ -215,6 +265,16 @@ void BattleRender(Enemy *enemy)
     if(enemy->GetName() == "Orc") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 11, 0, 10.0f);
     else if(enemy->GetName() == "Wandering Eye") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 13, 0, 10.0f);
 
+    //health
+    DrawRectangleRounded(playerHealthBox, 0.1, 1, BLACK);
+    DrawRectangleRounded(enemyHealthBox, 0.1, 1, BLACK);
+    //player HP
+    DrawText(TextFormat("Health: %d", Player.GetHealth()), playerHealthBox.x + 5, playerHealthBox.y + 10, 25, WHITE);
+    RenderPlayerHearts();
+    //enemy HP
+    DrawText(TextFormat("Health: %d", enemy->GetHealth()), enemyHealthBox.x +5, enemyHealthBox.y + 10, 25, WHITE);
+    RenderEnemyHearts(enemy);
+
     if(actionButtonIsPressed)
     {
         DrawRectangleRec(actionButtonMore, BLACK);
@@ -225,6 +285,27 @@ void BattleRender(Enemy *enemy)
         DrawText("BACK", actionBackButton.x + 10, actionBackButton.y + 10, 15 ,WHITE);
         DrawText("ATTACK", actionAttackButton.x + 50, actionAttackButton.y + 15, 15 ,WHITE);
         DrawText("DEFEND", actionDefendButton.x + 50, actionDefendButton.y + 15, 15 ,WHITE);
+    }
+
+    if(skillButtonIsPressed)
+    {
+
+        DrawRectangleRec(skillOrItemsButtonMore, BLACK);
+        DrawRectangleRounded(skillsBackButton, 0.1f, 1, buttonColor);
+        DrawRectangleRounded(skills1, 0.1f, 3, buttonColor);
+        DrawRectangleRounded(skills2, 0.1f, 3, buttonColor);
+        DrawRectangleRounded(skills3, 0.1f, 3, buttonColor);
+
+
+
+        if(Player.GetName() == Knight.GetName())  KnightSkill();
+        else if(Player.GetName() == Wizard.GetName())  WizardSkill(); 
+        else if(Player.GetName() == Rouge.GetName())  RougeSkill(); 
+    }
+
+    if(itemButtonIsPressed)
+    {
+        Inventory();
     }
 
     //Display damage numbers 
@@ -429,3 +510,77 @@ void EnemyAttacks(Enemy *enemy)
     textPosition = (Vector2) {playerCurrentPos.x + 30, playerCurrentPos.y - 70};
     textDisplayTime = 0;
 }
+
+void RenderPlayerHearts()
+{
+    if(Player.GetHealth() <= 20)
+    {
+        DrawTile(playerHealthBox.x + 150, playerHealthBox.y +8, 5, 6, 3.5f );
+        DrawTile(playerHealthBox.x + 180, playerHealthBox.y +8, 4, 6, 3.5f );
+        DrawTile(playerHealthBox.x + 210, playerHealthBox.y +8, 4, 6, 3.5f );
+    }
+    else if(Player.GetHealth() <= Player.GetMaxHealth() / 2)
+    {
+        DrawTile(playerHealthBox.x + 150, playerHealthBox.y +8, 6, 6, 3.5f );
+        DrawTile(playerHealthBox.x + 180, playerHealthBox.y +8, 5, 6, 3.5f );
+        DrawTile(playerHealthBox.x + 210, playerHealthBox.y +8, 4, 6, 3.5f );
+    }
+    else if(Player.GetHealth() < Player.GetMaxHealth())
+    {
+        
+        DrawTile(playerHealthBox.x + 150, playerHealthBox.y +8, 6, 6, 3.5f );
+        DrawTile(playerHealthBox.x + 180, playerHealthBox.y +8, 6, 6, 3.5f );
+        DrawTile(playerHealthBox.x + 210, playerHealthBox.y +8, 5, 6, 3.5f );
+    }
+    else if(Player.GetHealth() == Player.GetMaxHealth()) 
+    {
+        DrawTile(playerHealthBox.x + 150, playerHealthBox.y +8, 6, 6, 3.5f );
+        DrawTile(playerHealthBox.x + 180, playerHealthBox.y +8, 6, 6, 3.5f );
+        DrawTile(playerHealthBox.x + 210, playerHealthBox.y +8, 6, 6, 3.5f );
+    }
+}
+
+void RenderEnemyHearts(Enemy *enemy)
+{
+    if(enemy->GetHealth() <= 20)
+    {
+        DrawTile(enemyHealthBox.x + 150, enemyHealthBox.y +8, 5, 6, 3.5f );
+        DrawTile(enemyHealthBox.x + 180, enemyHealthBox.y +8, 4, 6, 3.5f );
+        DrawTile(enemyHealthBox.x + 210, enemyHealthBox.y +8, 4, 6, 3.5f );
+    }
+    else if(enemy->GetHealth() <= enemy->GetMaxHealth() / 2)
+    {
+        DrawTile(enemyHealthBox.x + 150, enemyHealthBox.y +8, 6, 6, 3.5f );
+        DrawTile(enemyHealthBox.x + 180, enemyHealthBox.y +8, 5, 6, 3.5f );
+        DrawTile(enemyHealthBox.x + 210, enemyHealthBox.y +8, 4, 6, 3.5f );
+    }
+    else if(enemy->GetHealth() < enemy->GetMaxHealth())
+    {
+        
+        DrawTile(enemyHealthBox.x + 150, enemyHealthBox.y +8, 6, 6, 3.5f );
+        DrawTile(enemyHealthBox.x + 180, enemyHealthBox.y +8, 6, 6, 3.5f );
+        DrawTile(enemyHealthBox.x + 210, enemyHealthBox.y +8, 5, 6, 3.5f );
+    }
+    else if(enemy->GetHealth() == enemy->GetMaxHealth()) 
+    {
+        DrawTile(enemyHealthBox.x + 150, enemyHealthBox.y +8, 6, 6, 3.5f );
+        DrawTile(enemyHealthBox.x + 180, enemyHealthBox.y +8, 6, 6, 3.5f );
+        DrawTile(enemyHealthBox.x + 210, enemyHealthBox.y +8, 6, 6, 3.5f );
+    }
+}
+
+void KnightSkill()
+{
+    
+}
+
+void WizardSkill()
+{
+
+}
+
+void RougeSkill()
+{
+
+}
+

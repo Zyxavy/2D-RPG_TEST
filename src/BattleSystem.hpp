@@ -16,6 +16,7 @@ extern bool itemButtonIsPressed;
 extern bool skillButtonIsPressed;
 extern bool attackButtonIsPressed;
 extern bool defendButtonIsPressed;
+extern bool aTabIsOpen;
 
 // Animation related variables
 extern Vector2 playerOriginalPos;
@@ -41,5 +42,11 @@ void PlayerAttacks(Enemy *enemy);
 void EnemyAttacks(Enemy *enemy);
 void RenderBackground(Enemy *enemy);
 void UpdateBattleAnimations(float frameTime, Enemy *enemy);
+void RenderPlayerHearts();
+void RenderEnemyHearts(Enemy *enemy);
+void KnightSkill();
+void WizardSkill();
+void RougeSkill();
+
 
 #endif // BATTLE_SYSTEM_HPP

@@ -1,13 +1,14 @@
 ------------------
 Work In Progress
 ------------------
-
-still a bit messy but it works, I guess.
+<br>
+A 2d game I made using c++ with the raylib and raygui library. The code is a bit messy and unoptimized but it works, most of the time.
+<br>
 ##Music by Alkakrab
-----
-2025
+<lr>
+<h3> 2025
 
-Feb 23 - Added Menu| Fixed Battle UI
+Feb 23 - Added Menu | Fixed Battle UI
 <br>
 Mar 4 - Added character selection| fixed some bugs| implemented entities
 <br>
@@ -25,8 +26,10 @@ Apr 8 - Replaced Hero struct with Hero class | fixed battle bug, Enemies are now
 <br>
 Apr 13 - Added Health Potions | Added Sound Fx when hovering over items/status in inventory.
 <br>
-Apr 17 - Added multiple instances of Enemies | Level Up screen -WIP-
+Apr 17 - Added multiple instances of Enemies | Level Up screen 
 <br>
 Apr 22 - Finished Level Up Screen | added Level up Sound Fx
 <br>
 May 3 - Fixed some bugs on battle UI | added animations for battle -buggy as hek-
+<br>
+May 6 - You can now access the inventory in battle | added health in battle | Skills -WIP-

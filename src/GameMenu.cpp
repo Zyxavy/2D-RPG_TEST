@@ -94,22 +94,20 @@ void DeathMenu(){
         //Start 
         if (CheckCollisionPointRec(mousePos, startButton)) {
            isDead = false;
-           orc.SetAlive(true);
-           orc.SetHealth(100);
+          //enemies
            Player.SetAlive(true);
            Player.SetZone(ZONE_WORLD);
-           Player.SetHealth(100);
+           Player.SetHealth(Player.GetMaxHealth());
 
         }
         //Options
         else if (CheckCollisionPointRec(mousePos, optionsButton)) {
            inOptions = true;
            isDead = false;
-           orc.SetAlive(true);
-           orc.SetHealth(100);
+           //eniemies
            Player.SetAlive(true);
            Player.SetZone(ZONE_WORLD);
-           Player.SetHealth(100);
+           Player.SetHealth(Player.GetMaxHealth());
         }
         //Exit
         else if (CheckCollisionPointRec(mousePos, exitButton) ) {
@@ -370,6 +368,7 @@ void Inventory()
       if(CheckCollisionPointRec(mousePos, exitButton))
       {
          isInventory = false;
+         if(battleMode) itemButtonIsPressed = false;
       }
 
       //Items/Consumables
@@ -575,6 +574,5 @@ void LevelUpScreen()
 
 
 }
-
 
 
