@@ -31,19 +31,19 @@ Enemy wanderingEye(
 Hero Knight (
     "Knight", "Strength", 
     TILE_WIDTH * 3, TILE_HEIGHT * 3,
-    200, 200, 18, 37, 24, 0, 1, 1000, ZONE_WORLD, true, true
+    200, 200, 100, 100, 18, 37, 24, 0, 1, 1000, ZONE_WORLD, true, true
 );
 
 Hero Wizard (
     "Wizard", "Intelligence", 
     TILE_WIDTH * 3, TILE_HEIGHT * 3,
-    100, 100, 45, 55, 12, 0, 1, 1000, ZONE_WORLD, true, true
+    100, 100, 200, 200, 45, 55, 12, 0, 1, 1000, ZONE_WORLD, true, true
 );
 
-Hero Rouge (
-    "Rouge", "Dexterity", 
+Hero Rogue (
+    "Rogue", "Dexterity", 
     TILE_WIDTH * 3, TILE_HEIGHT * 3,
-    140, 140, 35, 44, 17, 0, 1, 1300, ZONE_WORLD, true, true
+    140, 140, 130, 130, 35, 44, 17, 0, 1, 1300, ZONE_WORLD, true, true
 );
 
 Hero Player = Knight;
@@ -98,7 +98,7 @@ void PlayerRender()
 {
     if(Player.GetName() == Knight.GetName())  DrawTile(camera.target.x, camera.target.y, 6, 0);
     else if(Player.GetName() == Wizard.GetName())  DrawTile(camera.target.x, camera.target.y, 9, 0); 
-    else if(Player.GetName() == Rouge.GetName())  DrawTile(camera.target.x, camera.target.y, 8, 0);  
+    else if(Player.GetName() == Rogue.GetName())  DrawTile(camera.target.x, camera.target.y, 8, 0);  
 }
 
 void EnemyRender()

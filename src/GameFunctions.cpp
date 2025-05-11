@@ -18,7 +18,8 @@ sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
 bool isInventory = false;
 int count;
 
-void GameStartup() {
+void GameStartup() 
+{
 
     InitAudioDevice();
 
@@ -70,12 +71,16 @@ void GameStartup() {
     sounds[SOUND_COINS]  = LoadSound("assets/pickupCoin.wav");
     sounds[SOUND_HOVER_ITEMS] = LoadSound("assets/HoverItems.wav");
     sounds[SOUNDS_LEVEL_UP] = LoadSound("assets/LevelUp FX.wav");
+    //skils sounds
+    sounds[SOUNDS_KNIGHT_SKILL1] = LoadSound("assets/KnightSkill1.wav");
+    sounds[SOUNDS_KNIGHT_SKILL2] = LoadSound("assets/KnightSkill2.wav");
+    sounds[SOUNDS_KNIGHT_SKILL3] = LoadSound("assets/KnightSkill3.wav");
     
-
     LoadMusic();
 }
 
-void GameUpdate() {
+void GameUpdate() 
+{
 
     //Music
     UpdateMusic();
@@ -246,7 +251,8 @@ void GameUpdate() {
 
 }
 
-void GameRender() {
+void GameRender() 
+{
     
     if(battleMode)
     {
@@ -344,7 +350,8 @@ void GameRender() {
     }
 }
 
-void GameShutdown() {
+void GameShutdown() 
+{
 
     for(int i = 0; i < MAX_TEXTURES; i++)
     {
@@ -372,7 +379,8 @@ void GameShutdown() {
     
 }
 
-void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y){
+void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y)
+{
 
     Rectangle source = { (float)texture_index_x * TILE_WIDTH, (float)texture_index_y * TILE_HEIGHT, (float)TILE_WIDTH, (float)TILE_HEIGHT};
     Rectangle dest = { (float)(pos_x), (float)(pos_y), (float)TILE_WIDTH, (float)TILE_HEIGHT};

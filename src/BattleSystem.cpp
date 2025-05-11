@@ -38,6 +38,16 @@ bool skillButtonIsPressed = false;
 bool attackButtonIsPressed = false;
 bool aTabIsOpen = false;
 
+//skills
+int damageBuff = 0;
+int defenseBuff = 0;
+int damageBuffCounter = 0;
+int defenseBuffCounter = 0;
+bool skill1WasUsed = false;
+bool skill2WasUsed = false;
+bool skill3WasUsed = false;
+
+
 //main rects
 Rectangle battleScreen = {48, 56, 712, 288};
 Rectangle actionButton = {48, 360, 136, 64};
@@ -214,14 +224,29 @@ void BattleUpdate(Enemy *enemy)
                 }
                 else if(CheckCollisionPointRec(mousePos, skills1))
                 {
+                    skill1WasUsed = true;
+                    playerAnimating = true;
+                    animationTimer = 0;
+                    skillButtonIsPressed = false;  
+                    aTabIsOpen = false;
                     PlaySound(sounds[SOUND_HOVER_ITEMS]);
                 }
                 else if(CheckCollisionPointRec(mousePos, skills2))
                 {
+                    skill2WasUsed = true;
+                    playerAnimating = true;
+                    animationTimer = 0;
+                    skillButtonIsPressed = false;  
+                    aTabIsOpen = false;
                     PlaySound(sounds[SOUND_HOVER_ITEMS]);
                 }
                 else if(CheckCollisionPointRec(mousePos, skills3))
                 {
+                    skill3WasUsed = true;
+                    playerAnimating = true;
+                    animationTimer = 0;
+                    skillButtonIsPressed = false;  
+                    aTabIsOpen = false;
                     PlaySound(sounds[SOUND_HOVER_ITEMS]);
                 }
             }
@@ -236,6 +261,9 @@ void BattleUpdate(Enemy *enemy)
             showDamage = false;
             showText = false;
         }
+
+        if(defenseBuff > 0) defenseBuff--;
+        if(damageBuff > 0) damageBuff--;
     }
 }
 
@@ -259,7 +287,7 @@ void BattleRender(Enemy *enemy)
     //Player tile
     if(Player.GetName() == Knight.GetName())  DrawTile(playerCurrentPos.x, playerCurrentPos.y, 6, 0, 10.0f);
     else if(Player.GetName() == Wizard.GetName())  DrawTile(playerCurrentPos.x, playerCurrentPos.y, 9, 0, 10.0f); 
-    else if(Player.GetName() == Rouge.GetName())  DrawTile(playerCurrentPos.x, playerCurrentPos.y, 8, 0, 10.0f); 
+    else if(Player.GetName() == Rogue.GetName())  DrawTile(playerCurrentPos.x, playerCurrentPos.y, 8, 0, 10.0f); 
 
     //enemy Tile
     if(enemy->GetName() == "Orc") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 11, 0, 10.0f);
@@ -296,11 +324,12 @@ void BattleRender(Enemy *enemy)
         DrawRectangleRounded(skills2, 0.1f, 3, buttonColor);
         DrawRectangleRounded(skills3, 0.1f, 3, buttonColor);
 
+        DrawText("Back", skillsBackButton.x + 5, skillsBackButton.y + 5, 25, WHITE);
+        DrawText(TextFormat("Energy: %d / %d", Player.GetEnergy(), Player.GetMaxEnergy()), skillsBackButton.x + 160, skillsBackButton.y + 5, 25, WHITE);
 
-
-        if(Player.GetName() == Knight.GetName())  KnightSkill();
-        else if(Player.GetName() == Wizard.GetName())  WizardSkill(); 
-        else if(Player.GetName() == Rouge.GetName())  RougeSkill(); 
+        if(Player.GetName() == Knight.GetName())  ShowKnightSkill();
+        else if(Player.GetName() == Wizard.GetName())  ShowWizardSkill(); 
+        else if(Player.GetName() == Rogue.GetName())  ShowRogueSkill(); 
     }
 
     if(itemButtonIsPressed)
@@ -371,7 +400,28 @@ void UpdateBattleAnimations(float frameTime, Enemy *enemy)
         else if (animationTimer < ANIMATION_DURATION * 2) 
         {
             //play attack sound and show damage
-            if (!showDamage) 
+            if(skill1WasUsed)
+            {
+                if(Player.GetName() == Knight.GetName())  KnightSkill1(enemy);
+                //else if(Player.GetName() == Wizard.GetName()); 
+                //else if(Player.GetName() == Rogue.GetName()) ; 
+                skill1WasUsed = false;
+            }
+            else if(skill2WasUsed)
+            {
+                if(Player.GetName() == Knight.GetName())  KnightSkill2(enemy);
+                //else if(Player.GetName() == Wizard.GetName()); 
+                //else if(Player.GetName() == Rogue.GetName()) ; 
+                skill2WasUsed = false;
+            }
+            else if (skill3WasUsed)
+            {
+                if(Player.GetName() == Knight.GetName())  KnightSkill3(enemy);
+                //else if(Player.GetName() == Wizard.GetName()); 
+                //else if(Player.GetName() == Rogue.GetName()) ; 
+                skill3WasUsed = false;
+            }
+            else if (!showDamage) 
             { 
                 PlaySound(sounds[SOUNDS_ATTACK]);
                 PlayerAttacks(enemy);
@@ -462,7 +512,8 @@ void EnemyAttacks(Enemy *enemy)
     showDamage = true;
     
     int enemyDamage = GetRandomValue(enemy->GetDamageMin(), enemy->GetDamageMax()) - Player.GetDefense();
-    
+    if(damageBuffCounter > 0) enemyDamage = GetRandomValue(enemy->GetDamageMin(), enemy->GetDamageMax()) - (Player.GetDefense() + defenseBuff);
+
     if (playerDefending) 
     {
         showText = true;
@@ -569,18 +620,90 @@ void RenderEnemyHearts(Enemy *enemy)
     }
 }
 
-void KnightSkill()
+void ShowKnightSkill()
 {
-    
+    //draw
+    DrawText("Crushing Blow", skills1.x + 5, skills1.y + 5, 26, WHITE);
+    DrawText("15 Energy", skills1.x + 10, skills1.y + 35, 20, WHITE);
+
+    DrawText("Iron Wall", skills2.x + 5, skills2.y + 5, 26, WHITE);
+    DrawText("20 Energy", skills2.x + 10, skills2.y + 35, 20, WHITE);
+
+    DrawText("Sky Splitting Slash", skills3.x + 5, skills3.y + 5, 17, WHITE);
+    DrawText("40 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
 }
 
-void WizardSkill()
+void ShowWizardSkill()
 {
+   
+    //draw
+    DrawText("Ignis Fulgur", skills1.x + 5, skills1.y + 5, 25, WHITE);
+    DrawText("15 Energy", skills1.x + 10, skills1.y + 35, 20, WHITE);
+
+    DrawText("Aegis Arcanum", skills2.x + 5, skills2.y + 5, 20, WHITE);
+    DrawText("20 Energy", skills2.x + 10, skills2.y + 35, 20, WHITE);
+
+    DrawText("Rite of Cataclysm", skills3.x + 5, skills3.y + 5, 17, WHITE);
+    DrawText("40 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
 
 }
 
-void RougeSkill()
+void ShowRogueSkill()
 {
 
+    //draw
+    DrawText("Daggerfang", skills1.x + 5, skills1.y + 5, 25, WHITE);
+    DrawText("15 Energy", skills1.x + 10, skills1.y + 35, 20, WHITE);
+
+    DrawText("Smoke Viel", skills2.x + 5, skills2.y + 5, 26, WHITE);
+    DrawText("20 Energy", skills2.x + 10, skills2.y + 35, 20, WHITE);
+
+    DrawText("Mark of the Widow", skills3.x + 5, skills3.y + 5, 17, WHITE);
+    DrawText("40 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
 }
+
+void KnightSkill1(Enemy *enemy)
+{
+    //Crushing Blow
+    showDamage = true;
+    damageToShow = (Player.GetDamageMax()) - enemy->GetDefense();
+
+    if (enemy->GetWeakness() == Player.GetType()) damageToShow *= 2;
+    if (damageToShow <= 0) damageToShow = 1;
+    enemy->TakeDamage(damageToShow);
+    damagePosition = (Vector2){enemyCurrentPos.x + 50, enemyCurrentPos.y - 30};
+    damageDisplayTime = 0;
+    Player.SetEnergy(Player.GetEnergy() - 15);
+
+    PlaySound(sounds[SOUNDS_KNIGHT_SKILL1]);
+}
+
+void KnightSkill2(Enemy *enemy)
+{
+    //Iron Wall
+    defenseBuffCounter = GetRandomValue(1,3);
+    defenseBuff = GetRandomValue(4, Player.GetDefense());
+    Player.SetEnergy(Player.GetEnergy() - 20);
+
+    PlaySound(sounds[SOUNDS_KNIGHT_SKILL2]);
+}
+
+void KnightSkill3(Enemy *enemy)
+{
+    //Sky splitting slash
+    showDamage = true;
+    damageToShow = GetRandomValue(Player.GetDamageMax(), Player.GetDamageMax() + 10); 
+
+    if (enemy->GetWeakness() == Player.GetType()) damageToShow *= 2;
+    if (damageToShow <= 0) damageToShow = 1;
+    enemy->TakeDamage(damageToShow);
+    damagePosition = (Vector2){enemyCurrentPos.x + 50, enemyCurrentPos.y - 30};
+    damageDisplayTime = 0;
+    Player.SetEnergy(Player.GetEnergy() - 40);
+
+    PlaySound(sounds[SOUNDS_KNIGHT_SKILL3]);
+}
+
+
+
 

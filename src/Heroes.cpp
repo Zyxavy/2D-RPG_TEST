@@ -5,21 +5,22 @@
 #include <cmath>
 
 //constructor
-Hero::Hero(std::string name, std::string type, int x, int y, int health, int maxHealth, int damageMin, int damageMax, int defense, int experience,
+Hero::Hero(std::string name, std::string type, int x, int y, int health, int maxHealth, int energy, int maxEnergy, int damageMin, int damageMax, int defense, int experience,
     int level, int money, eZones zone, bool isAlive, bool isPassable )
     :
-    name(name), type(type), x(x), y(y), health(health), maxHealth(maxHealth), healthPotions(3), damageMin(damageMin), damageMax(damageMax), defense(defense),
+    name(name), type(type), x(x), y(y), health(health), maxHealth(maxHealth), energy(energy), maxEnergy(maxEnergy), healthPotions(3), damageMin(damageMin), damageMax(damageMax), defense(defense),
     experience(0), level(1), money(1000), zone(ZONE_WORLD), isAlive(true), isPassable(true) {}
 
 
 //getters
 std::string Hero::GetName() const { return name; }
-
 std::string Hero::GetType() const { return type; }
 int Hero::GetX() const {return x;}
 int Hero::GetY() const {return y;}
 int Hero::GetHealth() const { return health; }
 int Hero::GetMaxHealth() const { return maxHealth; }
+int Hero::GetEnergy() const {return energy;}
+int Hero::GetMaxEnergy() const {return maxEnergy;}
 int Hero::GetRemainingHealthPotions() const {return healthPotions;}
 int Hero::GetDamageMin() const { return damageMin; }
 int Hero::GetDamageMax() const { return damageMax; }
@@ -44,6 +45,10 @@ void Hero::SetHealth(int amount)
 }
 
 void Hero::SetMaxHealth(int amount) {maxHealth = amount;}
+
+void Hero::SetEnergy(int amount) {energy = amount;}
+
+void Hero::SetMaxEnergy(int amount) {maxEnergy = amount;}
 
 void Hero::SetDamageMin(int amount) {damageMin = amount;}
 

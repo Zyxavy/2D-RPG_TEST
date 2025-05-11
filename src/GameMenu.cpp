@@ -176,9 +176,9 @@ void CharacterSelect()
          inCharacterSelect = false;
          
         }
-        //Rouge
+        //Rogue
         else if (CheckCollisionPointRec(mousePos, rougeButton) ) {
-         Player = Rouge;
+         Player = Rogue;
          inCharacterSelect = false;
         }
     } else
@@ -204,15 +204,15 @@ void CharacterSelect()
             DrawText(TextFormat("Defense: %d", Wizard.GetDefense()), wizardButton_x - 80, button_y + 220, 25, WHITE);
             DrawText(TextFormat("Type: %s ", Wizard.GetType().c_str()), wizardButton_x - 80, button_y + 260, 25, WHITE);
          }
-         //Rouge
+         //Rogue
          else if (CheckCollisionPointRec(mousePos, rougeButton) ) {
             DrawRectangle(rougeButton_x, button_y, buttonWidth , buttonHeight, WHITE);
             DrawRectangle(rougeButton_x - 140, button_y + 130 , buttonWidth + 200, buttonHeight + 150, GRAY);
 
-            DrawText(TextFormat("Health: %d", Rouge.GetMaxHealth()), rougeButton_x - 120, button_y + 140, 25, WHITE);
-            DrawText(TextFormat("Damage: %d - %d", Rouge.GetDamageMin(), Rouge.GetDamageMax()), rougeButton_x - 120, button_y + 180, 25, WHITE);
-            DrawText(TextFormat("Defense: %d", Rouge.GetDefense()), rougeButton_x - 120, button_y + 220, 25, WHITE);
-            DrawText(TextFormat("Type: %s ", Rouge.GetType().c_str()), rougeButton_x - 120, button_y + 260, 25, WHITE);
+            DrawText(TextFormat("Health: %d", Rogue.GetMaxHealth()), rougeButton_x - 120, button_y + 140, 25, WHITE);
+            DrawText(TextFormat("Damage: %d - %d", Rogue.GetDamageMin(), Rogue.GetDamageMax()), rougeButton_x - 120, button_y + 180, 25, WHITE);
+            DrawText(TextFormat("Defense: %d", Rogue.GetDefense()), rougeButton_x - 120, button_y + 220, 25, WHITE);
+            DrawText(TextFormat("Type: %s ", Rogue.GetType().c_str()), rougeButton_x - 120, button_y + 260, 25, WHITE);
 
             
 
@@ -228,11 +228,11 @@ void CharacterSelect()
 	DrawText("Select Your Character",  (screenWidth / 2) - 300, 100 , 50, BLACK);
 	DrawText("Knight",knightButton_x - 7, button_y - 30 , 25, BLACK);
 	DrawText("Wizard", wizardButton_x- 7, button_y - 30 , 25, BLACK);
-	DrawText("Rouge",  rougeButton_x- 7, button_y - 30, 25, BLACK);
+	DrawText("Rogue",  rougeButton_x- 7, button_y - 30, 25, BLACK);
 
    DrawTile(knightButton_x - 15, button_y + 30, 6, 0, 10); // knight
    DrawTile(wizardButton_x - 15, button_y + 30, 9, 0, 10); // wizard
-   DrawTile(rougeButton_x - 15, button_y + 30, 8, 0, 10); // rouge
+   DrawTile(rougeButton_x - 15, button_y + 30, 8, 0, 10); // Rogue
 	EndDrawing();
 }
 
@@ -345,7 +345,7 @@ void Inventory()
    
    if(Player.GetName() == Knight.GetName())  DrawTile(560, 80, 6, 0, 20.0f);
    else if(Player.GetName() == Wizard.GetName())  DrawTile(560, 80, 9, 0, 20.0f); 
-   else if(Player.GetName() == Rouge.GetName())  DrawTile(560, 80, 8, 0, 20.0f);
+   else if(Player.GetName() == Rogue.GetName())  DrawTile(560, 80, 8, 0, 20.0f);
 
    DrawText(TextFormat("Type: %s ", Player.GetType().c_str()), 535, 240, 20, BLACK);
 

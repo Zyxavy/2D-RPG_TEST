@@ -18,6 +18,16 @@ extern bool attackButtonIsPressed;
 extern bool defendButtonIsPressed;
 extern bool aTabIsOpen;
 
+//Skills externs
+extern int damageBuff;
+extern int damageBuffCounter;
+extern int defenseBuff;
+extern int defenseBuffCounter;
+extern bool skill1WasUsed;
+extern bool skill2WasUsed;
+extern bool skill3WasUsed;
+
+
 // Animation related variables
 extern Vector2 playerOriginalPos;
 extern Vector2 enemyOriginalPos;
@@ -44,9 +54,17 @@ void RenderBackground(Enemy *enemy);
 void UpdateBattleAnimations(float frameTime, Enemy *enemy);
 void RenderPlayerHearts();
 void RenderEnemyHearts(Enemy *enemy);
-void KnightSkill();
-void WizardSkill();
-void RougeSkill();
-
+void ShowKnightSkill();
+void ShowWizardSkill();
+void ShowRogueSkill();
+void KnightSkill1(Enemy *enemy);
+void KnightSkill2(Enemy *enemy);
+void KnightSkill3(Enemy *enemy);
+void WizardSkill1(Enemy *enemy);
+void WizardSkill2(Enemy *enemy);
+void WizardSkill3(Enemy *enemy);
+void RogueSkill1(Enemy *enemy);
+void RogueSkill2(Enemy *enemy);
+void RogueSkill3(Enemy *enemy);
 
 #endif // BATTLE_SYSTEM_HPP
