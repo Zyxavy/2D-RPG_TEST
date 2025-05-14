@@ -35,3 +35,5 @@ May 3 - Fixed some bugs on battle UI | added animations for battle -buggy as hek
 May 6 - You can now access the inventory in battle | added health in battle | Skills -WIP-
 <br>
 May 11 - Added Hero skills -WIP-
+<br>
+May 14 - Optimized hero skills | added Status effects

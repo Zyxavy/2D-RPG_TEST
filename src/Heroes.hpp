@@ -59,6 +59,9 @@ class Hero
     void SetAlive(bool state);
     void SetPermeation(bool state);
 
+    //skills
+    void UseSkill(int skillNum, Enemy* target);
+
 };
 
 extern Hero Knight, Wizard, Rogue, Player;

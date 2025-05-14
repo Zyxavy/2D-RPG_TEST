@@ -1,4 +1,5 @@
 #include "GameFunctions.hpp"
+#include "BattleSystem.hpp"
 #include "Heroes.hpp"
 #include "Entities.hpp"
 #include <string>
@@ -69,3 +70,153 @@ void Hero::SetZone(eZones newZone) {zone = newZone;}
 void Hero::SetAlive(bool state) {isAlive = state;}
 
 void Hero::SetPermeation(bool state) {isPassable = state;}
+
+void Hero::UseSkill(int skillNum, Enemy* target)
+{
+    if(Player.GetName() == "Knight")
+    {
+        switch(skillNum)
+        {
+            case 1:
+            { //Crushing blow
+                showDamage = true;
+                damageToShow = (Player.GetDamageMax()) - enemy->GetDefense();
+
+                if (enemy->GetWeakness() == Player.GetType()) damageToShow *= 2;
+                if (damageToShow <= 0) damageToShow = 1;
+                enemy->TakeDamage(damageToShow);
+                damagePosition = (Vector2){enemyCurrentPos.x + 50, enemyCurrentPos.y - 30};
+                damageDisplayTime = 0;
+                Player.SetEnergy(Player.GetEnergy() - 15);
+
+                PlaySound(sounds[SOUNDS_KNIGHT_SKILL1]);
+                break;
+            }
+            case 2:
+            { //iron wall
+                defenseBuffCounter = GetRandomValue(1,3);
+                defenseBuff = GetRandomValue(4, Player.GetDefense());
+                Player.SetEnergy(Player.GetEnergy() - 20);
+
+                PlaySound(sounds[SOUNDS_KNIGHT_SKILL2]);
+                break;
+            }
+            case 3:
+            { //Sky splitting slash
+                showDamage = true;
+                damageToShow = GetRandomValue(Player.GetDamageMax(), Player.GetDamageMax() + 10); 
+
+                if (enemy->GetWeakness() == Player.GetType()) damageToShow *= 2;
+                if (damageToShow <= 0) damageToShow = 1;
+                enemy->TakeDamage(damageToShow);
+                damagePosition = (Vector2){enemyCurrentPos.x + 50, enemyCurrentPos.y - 30};
+                damageDisplayTime = 0;
+                Player.SetEnergy(Player.GetEnergy() - 40);
+
+                PlaySound(sounds[SOUNDS_KNIGHT_SKILL3]);
+            }
+
+        }
+    }
+    else if(Player.GetName() == "Wizard")
+    {
+        switch (skillNum)
+        {
+            case 1:
+            { // Ignis Fulgur
+                showDamage = true;
+                damageToShow = (Player.GetDamageMin() - enemy->GetDefense());
+
+                if (enemy->GetWeakness() == Player.GetType()) damageToShow *= 2;
+                if (damageToShow <= 0) damageToShow = 1;
+                
+                int status = GetRandomValue(1,3);
+                status == 1 ? enemyOnFire = 4 : status == 2 ? enemyIsShocked = 2 : damageToShow += 1; 
+
+                enemy->TakeDamage(damageToShow);
+                damagePosition = (Vector2){enemyCurrentPos.x + 50, enemyCurrentPos.y - 30};
+                damageDisplayTime = 0;
+                Player.SetEnergy(Player.GetEnergy() - 15);
+
+                PlaySound(sounds[SOUNDS_KNIGHT_SKILL1]);
+                break;
+            }
+            case 2:
+            { // Aegis Arcanum
+                defenseBuffCounter = 4;
+                defenseBuff = GetRandomValue(Player.GetDefense(), Player.GetDefense() + 10);
+                Player.SetEnergy(Player.GetEnergy() - 20);
+
+                PlaySound(sounds[SOUNDS_KNIGHT_SKILL2]);
+                break;
+            }
+            case 3:
+            { // Rite of Cataclysm
+                showDamage = true;
+                damageToShow = 10;
+
+                if (enemy->GetWeakness() == Player.GetType()) damageToShow *= 2;
+                if (damageToShow <= 0) damageToShow = 1;
+                
+                int status = GetRandomValue(1,4);
+                status == 1 ? enemyOnFire = 4 : status == 2 ? enemyIsShocked = 2 : status == 3 ? enemyIsPoisoned = 4 : enemyIsFrozen = 3;
+
+                enemy->TakeDamage(damageToShow);
+                damagePosition = (Vector2){enemyCurrentPos.x + 50, enemyCurrentPos.y - 30};
+                damageDisplayTime = 0;
+                Player.SetEnergy(Player.GetEnergy() - 50);
+
+                PlaySound(sounds[SOUNDS_KNIGHT_SKILL1]);
+                break;
+            }
+            
+        }
+    }
+    else if (Player.GetName() == "Rogue")
+    {
+        switch (skillNum)
+        {
+            case 1:
+            { // DaggerFang
+                showDamage = true;
+                damageToShow = ((Player.GetDamageMin() + 8) - enemy->GetDefense());
+
+                if (enemy->GetWeakness() == Player.GetType()) damageToShow *= 2;
+                if (damageToShow <= 0) damageToShow = 1;
+                
+                int status = GetRandomValue(1,2);
+                status == 1 ? enemyIsPoisoned = 6 : damageToShow += 5;
+
+                enemy->TakeDamage(damageToShow);
+                damagePosition = (Vector2){enemyCurrentPos.x + 50, enemyCurrentPos.y - 30};
+                damageDisplayTime = 0;
+                Player.SetEnergy(Player.GetEnergy() - 15);
+
+                PlaySound(sounds[SOUNDS_KNIGHT_SKILL1]);
+                break;
+            }
+            case 2:
+            { // Smoke Viel
+                int random = GetRandomValue(1,3);
+                random == 1 ? defenseBuffCounter = 2 : random == 2 ? defenseBuffCounter = 1 : defenseBuffCounter = 0;
+                random < 3 ? defenseBuff == 200 : defenseBuff = 0;
+
+                Player.SetEnergy(Player.GetEnergy() - 20);
+
+                PlaySound(sounds[SOUNDS_KNIGHT_SKILL2]);
+                break;
+            }
+            case 3:
+            { // Mark of the Widow
+                int random = GetRandomValue(1,3);
+                random == 1 ? damageBuffCounter = 2 : random == 2 ? damageBuffCounter = 1 : damageBuffCounter = 0;
+                random < 3 ? damageBuff == Player.GetDamageMax() * 2 : damageBuff = 0;
+
+                Player.SetEnergy(Player.GetEnergy() - 35);
+
+                PlaySound(sounds[SOUNDS_KNIGHT_SKILL2]);
+                break;
+            }
+        }
+    }
+}

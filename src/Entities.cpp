@@ -34,6 +34,7 @@ Hero Knight (
     200, 200, 100, 100, 18, 37, 24, 0, 1, 1000, ZONE_WORLD, true, true
 );
 
+
 Hero Wizard (
     "Wizard", "Intelligence", 
     TILE_WIDTH * 3, TILE_HEIGHT * 3,

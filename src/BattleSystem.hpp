@@ -26,6 +26,10 @@ extern int defenseBuffCounter;
 extern bool skill1WasUsed;
 extern bool skill2WasUsed;
 extern bool skill3WasUsed;
+extern int enemyOnFire;
+extern int enemyIsShocked;
+extern int enemyIsFrozen;
+extern int enemyIsPoisoned;
 
 
 // Animation related variables
@@ -36,11 +40,16 @@ extern Vector2 enemyCurrentPos;
 extern bool playerAnimating;
 extern bool enemyAnimating;
 extern bool showDamage;
+extern bool showStatus;
 extern int damageToShow;
+extern int textToShow;
+extern int statusToShow;
 extern Vector2 damagePosition;
 extern Vector2 textPosition;
+extern Vector2 statusTextPosition;
 extern float animationTimer;
 extern float damageDisplayTime;
+extern float statusDisplayTime;
 extern const float ANIMATION_SPEED;
 extern const float ANIMATION_DURATION;
 extern const float DAMAGE_DISPLAY_DURATION;
@@ -57,14 +66,6 @@ void RenderEnemyHearts(Enemy *enemy);
 void ShowKnightSkill();
 void ShowWizardSkill();
 void ShowRogueSkill();
-void KnightSkill1(Enemy *enemy);
-void KnightSkill2(Enemy *enemy);
-void KnightSkill3(Enemy *enemy);
-void WizardSkill1(Enemy *enemy);
-void WizardSkill2(Enemy *enemy);
-void WizardSkill3(Enemy *enemy);
-void RogueSkill1(Enemy *enemy);
-void RogueSkill2(Enemy *enemy);
-void RogueSkill3(Enemy *enemy);
+void CheckEnemyStatus(Enemy *enemy);
 
 #endif // BATTLE_SYSTEM_HPP
