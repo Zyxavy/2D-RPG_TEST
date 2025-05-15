@@ -2,11 +2,12 @@
 Work In Progress
 ------------------
 <br>
-A 2d game I made using c++ with the raylib and raygui library. The code is a bit messy and unoptimized but it works, most of the time.
+<p>A 2d game I made using c++ with the raylib and raygui library. The code is a bit messy and unoptimized but it works, most of the time.</p>
 <br>
-##Music by Alkakrab
+<br>
+<h1>Music by Alkakrab
 <hr>
-<h4> 2025
+<h2> 2025
 <br>
 Feb 23 - Added Menu | Fixed Battle UI
 <hr>
@@ -37,3 +38,5 @@ May 6 - You can now access the inventory in battle | added health in battle | Sk
 May 11 - Added Hero skills -WIP-
 <hr>
 May 14 - Optimized hero skills | added Status effects
+<hr>
+May 15 - Fixed Bugs during battle | added buffs for player 

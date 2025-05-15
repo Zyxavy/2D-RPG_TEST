@@ -17,17 +17,21 @@ bool playerAnimating = false;
 bool enemyAnimating = false;
 bool showDamage = false;
 bool showText = false;
-bool showStatus =false;
+bool showEnemyStatus =false;
+bool showPlayerStatus = false;
 int damageToShow = 0;
 int textToShow = 0;
-int statusToShow = 0;
+int enemyStatusToShow = 0;
+int playerStatusToShow = 0;
 Vector2 damagePosition = {0, 0};
 Vector2 textPosition = {0,0};
-Vector2 statusTextPosition = {0,0};
+Vector2 enemyStatusTextPosition = {0,0};
+Vector2 playerStatusTextPosition = {0,0};
 float animationTimer = 0;
 float damageDisplayTime = 0;
 float textDisplayTime = 0;
-float statusDisplayTime = 0;
+float enemyStatusDisplayTime = 0;
+float playerStatusDisplayTime = 0;
 const float ANIMATION_SPEED = 5.0f;
 const float ANIMATION_DURATION = 0.5f;
 const float DAMAGE_DISPLAY_DURATION = 1.0f;
@@ -101,28 +105,7 @@ void BattleUpdate(Enemy *enemy)
         Player.SetX(enemy->GetX() + TILE_WIDTH);
         
         PlayerLevelUp();
-         
-        battleMode = false;
-        playerTurn = true;
-        playerDefending = false;
-        actionButtonIsPressed = false;
-        itemButtonIsPressed = false;
-        skillButtonIsPressed = false;
-        attackButtonIsPressed = false;
-        playerAnimating = false;
-        enemyAnimating = false;
-        showDamage = false;
-        showText = false;
-        damageBuff = 0;
-        defenseBuff = 0;
-        damageBuffCounter = 0;
-        defenseBuffCounter = 0;
-        enemyOnFire = 0;
-        enemyIsShocked = 0;
-        enemyIsFrozen = 0;
-        enemyIsPoisoned = 0;
-        playerCurrentPos = playerOriginalPos;
-        enemyCurrentPos = enemyOriginalPos;
+        resetAllStates();
 
         //spawn chest
         chest.x = enemy->GetX();
@@ -137,27 +120,7 @@ void BattleUpdate(Enemy *enemy)
     {
         Player.SetAlive(false);
 
-        battleMode = false;
-        playerTurn = true;
-        playerDefending = false;
-        actionButtonIsPressed = false;
-        itemButtonIsPressed = false;
-        skillButtonIsPressed = false;
-        attackButtonIsPressed = false;
-        playerAnimating = false;
-        enemyAnimating = false;
-        showDamage = false;
-        showText = false;
-        damageBuff = 0;
-        defenseBuff = 0;
-        damageBuffCounter = 0;
-        defenseBuffCounter = 0;
-        enemyOnFire = 0;
-        enemyIsShocked = 0;
-        enemyIsFrozen = 0;
-        enemyIsPoisoned = 0;
-        playerCurrentPos = playerOriginalPos;
-        enemyCurrentPos = enemyOriginalPos;
+        resetAllStates();
 
         PlaySound(sounds[SOUND_DEATH]);
         isDead = true;
@@ -222,7 +185,7 @@ void BattleUpdate(Enemy *enemy)
                     PlaySound(sounds[SOUND_HOVER_ITEMS]);
 
                 }
-                else if(CheckCollisionPointRec(mousePos, actionDefendButton)) //defend
+                else if(CheckCollisionPointRec(mousePos, actionDefendButton) ) //defend
                 {
                     playerDefending = true;
                     showText = false;
@@ -247,7 +210,7 @@ void BattleUpdate(Enemy *enemy)
                     aTabIsOpen = false;
                     PlaySound(sounds[SOUND_HOVER_ITEMS]);
                 }
-                else if(CheckCollisionPointRec(mousePos, skills1))
+                else if(CheckCollisionPointRec(mousePos, skills1) && Player.GetEnergy() >= 15)
                 {
                     skill1WasUsed = true;
                     playerAnimating = true;
@@ -256,7 +219,7 @@ void BattleUpdate(Enemy *enemy)
                     aTabIsOpen = false;
                     PlaySound(sounds[SOUND_HOVER_ITEMS]);
                 }
-                else if(CheckCollisionPointRec(mousePos, skills2))
+                else if(CheckCollisionPointRec(mousePos, skills2) && Player.GetEnergy() >= 20)
                 {
                     skill2WasUsed = true;
                     playerAnimating = true;
@@ -265,7 +228,7 @@ void BattleUpdate(Enemy *enemy)
                     aTabIsOpen = false;
                     PlaySound(sounds[SOUND_HOVER_ITEMS]);
                 }
-                else if(CheckCollisionPointRec(mousePos, skills3))
+                else if(CheckCollisionPointRec(mousePos, skills3) && Player.GetEnergy() >= 50)
                 {
                     skill3WasUsed = true;
                     playerAnimating = true;
@@ -294,12 +257,14 @@ void BattleUpdate(Enemy *enemy)
             if (enemyOnFire > 0) enemyOnFire--;
             if (enemyIsFrozen > 0) enemyIsFrozen--;
             if (enemyIsShocked > 0) enemyIsShocked--;
+            if(enemyIsPoisoned <= 0 && enemyOnFire <= 0 && enemyIsFrozen <= 0 && enemyIsShocked <= 0) showEnemyStatus = false;
+
+            CheckPlayerStatus();
+            if(defenseBuffCounter > 0) defenseBuffCounter--;
+            if(damageBuffCounter > 0) damageBuffCounter--;
+            if(damageBuffCounter <= 0 && defenseBuffCounter <= 0) showPlayerStatus = false;
         }
 
-
-
-        if(defenseBuff > 0) defenseBuff--;
-        if(damageBuff > 0) damageBuff--;
     }
 }
 
@@ -416,41 +381,57 @@ void BattleRender(Enemy *enemy)
         }
     }
     
-    if(showStatus)
+    if(showEnemyStatus)
     {
-        float yOffset = -10.0f * (statusDisplayTime / DAMAGE_DISPLAY_DURATION);
+        float yOffset = -10.0f * (enemyStatusDisplayTime / DAMAGE_DISPLAY_DURATION);
         
         Color textColor = WHITE;
-        switch (statusToShow)
+        switch (enemyStatusToShow)
         {
         case 1:
         {
             textColor = PURPLE;
-            DrawText("Poisoned" , statusTextPosition.x, statusTextPosition.y + yOffset, 24, textColor);
+            DrawText("Poisoned" , enemyStatusTextPosition.x, enemyStatusTextPosition.y + yOffset, 24, textColor);
             break;
         }
         case 2:
         {
             textColor = RED;
-            DrawText("Burned", statusTextPosition.x, statusTextPosition.y + yOffset, 24, textColor);
+            DrawText("Burned", enemyStatusTextPosition.x, enemyStatusTextPosition.y + yOffset, 24, textColor);
             break;
         }
         case 3:
         {
             textColor = BLUE;
-            DrawText("Frozen", statusTextPosition.x, statusTextPosition.y + yOffset, 24, textColor);
+            DrawText("Frozen", enemyStatusTextPosition.x, (enemyStatusTextPosition.y - 20) + yOffset, 24, textColor);
             break;
         }
         case 4:
         {
             textColor = YELLOW;
-            DrawText("Shocked", statusTextPosition.x, statusTextPosition.y + yOffset, 24, textColor);
+            DrawText("Shocked", enemyStatusTextPosition.x, (enemyStatusTextPosition.y - 20) + yOffset, 24, textColor);
             break;  
         }
-        case 5:
+        }
+    }
+
+    if(showPlayerStatus)
+    {
+        float yOffset = -10.0f * (playerStatusDisplayTime / DAMAGE_DISPLAY_DURATION);
+        
+        Color textColor = WHITE;
+        switch (playerStatusToShow)
+        {
+        case 1:
         {
             textColor = GREEN;
-            DrawText("Damaged Buff!", statusTextPosition.x, statusTextPosition.y + yOffset, 24, textColor);
+            DrawText("Damaged Buff!", playerStatusTextPosition.x, playerStatusTextPosition.y + yOffset, 24, textColor);
+            break; 
+        }
+        case 2:
+        {
+            textColor = DARKBLUE;
+            DrawText("Defense Buff!", playerStatusTextPosition.x, playerStatusTextPosition.y + yOffset, 24, textColor);
             break; 
         }
         }
@@ -473,17 +454,27 @@ void UpdateBattleAnimations(float frameTime, Enemy *enemy)
         {
             //move toward enemy
             float progress = animationTimer / ANIMATION_DURATION;
-            playerCurrentPos.x = playerOriginalPos.x + (enemyOriginalPos.x - playerOriginalPos.x - 112) * progress;
+
+            if(!skill2WasUsed) playerCurrentPos.x = playerOriginalPos.x + (enemyOriginalPos.x - playerOriginalPos.x - 112) * progress;
+            else if (skill2WasUsed)   playerCurrentPos.y = playerOriginalPos.y - 30 * sinf(progress * 3.14f);
+        }
+        else if (skill2WasUsed)
+        {
+            int skillNum = 2;
+               
+            Player.UseSkill(skillNum, enemy);
+            skill2WasUsed = false;
+            playerTurn = false;
         } 
-        else if (animationTimer < ANIMATION_DURATION * 2) 
+        else if (animationTimer < ANIMATION_DURATION * 2 && playerTurn) 
         {
             //play attack sound and show damage
-            if(skill1WasUsed || skill2WasUsed || skill3WasUsed)
+            if(skill1WasUsed || skill3WasUsed)
             {
-                int skillNum = skill1WasUsed ? 1 : skill2WasUsed ? 2 : 3;
+                int skillNum = skill1WasUsed ? 1 : 3;
                
                 Player.UseSkill(skillNum, enemy);
-                skill1WasUsed = skill2WasUsed = skill3WasUsed = false;
+                skill1WasUsed = skill3WasUsed = false;
             }
             else if (!showDamage) 
             { 
@@ -561,12 +552,21 @@ void UpdateBattleAnimations(float frameTime, Enemy *enemy)
         }
     }
 
-    if(showStatus)
+    if(showEnemyStatus)
     {
-        statusDisplayTime += frameTime;
-        if(statusDisplayTime >= DAMAGE_DISPLAY_DURATION)
+        enemyStatusDisplayTime += frameTime;
+        if(enemyStatusDisplayTime >= DAMAGE_DISPLAY_DURATION)
         {
-            showStatus = false;
+            showEnemyStatus = false;
+        }
+    }
+
+    if(showPlayerStatus)
+    {
+        playerStatusDisplayTime += frameTime;
+        if(playerStatusDisplayTime >= DAMAGE_DISPLAY_DURATION)
+        {
+            showPlayerStatus = false;
         }
     }
 }
@@ -575,9 +575,11 @@ void PlayerAttacks(Enemy *enemy)
 {
     showDamage = true;
     damageToShow = GetRandomValue(Player.GetDamageMin(), Player.GetDamageMax()) - enemy->GetDefense();
+    if(damageBuffCounter > 0) damageToShow += damageBuff;
     if (enemy->GetWeakness() == Player.GetType()) damageToShow *= 2;
     if (damageToShow <= 0) damageToShow = 1;
     enemy->TakeDamage(damageToShow);
+
     damagePosition = (Vector2){enemyCurrentPos.x + 50, enemyCurrentPos.y - 30};
     damageDisplayTime = 0;
 }
@@ -587,7 +589,7 @@ void EnemyAttacks(Enemy *enemy)
     showDamage = true;
     
     int enemyDamage = GetRandomValue(enemy->GetDamageMin(), enemy->GetDamageMax()) - Player.GetDefense();
-    if(damageBuffCounter > 0) enemyDamage = GetRandomValue(enemy->GetDamageMin(), enemy->GetDamageMax()) - (Player.GetDefense() + defenseBuff);
+    if(defenseBuffCounter > 0) enemyDamage = GetRandomValue(enemy->GetDamageMin(), enemy->GetDamageMax()) - (Player.GetDefense() + defenseBuff);
 
     if (playerDefending) 
     {
@@ -695,6 +697,31 @@ void RenderEnemyHearts(Enemy *enemy)
     }
 }
 
+void resetAllStates()
+{
+    battleMode = false;
+    playerTurn = true;
+    playerDefending = false;
+    actionButtonIsPressed = false;
+    itemButtonIsPressed = false;
+    skillButtonIsPressed = false;
+    attackButtonIsPressed = false;
+    playerAnimating = false;
+    enemyAnimating = false;
+    showDamage = false;
+    showText = false;
+    damageBuff = 0;
+    defenseBuff = 0;
+    damageBuffCounter = 0;
+    defenseBuffCounter = 0;
+    enemyOnFire = 0;
+    enemyIsShocked = 0;
+    enemyIsFrozen = 0;
+    enemyIsPoisoned = 0;
+    playerCurrentPos = playerOriginalPos;
+    enemyCurrentPos = enemyOriginalPos;
+}
+
 void ShowKnightSkill()
 {
     //draw
@@ -705,7 +732,7 @@ void ShowKnightSkill()
     DrawText("20 Energy", skills2.x + 10, skills2.y + 35, 20, WHITE);
 
     DrawText("Sky Splitting Slash", skills3.x + 5, skills3.y + 5, 17, WHITE);
-    DrawText("40 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
+    DrawText("50 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
 }
 
 void ShowWizardSkill()
@@ -719,7 +746,7 @@ void ShowWizardSkill()
     DrawText("20 Energy", skills2.x + 10, skills2.y + 35, 20, WHITE);
 
     DrawText("Rite of Cataclysm", skills3.x + 5, skills3.y + 5, 17, WHITE);
-    DrawText("40 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
+    DrawText("50 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
 
 }
 
@@ -734,12 +761,13 @@ void ShowRogueSkill()
     DrawText("20 Energy", skills2.x + 10, skills2.y + 35, 20, WHITE);
 
     DrawText("Mark of the Widow", skills3.x + 5, skills3.y + 5, 17, WHITE);
-    DrawText("40 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
+    DrawText("50 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
 }
 
 void CheckEnemyStatus(Enemy *enemy)
 {
-    showStatus = true;
+    showEnemyStatus = true;
+
     if(enemyIsPoisoned > 0)
     {
         damageToShow = 10;
@@ -748,7 +776,7 @@ void CheckEnemyStatus(Enemy *enemy)
         damageDisplayTime = 0;
 
         std::cout << "Enemy is poisoned for " << enemyIsPoisoned << " turns, took " << damageToShow << std::endl; 
-        statusToShow = 1;
+        enemyStatusToShow = 1;
         if(enemyIsPoisoned < 0) enemyIsPoisoned = 0;
 
     }
@@ -760,7 +788,7 @@ void CheckEnemyStatus(Enemy *enemy)
         damageDisplayTime = 0;
 
         std::cout << "Enemy is on fire for " << enemyOnFire << " turns, took " << damageToShow << std::endl; 
-        statusToShow = 2;
+        enemyStatusToShow = 2;
         if(enemyOnFire < 0) enemyOnFire = 0;
 
     }
@@ -773,7 +801,7 @@ void CheckEnemyStatus(Enemy *enemy)
         damageDisplayTime = 0;
 
         std::cout << "Enemy is frozen for " << enemyIsFrozen << " turns, took " << damageToShow << std::endl; 
-        statusToShow = 3;
+        enemyStatusToShow = 3;
         if(enemyIsFrozen < 0) enemyIsFrozen = 0;
 
     }
@@ -781,7 +809,7 @@ void CheckEnemyStatus(Enemy *enemy)
     {
         std::cout << "Enemy is shocked for " << enemyIsShocked << " turns" << std::endl; 
         if(enemyIsShocked < 0) enemyIsShocked = 0;
-        statusToShow = 4;
+        enemyStatusToShow = 4;
 
     }
 
@@ -794,22 +822,37 @@ void CheckEnemyStatus(Enemy *enemy)
         std::cout << "Enemy attack skipped due to status effect" << std::endl;
         
     }
+     
+    if(enemyIsFrozen || enemyIsShocked) {enemyStatusTextPosition = (Vector2) {enemyCurrentPos.x + 30, enemyCurrentPos.y - 50};}
+    if(enemyIsPoisoned || enemyOnFire) {enemyStatusTextPosition = (Vector2) {enemyCurrentPos.x + 30, enemyCurrentPos.y - 70};}
+
+    enemyStatusDisplayTime = 0;
+
+}
+
+void CheckPlayerStatus()
+{
+    showPlayerStatus = true;
 
     if(damageBuffCounter > 0)
     {
         std::cout << "Damaged buffed for " << damageBuffCounter << " turns" << std::endl; 
         if(damageBuffCounter < 0) damageBuffCounter = 0;
-        statusToShow = 5;
-        statusTextPosition = (Vector2) {playerCurrentPos.x + 30, playerCurrentPos.y - 70};
+
+        playerStatusToShow = 1;
     }
-     
-    if(enemyIsFrozen || enemyIsShocked) {statusTextPosition = (Vector2) {enemyCurrentPos.x + 30, enemyCurrentPos.y - 50};}
-    if(enemyIsPoisoned || enemyOnFire) {statusTextPosition = (Vector2) {enemyCurrentPos.x + 30, enemyCurrentPos.y - 70};}
 
-    statusDisplayTime = 0;
+    if(defenseBuffCounter > 0 )
+    {
+        std::cout << "Defense buffed for " << defenseBuffCounter << " turns" << std::endl; 
+        if(defenseBuffCounter < 0) defenseBuffCounter = 0;
 
+        playerStatusToShow = 2;
+    }
+
+    playerStatusTextPosition = (Vector2) {playerCurrentPos.x + 30, playerCurrentPos.y - 70};
+    playerStatusDisplayTime = 0;
 }
-
 
 
 

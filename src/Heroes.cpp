@@ -94,6 +94,7 @@ void Hero::UseSkill(int skillNum, Enemy* target)
             }
             case 2:
             { //iron wall
+                showDamage = false;
                 defenseBuffCounter = GetRandomValue(1,3);
                 defenseBuff = GetRandomValue(4, Player.GetDefense());
                 Player.SetEnergy(Player.GetEnergy() - 20);
@@ -111,7 +112,7 @@ void Hero::UseSkill(int skillNum, Enemy* target)
                 enemy->TakeDamage(damageToShow);
                 damagePosition = (Vector2){enemyCurrentPos.x + 50, enemyCurrentPos.y - 30};
                 damageDisplayTime = 0;
-                Player.SetEnergy(Player.GetEnergy() - 40);
+                Player.SetEnergy(Player.GetEnergy() - 50);
 
                 PlaySound(sounds[SOUNDS_KNIGHT_SKILL3]);
             }
@@ -138,16 +139,17 @@ void Hero::UseSkill(int skillNum, Enemy* target)
                 damageDisplayTime = 0;
                 Player.SetEnergy(Player.GetEnergy() - 15);
 
-                PlaySound(sounds[SOUNDS_KNIGHT_SKILL1]);
+                PlaySound(sounds[SOUNDS_WIZARD_SKILL1]);
                 break;
             }
             case 2:
             { // Aegis Arcanum
+                showDamage = false;
                 defenseBuffCounter = 4;
                 defenseBuff = GetRandomValue(Player.GetDefense(), Player.GetDefense() + 10);
                 Player.SetEnergy(Player.GetEnergy() - 20);
 
-                PlaySound(sounds[SOUNDS_KNIGHT_SKILL2]);
+                PlaySound(sounds[SOUNDS_WIZARD_SKILL2]);
                 break;
             }
             case 3:
@@ -166,7 +168,7 @@ void Hero::UseSkill(int skillNum, Enemy* target)
                 damageDisplayTime = 0;
                 Player.SetEnergy(Player.GetEnergy() - 50);
 
-                PlaySound(sounds[SOUNDS_KNIGHT_SKILL1]);
+                PlaySound(sounds[SOUNDS_WIZARD_SKILL3]);
                 break;
             }
             
@@ -197,9 +199,10 @@ void Hero::UseSkill(int skillNum, Enemy* target)
             }
             case 2:
             { // Smoke Viel
+                showDamage = false;
                 int random = GetRandomValue(1,3);
                 random == 1 ? defenseBuffCounter = 2 : random == 2 ? defenseBuffCounter = 1 : defenseBuffCounter = 0;
-                random < 3 ? defenseBuff == 200 : defenseBuff = 0;
+                defenseBuff = random < 3 ? 200 : 0;
 
                 Player.SetEnergy(Player.GetEnergy() - 20);
 
@@ -208,11 +211,17 @@ void Hero::UseSkill(int skillNum, Enemy* target)
             }
             case 3:
             { // Mark of the Widow
+                showDamage = true;
+                damageToShow = ((Player.GetDamageMax() + 8) - enemy->GetDefense());
+
+                if (enemy->GetWeakness() == Player.GetType()) damageToShow *= 2;
+                if (damageToShow <= 0) damageToShow = 1;
+
                 int random = GetRandomValue(1,3);
                 random == 1 ? damageBuffCounter = 2 : random == 2 ? damageBuffCounter = 1 : damageBuffCounter = 0;
                 random < 3 ? damageBuff == Player.GetDamageMax() * 2 : damageBuff = 0;
 
-                Player.SetEnergy(Player.GetEnergy() - 35);
+                Player.SetEnergy(Player.GetEnergy() - 50);
 
                 PlaySound(sounds[SOUNDS_KNIGHT_SKILL2]);
                 break;

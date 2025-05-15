@@ -15,7 +15,7 @@ const int screenHeight = 600;
 #define MAX_TEXTURES 2
 #define TILE_WIDTH 8
 #define TILE_HEIGHT  8
-#define MAX_SOUNDS 10
+#define MAX_SOUNDS 13
 #define WORLD_WIDTH 25
 #define WORLD_HEIGHT 25
 
@@ -44,7 +44,10 @@ typedef enum
     SOUNDS_LEVEL_UP,
     SOUNDS_KNIGHT_SKILL1,
     SOUNDS_KNIGHT_SKILL2,
-    SOUNDS_KNIGHT_SKILL3
+    SOUNDS_KNIGHT_SKILL3,
+    SOUNDS_WIZARD_SKILL1,
+    SOUNDS_WIZARD_SKILL2,
+    SOUNDS_WIZARD_SKILL3
 } sound_asset;
 
 typedef enum
