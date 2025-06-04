@@ -28,6 +28,7 @@ typedef struct
     int experience;
     int level;
     int healthPotions;
+    int energyFoods;
     std::string name;
     std::string type;
 

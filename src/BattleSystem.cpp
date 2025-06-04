@@ -113,6 +113,7 @@ void BattleUpdate(Enemy *enemy)
         chest.isAlive = true;
         chest.money = GetRandomValue(23, 205);
         chest.healthPotions = GetRandomValue(1,4);
+        chest.energyFoods = GetRandomValue(0,3);
 
         return;
     } 
@@ -761,7 +762,7 @@ void ShowRogueSkill()
     DrawText("20 Energy", skills2.x + 10, skills2.y + 35, 20, WHITE);
 
     DrawText("Mark of the Widow", skills3.x + 5, skills3.y + 5, 17, WHITE);
-    DrawText("50 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
+    DrawText("70 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
 }
 
 void CheckEnemyStatus(Enemy *enemy)

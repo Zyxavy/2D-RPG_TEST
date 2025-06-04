@@ -78,6 +78,9 @@ void GameStartup()
     sounds[SOUNDS_WIZARD_SKILL1] = LoadSound("assets/WizardSkill1.wav");
     sounds[SOUNDS_WIZARD_SKILL2] = LoadSound("assets/WizardSkill2.wav");
     sounds[SOUNDS_WIZARD_SKILL3] = LoadSound("assets/WizardSkill3.wav");
+    sounds[SOUNDS_ROGUE_SKILL1] = LoadSound("assets/RogueSkill1.wav");
+    sounds[SOUNDS_ROGUE_SKILL2] = LoadSound("assets/RogueSkill2.wav");
+    sounds[SOUNDS_ROGUE_SKILL3] = LoadSound("assets/RogueSkill3.wav");
     
     LoadMusic();
 }
@@ -240,6 +243,7 @@ void GameUpdate()
                     {
                     Player.SetMoney(Player.GetMoney() + chest.money);
                     Player.SetHealthPotions(Player.GetRemainingHealthPotions() + chest.healthPotions);
+                    Player.SetEnergyFoods(Player.GetRemainingEnergyFoods() + chest.energyFoods );
                     chest.isAlive = false;
                     PlaySound(sounds[SOUND_COINS]);
                     }

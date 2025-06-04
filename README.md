@@ -3,6 +3,7 @@ Work In Progress
 ------------------
 <br>
 <p>A 2d game I made using c++ with the raylib and raygui library. The code is a bit messy and unoptimized but it works, most of the time.</p>
+<p><em><b>Click on main.exe to play the game.</b></em></p>
 <br>
 <br>
 <h1>Music by Alkakrab
@@ -17,7 +18,7 @@ Mar 11 - Added Barriers| imported more music.
 <hr>
 Mar 18 - Added more music| implemented MusicFunctions.cpp & hpp | implemented slider for audio adjustments.
 <hr>
-Mar 23 - Inventory Gui -WIP-
+Mar 23 - Inventory Gui
 <hr>
 Mar 26 - Replaced Enemy struct with Enemy class | Added movement to the enemy, if player is within range the enemy will chase, else it will wander.
 <hr>
@@ -40,3 +41,5 @@ May 11 - Added Hero skills -WIP-
 May 14 - Optimized hero skills | added Status effects
 <hr>
 May 15 - Fixed Bugs during battle | added buffs for player 
+<hr>
+Jun 4 - Added Rogue SoundFx | added energy foods | fixed some Inventory bugs | adjusted the damage of some skills

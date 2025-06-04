@@ -15,6 +15,7 @@ static double lastHoverSoundTime = 0.0;
 
 static bool showItemInfo = false;
 static bool healthPotionsWasClicked = false;
+static bool energyFoodWasClicked = false;
 
 Rectangle
 		startButton = { button_x, startButton_y, buttonWidth, buttonHeight },
@@ -306,9 +307,11 @@ void Inventory()
    Rectangle defense{ 650, 280, 30, 30};
    Rectangle damage{ 535, 340, 30, 30};
    Rectangle level {535, 390, 30, 30};
+   Rectangle energy {535, 460, 30, 30};
 
    //items-blahblah
    Rectangle healthPotion{41, 71, 45, 45};
+   Rectangle energyFood{91, 71, 45, 45};
    
 
    DrawRectangleRounded(outer, 0.2, 2, GRAY);
@@ -336,6 +339,7 @@ void Inventory()
 
    //Items / Consumable
    DrawTile(41, 71, 7, 8, 5.8f);
+   DrawTile(energyFood.x, energyFood.y,10, 8, 5.8f);
    
    //Player Status
    DrawRectangleLinesEx(charBorder, 4, BLACK);
@@ -360,9 +364,12 @@ void Inventory()
 
    DrawText(TextFormat("Level: %d", Player.GetLevel() ), 580, 390, 25, BLACK );
    DrawTile(535, 390, 8, 5, 5.0f);
+
+   DrawText(TextFormat("Energy: %d", Player.GetEnergy()), 580, 470, 25, BLACK);
+   DrawTile(535, 460, 5, 8, 5.0f);
    
 
-   if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+   if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)&& !showItemInfo)
    {
       // X button
       if(CheckCollisionPointRec(mousePos, exitButton))
@@ -378,9 +385,15 @@ void Inventory()
          healthPotionsWasClicked = true;       
       }
 
+      if(CheckCollisionPointRec(mousePos, energyFood))
+      {
+         showItemInfo = true;  
+         energyFoodWasClicked = true;       
+      }
+
    }
 
-   if(CheckCollisionPointRec(mousePos, health))
+   if(CheckCollisionPointRec(mousePos, health) && !showItemInfo)
    {
 
       DrawRectangle(500, 290, 200, 200, BLACK);
@@ -394,7 +407,7 @@ void Inventory()
    } 
    
 
-   if (CheckCollisionPointRec(mousePos, defense))
+   if (CheckCollisionPointRec(mousePos, defense)&& !showItemInfo)
    {
       DrawRectangle(550, 290, 200, 200, BLACK);
       DrawText(TextFormat("%d damage is reduced \nfrom enemy attacks", Player.GetDefense()), 555, 300, 18, WHITE );
@@ -402,7 +415,7 @@ void Inventory()
       isCurrentlyHovering = true;
       PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
    }
-   else if (CheckCollisionPointRec(mousePos, damage))
+   else if (CheckCollisionPointRec(mousePos, damage)&& !showItemInfo)
    {
       DrawRectangle(500, 300, 220, 200, BLACK);
       DrawText(TextFormat("Minimun Attack damage: %d", Player.GetDamageMin() ), 510, 310, 15, WHITE );
@@ -412,7 +425,7 @@ void Inventory()
       isCurrentlyHovering = true;
       PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
    }
-   else if (CheckCollisionPointRec(mousePos, level))
+   else if (CheckCollisionPointRec(mousePos, level)&& !showItemInfo)
    {
       DrawRectangle(500, 360, 220, 200, BLACK);
       DrawText(TextFormat("Experience Points: %d", Player.GetExperience()),  510, 370, 15, WHITE);
@@ -421,11 +434,27 @@ void Inventory()
       isCurrentlyHovering = true;
       PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
    }
+   else if (CheckCollisionPointRec(mousePos, energy)&& !showItemInfo)
+   {
+      DrawRectangle(500, 360, 220, 200, BLACK);
+      DrawText(TextFormat("Energy Points: %d / %d", Player.GetEnergy(), Player.GetMaxEnergy()),  510, 370, 15, WHITE);
+      
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+   }
 
    //Items Consumables
-   else if (CheckCollisionPointRec(mousePos, healthPotion))
+   else if (CheckCollisionPointRec(mousePos, healthPotion)&& !showItemInfo)
    {
       DrawRectangle(40, 70, 50, 50, {255, 255, 255, 150});
+      
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+      
+   }
+   else if (CheckCollisionPointRec(mousePos, energyFood)&& !showItemInfo)
+   {
+      DrawRectangle(energyFood.x-1, energyFood.y-1, 50, 50, {255, 255, 255, 150});
       
       isCurrentlyHovering = true;
       PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
@@ -464,14 +493,22 @@ void ShowItemInfos()
    //identify what item
    if(healthPotionsWasClicked)
    {
-      DrawText("Health Potions provides 25-75 points of health \nwhen consumed.",  itemRectBox.x + 30, itemRectBox.y + 30, 15, WHITE);
-      DrawText(TextFormat(" X %d", Player.GetRemainingHealthPotions()), itemRectBox.x + 440, itemRectBox.y + 30, 30, WHITE);
-      DrawTile(itemRectBox.x + 400, itemRectBox.y + 20, 7, 8, 5.8f);
+      DrawText("Health Potions provides 25-75 points of \nhealth when consumed.",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+      DrawText(TextFormat(" X %d", Player.GetRemainingHealthPotions()), itemRectBox.x + 430, itemRectBox.y + 30, 30, WHITE);
+      DrawTile(itemRectBox.x + 395, itemRectBox.y + 20, 7, 8, 5.8f);
 
       DrawRectangleRec(interactItem, DARKGRAY);
-      DrawText("Consume Potion", interactItem.x + 30, interactItem.y + 10, 25, WHITE);
+      DrawText("Drink Potion", interactItem.x + 40, interactItem.y + 10, 25, WHITE);
+   }
 
+   if(energyFoodWasClicked)
+   {
+      DrawText("Food provides 15-40 points of energy \nwhen consumed.",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+      DrawText(TextFormat(" X %d", Player.GetRemainingEnergyFoods()), itemRectBox.x + 430, itemRectBox.y + 30, 30, WHITE);
+      DrawTile(itemRectBox.x + 395, itemRectBox.y + 20, 10, 8, 5.8f);
 
+      DrawRectangleRec(interactItem, DARKGRAY);
+      DrawText("Consume Meat", interactItem.x + 45, interactItem.y + 10, 25, WHITE);
    }
 
 
@@ -481,6 +518,8 @@ void ShowItemInfos()
       if(CheckCollisionPointRec(mousePos, exitItemRectBox))
       {
          showItemInfo = false;
+         healthPotionsWasClicked = false;
+         energyFoodWasClicked = false;
       }
 
       //items or consumables
@@ -495,6 +534,20 @@ void ShowItemInfos()
          if(Player.GetHealth() > Player.GetMaxHealth())
          {
             Player.SetHealth(Player.GetMaxHealth());
+         }
+      }
+
+      if(CheckCollisionPointRec(mousePos, interactItem) && energyFoodWasClicked) // energy Food
+      {
+         if(Player.GetRemainingEnergyFoods() <= 0 || Player.GetEnergy() == Player.GetMaxEnergy()) return;
+
+         int energyAmount = GetRandomValue(15, 45);
+         Player.SetEnergy(Player.GetEnergy() + energyAmount);
+         Player.SetEnergyFoods(Player.GetRemainingEnergyFoods() - 1);
+
+         if(Player.GetEnergy() > Player.GetMaxEnergy())
+         {
+            Player.SetEnergy(Player.GetMaxEnergy());
          }
       }
 

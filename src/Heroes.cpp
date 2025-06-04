@@ -9,7 +9,7 @@
 Hero::Hero(std::string name, std::string type, int x, int y, int health, int maxHealth, int energy, int maxEnergy, int damageMin, int damageMax, int defense, int experience,
     int level, int money, eZones zone, bool isAlive, bool isPassable )
     :
-    name(name), type(type), x(x), y(y), health(health), maxHealth(maxHealth), energy(energy), maxEnergy(maxEnergy), healthPotions(3), damageMin(damageMin), damageMax(damageMax), defense(defense),
+    name(name), type(type), x(x), y(y), health(health), maxHealth(maxHealth), energy(energy), maxEnergy(maxEnergy), healthPotions(3), energyFoods(2), damageMin(damageMin), damageMax(damageMax), defense(defense),
     experience(0), level(1), money(1000), zone(ZONE_WORLD), isAlive(true), isPassable(true) {}
 
 
@@ -23,6 +23,7 @@ int Hero::GetMaxHealth() const { return maxHealth; }
 int Hero::GetEnergy() const {return energy;}
 int Hero::GetMaxEnergy() const {return maxEnergy;}
 int Hero::GetRemainingHealthPotions() const {return healthPotions;}
+int Hero::GetRemainingEnergyFoods() const {return energyFoods;}
 int Hero::GetDamageMin() const { return damageMin; }
 int Hero::GetDamageMax() const { return damageMax; }
 int Hero::GetDefense() const { return defense; }
@@ -56,6 +57,8 @@ void Hero::SetDamageMin(int amount) {damageMin = amount;}
 void Hero::SetDamageMax(int amount) {damageMax = amount;}
 
 void Hero::SetHealthPotions(int amount) {healthPotions = amount;}
+
+void Hero::SetEnergyFoods(int amount) {energyFoods = amount;}
 
 void Hero::SetDefense(int amount) {defense = amount;}
 
@@ -95,7 +98,7 @@ void Hero::UseSkill(int skillNum, Enemy* target)
             case 2:
             { //iron wall
                 showDamage = false;
-                defenseBuffCounter = GetRandomValue(1,3);
+                defenseBuffCounter = GetRandomValue(2,4);
                 defenseBuff = GetRandomValue(4, Player.GetDefense());
                 Player.SetEnergy(Player.GetEnergy() - 20);
 
@@ -194,19 +197,19 @@ void Hero::UseSkill(int skillNum, Enemy* target)
                 damageDisplayTime = 0;
                 Player.SetEnergy(Player.GetEnergy() - 15);
 
-                PlaySound(sounds[SOUNDS_KNIGHT_SKILL1]);
+                PlaySound(sounds[SOUNDS_ROGUE_SKILL1]);
                 break;
             }
             case 2:
             { // Smoke Viel
                 showDamage = false;
                 int random = GetRandomValue(1,3);
-                random == 1 ? defenseBuffCounter = 2 : random == 2 ? defenseBuffCounter = 1 : defenseBuffCounter = 0;
+                random == 1 ? defenseBuffCounter = 3 : random == 2 ? defenseBuffCounter = 2 : defenseBuffCounter = 0;
                 defenseBuff = random < 3 ? 200 : 0;
 
                 Player.SetEnergy(Player.GetEnergy() - 20);
 
-                PlaySound(sounds[SOUNDS_KNIGHT_SKILL2]);
+                PlaySound(sounds[SOUNDS_ROGUE_SKILL2]);
                 break;
             }
             case 3:
@@ -218,12 +221,12 @@ void Hero::UseSkill(int skillNum, Enemy* target)
                 if (damageToShow <= 0) damageToShow = 1;
 
                 int random = GetRandomValue(1,3);
-                random == 1 ? damageBuffCounter = 2 : random == 2 ? damageBuffCounter = 1 : damageBuffCounter = 0;
-                random < 3 ? damageBuff == Player.GetDamageMax() * 2 : damageBuff = 0;
+                random == 1 ? damageBuffCounter = 3 : random == 2 ? damageBuffCounter = 2 : damageBuffCounter = 0;
+                random < 3 ? damageBuff = Player.GetDamageMax() + Player.GetDamageMin() : damageBuff = 0;
 
-                Player.SetEnergy(Player.GetEnergy() - 50);
+                Player.SetEnergy(Player.GetEnergy() - 70);
 
-                PlaySound(sounds[SOUNDS_KNIGHT_SKILL2]);
+                PlaySound(sounds[SOUNDS_ROGUE_SKILL3]);
                 break;
             }
         }
