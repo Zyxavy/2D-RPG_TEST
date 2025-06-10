@@ -99,6 +99,7 @@ void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y, fl
 bool IsBarrierCollision(int x, int y);
 
 void CheckContactWithEnemies();
+void DrawHotBar();
 
 
 

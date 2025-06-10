@@ -109,14 +109,14 @@ void GameUpdate()
         float y = Player.GetY();
         bool hasKeyPressed = false;
 
-        if(IsKeyPressed(KEY_LEFT)) {
+        if(IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) {
             if (!IsBarrierCollision(Player.GetX() - TILE_WIDTH, Player.GetY())) 
             { 
                 x -= TILE_WIDTH;
                 hasKeyPressed = true;
             }
         }
-        else if(IsKeyPressed(KEY_RIGHT)) {
+        else if(IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) {
             if (!IsBarrierCollision(Player.GetX() + TILE_WIDTH, Player.GetY()))
             {  
                 x += TILE_WIDTH;
@@ -124,19 +124,50 @@ void GameUpdate()
                 
             }
         }
-        else if(IsKeyPressed(KEY_UP)) {
+        else if(IsKeyPressed(KEY_UP)|| IsKeyPressed(KEY_W)) {
             if (!IsBarrierCollision(Player.GetX(), Player.GetY() - TILE_HEIGHT))
             {  
                 y -= TILE_HEIGHT;
                 hasKeyPressed = true;
             }
         }
-        else if(IsKeyPressed(KEY_DOWN)) {
+        else if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) { 
             if (!IsBarrierCollision(Player.GetX(), Player.GetY() + TILE_HEIGHT))
             {  
                 y += TILE_HEIGHT;
                 hasKeyPressed = true;
             }
+        }
+
+        else if (IsKeyPressed(KEY_TAB))
+        {
+            int num = GetRandomValue(1,4);
+            std::cout << "Tab was pressed\n";
+            switch (num)
+            {
+            case 1:
+                y -= TILE_HEIGHT;
+                break;
+            case 2:
+                y += TILE_HEIGHT;
+                break;
+            case 3: 
+                x -= TILE_WIDTH;
+                break;
+            case 4:
+                x += TILE_WIDTH;
+                break;
+            }
+
+        }
+
+        if(Player.GetX() == chest.x && Player.GetY() == chest.y && chest.isAlive) //interact with chest
+        {
+            Player.SetMoney(Player.GetMoney() + chest.money);
+            Player.SetHealthPotions(Player.GetRemainingHealthPotions() + chest.healthPotions);
+            Player.SetEnergyFoods(Player.GetRemainingEnergyFoods() + chest.energyFoods );
+            chest.isAlive = false;
+            PlaySound(sounds[SOUND_COINS]);
         }
 
         //Player Escapes and stuns enemy
@@ -238,15 +269,7 @@ void GameUpdate()
                         Player.SetZone(ZONE_WORLD);
                     }
                 }
-                //interact with chest
-                else if(Player.GetX() == chest.x && Player.GetY() == chest.y && chest.isAlive)
-                    {
-                    Player.SetMoney(Player.GetMoney() + chest.money);
-                    Player.SetHealthPotions(Player.GetRemainingHealthPotions() + chest.healthPotions);
-                    Player.SetEnergyFoods(Player.GetRemainingEnergyFoods() + chest.energyFoods );
-                    chest.isAlive = false;
-                    PlaySound(sounds[SOUND_COINS]);
-                    }
+                
         }
         else if(IsKeyPressed(KEY_Q))
         {
@@ -303,7 +326,7 @@ void GameRender()
                         texture_index_x = 5;
                         texture_index_y = 4;
                         break;
-                    case TILE_TYPE_TREE:
+                    case TILE_TYPE_TREE:  //This is tree
                         texture_index_x = 4;
                         texture_index_y = 5;
                         break;
@@ -342,17 +365,7 @@ void GameRender()
         EndMode2D();
 
         // Top-left thingy
-        DrawRectangle(5, 5, 330, 120, Fade(GRAY, 2.0f));
-        DrawRectangleLines(5, 5, 330, 120, BLACK);
-        DrawText(TextFormat("Coordinates: (X: %06.2f, Y: %06.2f)", camera.target.x, camera.target.y), 15, 10, 14, WHITE);
-        DrawText(TextFormat("Health: %d", Player.GetHealth()), 15, 30, 14, WHITE);
-        DrawText(TextFormat("Player XP: %d", Player.GetExperience()), 15, 50, 14, WHITE);
-        DrawText(TextFormat("Money: %d", Player.GetMoney()), 15, 70, 14, WHITE);
-
-        DrawText(TextFormat("Arrow Keys to move "), 180, 30, 15, WHITE);
-        DrawText(TextFormat("Press E to interact"), 180, 50, 15, WHITE);
-        DrawText(TextFormat("Mouse Wheel to zoom"), 180, 70, 15, WHITE);
-        DrawText(TextFormat("Press Q to Open Invetory"), 140, 90, 15, WHITE);
+        DrawHotBar();
 
     }
 }
@@ -424,10 +437,25 @@ bool IsBarrierCollision(int x, int y)
     int tileX = x / TILE_WIDTH;
     int tileY = y / TILE_HEIGHT;
 
+    sTile tile;
+    if (Player.GetZone() == ZONE_WORLD) {
+        tile = world[tileX][tileY];
+    } else if (Player.GetZone() == ZONE_DUNGEON) {
+        tile = dungeon[tileX][tileY];
+    } else {
+        return false; 
+    }
+
     //check if collides with barriers
     if (tileX < WORLD_LEFT + 1 || tileX > WORLD_RIGHT - 1 || tileY < WORLD_TOP + 1 || tileY > WORLD_BOTTOM - 1) {
         std::cout << "Barrier Collision!\n";
         return true; 
+    }
+
+    // Check for trees
+    if (tile.type == TILE_TYPE_TREE) {
+        std::cout << "Tree Collision at (" << tileX << ", " << tileY << ")\n";
+        return true;
     }
 
     return false;
@@ -458,4 +486,43 @@ void CheckContactWithEnemies()
 
 }
 
+void DrawHotBar()
+{
+    Rectangle hotBarRect{5,5, 330, 120};
 
+    DrawRectangleRec(hotBarRect, {36, 38, 36, 255});
+    DrawRectangleLinesEx(hotBarRect, 2.0, {178, 204, 214, 255});
+
+
+    DrawText(TextFormat("Coordinates: (X: %06.2f, Y: %06.2f)", camera.target.x, camera.target.y), 15, 10, 15, WHITE);
+    DrawText(TextFormat("Health: %d", Player.GetHealth()), 15, 40, 15, WHITE);
+
+    if(Player.GetHealth() <= 20)
+    {
+        DrawTile(100, 40, 5, 6, 2.5f );
+        DrawTile(125, 40, 4, 6, 2.5f );
+        DrawTile(150, 40, 4, 6, 2.5f );
+    }
+    else if(Player.GetHealth() <= Player.GetMaxHealth() / 2)
+    {
+        DrawTile(100, 40, 6, 6, 2.5f );
+        DrawTile(125, 40, 5, 6, 2.5f );
+        DrawTile(150, 40, 4, 6, 2.5f );
+    }
+    else if(Player.GetHealth() < Player.GetMaxHealth())
+    {
+        
+        DrawTile(100, 40, 6, 6, 2.5f );
+        DrawTile(125, 40, 6, 6, 2.5f );
+        DrawTile(150, 40, 5, 6, 2.5f );
+    }
+    else if(Player.GetHealth() == Player.GetMaxHealth()) 
+    {
+        DrawTile(100, 40, 6, 6, 2.5f );
+        DrawTile(125, 40, 6, 6, 2.5f );
+        DrawTile(150, 40, 6, 6, 2.5f );
+    }
+
+    DrawText(TextFormat("Money: %d", Player.GetMoney()), 15, 70, 15, WHITE);
+    DrawText("Press Tab to get unstuck", 15, 85, 15, WHITE);
+}

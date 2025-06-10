@@ -16,7 +16,7 @@ bool playerLeveledUp = false;
 Enemy orc(
     "Orc",
     TILE_WIDTH * 5, TILE_HEIGHT * 5,
-    130, ZONE_DUNGEON, 25, 30, 12,
+    130, ZONE_DUNGEON, 25, 50, 12,
     100, 1, "Intelligence"
 );
 
@@ -51,11 +51,16 @@ Hero Player = Knight;
 //enemy pointers
 Enemy* orc1 = nullptr;
 Enemy* orc2 = nullptr;
+Enemy* orc3 = nullptr;
+Enemy* orc4 = nullptr;
+Enemy* orc5 = nullptr;
+Enemy* orc6 = nullptr;
 
 Enemy* wanderingEye1 = nullptr;
 Enemy* wanderingEye2 = nullptr;
 
 Enemy* enemy = nullptr;
+
 //enemy arrays
 Enemy* orcArr[MAX_ORCS_INSTANCES];
 Enemy* eyeArr[MAX_WANDERING_EYE_INSTANCES];
@@ -70,12 +75,27 @@ void EntitiesInit() {
         .zone = ZONE_ALL,
     };
 
+
+
     //Place enemy instances
     orc1 = new Enemy(orc);
     orc1->Move( TILE_WIDTH * 5, TILE_HEIGHT * 5);
 
     orc2 = new Enemy(orc);
     orc2->Move(TILE_WIDTH * 6, TILE_HEIGHT * 5);
+
+    orc3 = new Enemy(orc);
+    orc3->Move(TILE_WIDTH * 15, TILE_HEIGHT * 16);
+
+    orc4 = new Enemy(orc);
+    orc4->Move(TILE_WIDTH * 14, TILE_HEIGHT * 5);
+
+    orc5 = new Enemy(orc);
+    orc5->Move(TILE_WIDTH * 12, TILE_HEIGHT * 14);
+
+    orc6 = new Enemy(orc);
+    orc6->Move(TILE_WIDTH * 3, TILE_HEIGHT * 10);
+
 
     wanderingEye1 = new Enemy(wanderingEye);
     wanderingEye1->Move(TILE_WIDTH * 10, TILE_HEIGHT * 20);
@@ -86,6 +106,11 @@ void EntitiesInit() {
     //array of enemies
     orcArr[0] = orc1;
     orcArr[1] = orc2;
+    orcArr[2] = orc3;
+    orcArr[3] = orc4;
+    orcArr[4] = orc5;
+    orcArr[5] = orc6;
+
 
     eyeArr[0] = wanderingEye1;
     eyeArr[1] = wanderingEye2;

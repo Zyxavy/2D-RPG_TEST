@@ -732,7 +732,7 @@ void ShowKnightSkill()
     DrawText("Iron Wall", skills2.x + 5, skills2.y + 5, 26, WHITE);
     DrawText("20 Energy", skills2.x + 10, skills2.y + 35, 20, WHITE);
 
-    DrawText("Sky Splitting Slash", skills3.x + 5, skills3.y + 5, 17, WHITE);
+    DrawText("Valor's Edge", skills3.x + 5, skills3.y + 5, 17, WHITE);
     DrawText("50 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
 }
 
@@ -761,7 +761,7 @@ void ShowRogueSkill()
     DrawText("Smoke Viel", skills2.x + 5, skills2.y + 5, 26, WHITE);
     DrawText("20 Energy", skills2.x + 10, skills2.y + 35, 20, WHITE);
 
-    DrawText("Mark of the Widow", skills3.x + 5, skills3.y + 5, 17, WHITE);
+    DrawText("Final Requiem", skills3.x + 5, skills3.y + 5, 17, WHITE);
     DrawText("70 Energy", skills3.x + 10, skills3.y + 35, 20, WHITE);
 }
 

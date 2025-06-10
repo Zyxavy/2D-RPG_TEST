@@ -8,7 +8,7 @@
 class Enemy;
 
 //definitions
-#define MAX_ORCS_INSTANCES 2
+#define MAX_ORCS_INSTANCES 6
 #define MAX_WANDERING_EYE_INSTANCES 2
 
 //structs for player and enemy (OLD)

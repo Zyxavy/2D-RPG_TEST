@@ -106,7 +106,7 @@ void Hero::UseSkill(int skillNum, Enemy* target)
                 break;
             }
             case 3:
-            { //Sky splitting slash
+            { //Valor's Edge
                 showDamage = true;
                 damageToShow = GetRandomValue(Player.GetDamageMax(), Player.GetDamageMax() + 10); 
 
@@ -116,6 +116,10 @@ void Hero::UseSkill(int skillNum, Enemy* target)
                 damagePosition = (Vector2){enemyCurrentPos.x + 50, enemyCurrentPos.y - 30};
                 damageDisplayTime = 0;
                 Player.SetEnergy(Player.GetEnergy() - 50);
+
+                int status = GetRandomValue(1,4);
+                status == 1? defenseBuff = 100 : defenseBuff = Player.GetDefense() + 2;
+                status == 1? defenseBuffCounter = 1 : defenseBuffCounter = 2;
 
                 PlaySound(sounds[SOUNDS_KNIGHT_SKILL3]);
             }
@@ -213,7 +217,7 @@ void Hero::UseSkill(int skillNum, Enemy* target)
                 break;
             }
             case 3:
-            { // Mark of the Widow
+            { // Final Requiem
                 showDamage = true;
                 damageToShow = ((Player.GetDamageMax() + 8) - enemy->GetDefense());
 

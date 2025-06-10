@@ -589,6 +589,8 @@ void LevelUpScreen()
    DrawText(TextFormat("MAXIMUM DAMAGE: %d -> %d", Player.GetDamageMax(), Player.GetDamageMax() + 10), 115, 340, 30, BLACK);
    DrawText(TextFormat("DEFENSE: %d -> %d", Player.GetDefense(), Player.GetDefense() + 1), 115, 380, 30, BLACK);
    DrawText(TextFormat("MAX HEALTH: %d -> %d", Player.GetMaxHealth(), Player.GetMaxHealth() + 50), 115, 420, 30, BLACK);
+   DrawText(TextFormat("MAX ENERGY: %d -> %d", Player.GetMaxEnergy(), Player.GetMaxEnergy() + 30), 115, 450, 30, BLACK);
+
 
    //Texture or Image
    DrawTextureEx(textures[TEXTURE_STAR], StarPos1, 0.0f, 0.4f, WHITE);
@@ -618,6 +620,7 @@ void LevelUpScreen()
             Player.SetDamageMax(Player.GetDamageMax() + 10);
             Player.SetDefense(Player.GetDefense() + 1);
             Player.SetMaxHealth(Player.GetMaxHealth() + 50);
+            Player.SetMaxEnergy(Player.GetMaxEnergy() + 30);
             Player.GiveExperience(0);
             levelCap += 100;
          }
