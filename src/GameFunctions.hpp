@@ -15,7 +15,7 @@ const int screenHeight = 600;
 #define MAX_TEXTURES 2
 #define TILE_WIDTH 8
 #define TILE_HEIGHT  8
-#define MAX_SOUNDS 16
+#define MAX_SOUNDS 17
 #define WORLD_WIDTH 25
 #define WORLD_HEIGHT 25
 
@@ -42,6 +42,7 @@ typedef enum
     SOUND_COINS,
     SOUND_HOVER_ITEMS,
     SOUNDS_LEVEL_UP,
+    SOUNDS_TREE_CUTTING,
     SOUNDS_KNIGHT_SKILL1,
     SOUNDS_KNIGHT_SKILL2,
     SOUNDS_KNIGHT_SKILL3,
@@ -59,6 +60,7 @@ typedef enum
     TILE_TYPE_GRASS,
     TILE_TYPE_TREE,
     TILE_TYPE_STONE,
+    TILE_TYPE_STUMP,
 
 } tile_type;
 
@@ -87,6 +89,7 @@ extern sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
 extern Camera2D camera;
 extern bool isInventory;
+extern int lastKeyPressed;
 
 //functions
 void GameStartup();
@@ -100,6 +103,7 @@ bool IsBarrierCollision(int x, int y);
 
 void CheckContactWithEnemies();
 void DrawHotBar();
+void CutDownTree();
 
 
 

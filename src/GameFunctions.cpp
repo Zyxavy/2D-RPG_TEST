@@ -17,6 +17,7 @@ sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
 bool isInventory = false;
 int count;
+int lastKeyPressed;
 
 void GameStartup() 
 {
@@ -57,6 +58,15 @@ void GameStartup()
     //initialize entities
     EntitiesInit();
 
+    while(IsBarrierCollision(dungeon_gate.x, dungeon_gate.y))
+    {
+        int count = 1;
+        dungeon_gate.x += TILE_WIDTH * count;
+        dungeon_gate.y += TILE_HEIGHT * count;
+        count++;
+        
+    }
+
     //cameras
     camera.target = (Vector2) { (float)Player.GetX(), (float)Player.GetY()};
     camera.offset = (Vector2) { (float)screenWidth / 2, (float)screenHeight / 2};
@@ -71,6 +81,7 @@ void GameStartup()
     sounds[SOUND_COINS]  = LoadSound("assets/pickupCoin.wav");
     sounds[SOUND_HOVER_ITEMS] = LoadSound("assets/HoverItems.wav");
     sounds[SOUNDS_LEVEL_UP] = LoadSound("assets/LevelUp FX.wav");
+    sounds[SOUNDS_TREE_CUTTING] = LoadSound("assets/TreeCutting.wav");
     //skils sounds
     sounds[SOUNDS_KNIGHT_SKILL1] = LoadSound("assets/KnightSkill1.wav");
     sounds[SOUNDS_KNIGHT_SKILL2] = LoadSound("assets/KnightSkill2.wav");
@@ -110,6 +121,7 @@ void GameUpdate()
         bool hasKeyPressed = false;
 
         if(IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) {
+            lastKeyPressed = KEY_A;
             if (!IsBarrierCollision(Player.GetX() - TILE_WIDTH, Player.GetY())) 
             { 
                 x -= TILE_WIDTH;
@@ -117,14 +129,15 @@ void GameUpdate()
             }
         }
         else if(IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) {
+            lastKeyPressed = KEY_D;
             if (!IsBarrierCollision(Player.GetX() + TILE_WIDTH, Player.GetY()))
             {  
                 x += TILE_WIDTH;
                 hasKeyPressed = true;
-                
             }
         }
         else if(IsKeyPressed(KEY_UP)|| IsKeyPressed(KEY_W)) {
+            lastKeyPressed = KEY_W;
             if (!IsBarrierCollision(Player.GetX(), Player.GetY() - TILE_HEIGHT))
             {  
                 y -= TILE_HEIGHT;
@@ -132,6 +145,7 @@ void GameUpdate()
             }
         }
         else if(IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) { 
+            lastKeyPressed = KEY_S;
             if (!IsBarrierCollision(Player.GetX(), Player.GetY() + TILE_HEIGHT))
             {  
                 y += TILE_HEIGHT;
@@ -159,6 +173,11 @@ void GameUpdate()
                 break;
             }
 
+        }
+
+        if(IsKeyPressed(KEY_R))
+        {
+            CutDownTree();
         }
 
         if(Player.GetX() == chest.x && Player.GetY() == chest.y && chest.isAlive) //interact with chest
@@ -334,8 +353,10 @@ void GameRender()
                         texture_index_x = 1;
                         texture_index_y = 6;
                         break;
-
-                    
+                    case TILE_TYPE_STUMP:
+                        texture_index_x = 8;
+                        texture_index_y = 3;
+                        break;
                     default:
                         break;
                 }
@@ -436,24 +457,29 @@ bool IsBarrierCollision(int x, int y)
 {
     int tileX = x / TILE_WIDTH;
     int tileY = y / TILE_HEIGHT;
-
     sTile tile;
-    if (Player.GetZone() == ZONE_WORLD) {
+
+    if (Player.GetZone() == ZONE_WORLD) 
+    {
         tile = world[tileX][tileY];
-    } else if (Player.GetZone() == ZONE_DUNGEON) {
+    } else if (Player.GetZone() == ZONE_DUNGEON) 
+    {
         tile = dungeon[tileX][tileY];
-    } else {
+    } else
+    {
         return false; 
     }
 
     //check if collides with barriers
-    if (tileX < WORLD_LEFT + 1 || tileX > WORLD_RIGHT - 1 || tileY < WORLD_TOP + 1 || tileY > WORLD_BOTTOM - 1) {
+    if (tileX < WORLD_LEFT + 1 || tileX > WORLD_RIGHT - 1 || tileY < WORLD_TOP + 1 || tileY > WORLD_BOTTOM - 1) 
+    {
         std::cout << "Barrier Collision!\n";
         return true; 
     }
 
     // Check for trees
-    if (tile.type == TILE_TYPE_TREE) {
+    if (tile.type == TILE_TYPE_TREE) 
+    {
         std::cout << "Tree Collision at (" << tileX << ", " << tileY << ")\n";
         return true;
     }
@@ -524,5 +550,34 @@ void DrawHotBar()
     }
 
     DrawText(TextFormat("Money: %d", Player.GetMoney()), 15, 70, 15, WHITE);
-    DrawText("Press Tab to get unstuck", 15, 85, 15, WHITE);
+    DrawText("Press R to cut down tree", 15, 85, 15, WHITE);
+}
+
+void CutDownTree()
+{
+    int TileX = Player.GetX() / TILE_WIDTH;
+    int TileY = Player.GetY() / TILE_HEIGHT;
+    sTile *tile = nullptr;
+
+    switch (lastKeyPressed)
+    {
+    case KEY_A: TileX -= 1; break;
+    case KEY_D: TileX += 1; break;
+    case KEY_W: TileY -= 1; break;
+    case KEY_S: TileY += 1; break;
+    }
+
+    if(Player.GetZone() == ZONE_WORLD)
+    {
+        tile = &world[TileX][TileY];
+    }
+    // add more zones if needed
+
+    if(tile->type == TILE_TYPE_TREE)
+    {
+        tile->type = TILE_TYPE_STUMP;
+        std::cout << "tree Cut down!\n"; 
+        PlaySound(sounds[SOUNDS_TREE_CUTTING]);
+    }
+
 }

@@ -44,4 +44,6 @@ May 15 - Fixed Bugs during battle | added buffs for player
 <hr>
 Jun 4 - Added Rogue SoundFx | added energy foods | fixed some Inventory bugs | adjusted the damage of some skills
 <hr>
-Jun 10 - Trees are now obstacles | added an unstuck feature | more orcs in dungeon  
+Jun 10 - Trees are now obstacles | <strike>added an unstuck feature</strike> | more orcs in dungeon  
+<hr>
+Jun 13 - Added the ability to cut down trees
