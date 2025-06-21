@@ -9,6 +9,7 @@ extern bool inOptions;
 extern bool inMenu;
 extern bool isDead;
 extern bool inCharacterSelect;
+extern bool inTutorial;
 
 
 //buttons
@@ -17,6 +18,7 @@ extern float button_x;
 extern float startButton_y;
 extern float optionsButton_y;
 extern float exitButton_y;
+extern float tutorialButton_y;
 
 //functionjs
 void GameMenu();
@@ -26,8 +28,7 @@ void OptionsMenu();
 void Inventory();
 void ShowItemInfos();
 void LevelUpScreen();
-
-
+void Tutorial();
 
 
 #endif

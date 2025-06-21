@@ -21,10 +21,12 @@ Rectangle
 		startButton = { button_x, startButton_y, buttonWidth, buttonHeight },
 		optionsButton = { button_x, optionsButton_y, buttonWidth, buttonHeight },
 		exitButton = { button_x, exitButton_y, buttonWidth, buttonHeight },
+      tutorialButton = { button_x + 250 , tutorialButton_y, buttonWidth, buttonHeight},
 
 		startButton_lines = { button_x - 5, startButton_y - 5, buttonWidth + 10, buttonHeight + 10 },
 		optionsButton_lines = { button_x - 5, optionsButton_y - 5, buttonWidth + 10, buttonHeight + 10 },
-		exitButton_lines = { button_x - 5, exitButton_y - 5, buttonWidth + 10, buttonHeight + 10 };
+		exitButton_lines = { button_x - 5, exitButton_y - 5, buttonWidth + 10, buttonHeight + 10 },
+      tutorialButton_lines = {button_x  + 250, tutorialButton_y - 5, buttonWidth + 10, buttonHeight + 10 };
 
 
 float buttonWidth = 50, buttonHeight = 25;
@@ -32,11 +34,14 @@ float button_x = 200;
 float startButton_y = 250;
 float optionsButton_y = 350;
 float exitButton_y = 450;
+float tutorialButton_y = 250;
 
 bool inOptions = false;
 bool inMenu = true;
 bool isDead = false;
 bool inCharacterSelect = false;
+bool inTutorial = false;
+int page = 1;
 
 void GameMenu()
 {
@@ -58,32 +63,48 @@ void GameMenu()
       else if (CheckCollisionPointRec(mousePos, exitButton) ) {
           exit(0);
       }
+      else if (CheckCollisionPointRec(mousePos, tutorialButton)) // tutorial
+      {
+         inMenu = false;
+         inTutorial = true;
+      }
+      
   } else
   {
       //start
-      if (CheckCollisionPointRec(mousePos, startButton)) {
+      if (CheckCollisionPointRec(mousePos, startButton)) 
+      {
           DrawRectangle(button_x, startButton_y, buttonWidth , buttonHeight, WHITE);
        }
        //Options
-       else if (CheckCollisionPointRec(mousePos, optionsButton)) {
+       else if (CheckCollisionPointRec(mousePos, optionsButton)) 
+       {
           DrawRectangle(button_x, optionsButton_y, buttonWidth , buttonHeight, WHITE);
        }
        //Exit
-       else if (CheckCollisionPointRec(mousePos, exitButton) ) {
+       else if (CheckCollisionPointRec(mousePos, exitButton) ) 
+       {
           DrawRectangle(button_x, exitButton_y, buttonWidth , buttonHeight, WHITE);
+       }
+       else if(CheckCollisionPointRec(mousePos, tutorialButton)) // tutorial
+       {
+          DrawRectangle(button_x + 255, tutorialButton_y, buttonWidth , buttonHeight, WHITE);
        }
   }
 
   //shapes
-  ClearBackground(Color{ 50, 80, 110, 255 });
+ ClearBackground(Color{ 50, 80, 110, 255 });
  DrawRectangleLinesEx(startButton_lines, 5, BLACK);
  DrawRectangleLinesEx(optionsButton_lines, 5, BLACK);
  DrawRectangleLinesEx(exitButton_lines, 5, BLACK);
+ DrawRectangleLinesEx(tutorialButton_lines, 5, BLACK);
+
 
  DrawText("2D RPG",  (screenWidth / 2) - 70, 100 , 50, BLACK);
  DrawText("Start game",button_x + 70, startButton_y + 7 , 25, BLACK);
  DrawText("Options", button_x + 70, optionsButton_y + 7 , 25, BLACK);
  DrawText("Exit game",  button_x + 70, exitButton_y + 7 , 25, BLACK);
+ DrawText("Tutorial", button_x + 320, tutorialButton_y + 7, 25, BLACK);
  EndDrawing();
 }
 
@@ -631,4 +652,120 @@ void LevelUpScreen()
 
 }
 
+void Tutorial()
+{
+   Vector2 mousePos = GetMousePosition();
 
+   //texture or images positions
+   Vector2 bookPos = {-35, -15};
+
+   //shapes n buttons
+   Rectangle prevButton = {16,40, 104, 24};
+   Rectangle nextButton = {656, 40, 104, 24};
+   Rectangle exitButton = {336, 8, 120, 24};
+   Rectangle image1Rec = {88, 80, 288, 168};
+   Rectangle image2Rec = {416, 80, 288, 168};
+   Rectangle textBox1 = {88, 264, 288, 240};
+   Rectangle textBox2 = {416, 264, 288, 240};
+
+   Color buttonColor = {133, 99, 44, 255};
+
+   ClearBackground({36, 38, 36, 255});
+   DrawTextureEx(textures[TEXTURE_BOOK], bookPos, 0.0f, 0.92f, WHITE);
+
+   //buttons
+   DrawRectangleRounded(prevButton, 0.1f, 1, buttonColor);
+   DrawText("PREV", prevButton.x + 10, prevButton.y + 5, 20, BLACK);
+
+   DrawRectangleRounded(nextButton, 0.1f, 1, buttonColor);
+   DrawText("NEXT", nextButton.x + 10, nextButton.y + 5, 20, BLACK);
+
+   DrawRectangleRounded(exitButton,0.1f, 1, buttonColor);
+   DrawText("EXIT", exitButton.x + 10, exitButton.y + 5, 20, BLACK);
+
+
+  
+   if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+   {
+      if(CheckCollisionPointRec(mousePos, prevButton))
+      {
+         if(page!=1) page--;
+      }
+      else if(CheckCollisionPointRec(mousePos, nextButton))
+      {
+         if(page!=6) page++;
+      }
+      else if(CheckCollisionPointRec(mousePos, exitButton))
+      {
+         inTutorial = false;
+         inMenu = true;
+      }
+   }
+
+   switch(page)
+   {
+      case 1:
+      {
+         DrawTextureEx(pagePictures[PAGE1], {image1Rec.x, image1Rec.y + 1}, 0.0f, 0.36f, WHITE);
+         DrawText("Choose your hero: \n\nKnight, Wizard, or \n\nRogue \n\neach with unique \n\nstrengths, weaknesses, \n\nand special skills.", textBox1.x + 5, textBox1.y + 15, 25, BLACK);
+        
+         DrawTextureEx(pagePictures[PAGE2], {image2Rec.x + 34, image2Rec.y}, 0.0f, 0.36f, WHITE);
+         DrawText("Use WASD or the \n\narrow keys to move \n\nyour character.", textBox2.x + 5, textBox2.y + 15, 25, BLACK);
+         DrawText("Scroll the mouse wheel \n\nto zoom the camera \n\nin and out.", textBox2.x + 5, textBox2.y + 100, 25, BLACK);
+         break;
+      }
+      case 2:
+      {
+         DrawTextureEx(pagePictures[PAGE3], {image1Rec.x + 25, image1Rec.y}, 0.0f, 0.36f, WHITE);
+         DrawText("Press R to chop down \n\na tree tile directly in \n\nfront of you \n\n(based on last movement \n\ndirection).\n\nCleared tiles turn into \n\ngrass, opening new \n\npaths. ", textBox1.x + 5, textBox1.y + 15, 20, BLACK);
+        
+         DrawTextureEx(pagePictures[PAGE4], {image2Rec.x + 27, image2Rec.y}, 0.0f, 0.32f, WHITE);
+         DrawText("Press Q to open your \n\ninventory screen at \n\nany time ", textBox2.x + 5, textBox2.y + 15, 25, BLACK);
+         
+         break;
+      }
+      case 3:
+      {
+         DrawTextureEx(pagePictures[PAGE5], {image1Rec.x + 3, image1Rec.y + 15}, 0.0f, 0.51f, WHITE);
+         DrawText("Health Potions restore \n\nHP.\n\nFood items restore \n\nEnergy.\n\nBoth drop from chests \n\nyou find after defeating \n\nenemies.", textBox1.x + 5, textBox1.y + 15, 25, BLACK);
+        
+         DrawTextureEx(pagePictures[PAGE6], {image2Rec.x + 40, image2Rec.y}, 0.0f, 0.44f, WHITE);
+         DrawText("On the right side of the \n\ninventory you'll see your \n\ncharacter's Stats.", textBox2.x + 5, textBox2.y + 15, 25, BLACK);
+         DrawText("Stats increase \n\nautomatically when \n\nyou level up.", textBox2.x + 5, textBox2.y + 110, 25, BLACK);
+         
+         break;
+      }
+      case 4:
+      {
+         DrawTextureEx(pagePictures[PAGE7], {image1Rec.x, image1Rec.y + 20}, 0.0f, 0.84f, WHITE);
+         DrawText("In the top-left corner \n\nof your screen, the \n\nHotbar displays:\n\nCurrent coordinates\n\nHealth and\n\nMoney (gold)", textBox1.x + 5, textBox1.y + 15, 25, BLACK);
+        
+         DrawTextureEx(pagePictures[PAGE8], {image2Rec.x + 15, image2Rec.y}, 0.0f, 0.36f, WHITE);
+         DrawText("Enemies roam the map.\n\nIf you get too close, \n\nthey'll aggro, chase you, \n\nand trigger a battle \n\nwhen they reach you.", textBox2.x + 5, textBox2.y + 15, 25, BLACK);
+         
+         break;
+      }
+      case 5:
+      {
+         DrawTextureEx(pagePictures[PAGE9], {image1Rec.x, image1Rec.y}, 0.0f, 0.38f, WHITE);
+         DrawText("Turn-based, one action \nper turn. Your options:\n\nBasic Attack / Defend \n(no energy cost)\n\nSkill (costs Energy; each \nskill has its own damage\nand effect)\n\nInventory (using a \nconsumable or equipping an \nitem will costs your turn)\n\nRun (attempt to flee; \nsuccess isn't guaranteed)", textBox1.x + 5, textBox1.y + 5, 20, BLACK);
+        
+         DrawTextureEx(pagePictures[PAGE10], {image2Rec.x + 15, image2Rec.y}, 0.0f, 0.54f, WHITE);
+         DrawText("Defeated foes grant \n\nExperience and drop a \n\nChest. Open chests to \n\nfind gold, potions, food, \n\nor rare loot.", textBox2.x + 5, textBox2.y + 15, 25, BLACK);
+         
+         break;
+      }
+      case 6:
+      {
+         DrawTextureEx(pagePictures[PAGE11], {image1Rec.x + 15, image1Rec.y}, 0.0f, 0.64f, WHITE);
+         DrawText("Approach a gate or \n\nportal and press E \n\nto enter a new \n\narea or dungeon.", textBox1.x + 5, textBox1.y + 15, 25, BLACK);
+        
+         DrawText("That's about it, \n\n\nenjoy the game!", textBox2.x + 5, textBox2.y + 15, 30, BLACK);
+         
+         break;
+      }
+
+   }
+   
+   EndDrawing();
+}

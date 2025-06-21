@@ -17,6 +17,10 @@ int main(){
             {
                 GameMenu();
             }
+            else if(inTutorial)
+            {
+                Tutorial();
+            }
             else if (inCharacterSelect)
             {
                 CharacterSelect();
@@ -25,7 +29,7 @@ int main(){
             {
                 OptionsMenu();
             }
-           else if(isDead)
+            else if(isDead)
             {
                 DeathMenu();
             }

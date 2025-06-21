@@ -12,9 +12,11 @@ sEntity chest = { 0 };
 Camera2D camera { 0 };
 
 Texture2D textures[MAX_TEXTURES];
+Texture2D pagePictures[MAX_PAGE_PICTURES];
 Sound sounds[MAX_SOUNDS];
 sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
+sTile tutorialWorld[WORLD_WIDTH][WORLD_HEIGHT]; // WIP
 bool isInventory = false;
 int count;
 int lastKeyPressed;
@@ -32,8 +34,13 @@ void GameStartup()
     Image StarImage = LoadImage("assets/Star.png");
     textures[TEXTURE_STAR]= LoadTextureFromImage(StarImage);
     UnloadImage(StarImage);
- 
 
+    Image BookImage = LoadImage("assets/Book.png");
+    textures[TEXTURE_BOOK]= LoadTextureFromImage(BookImage);
+    UnloadImage(BookImage);
+
+    //Tutorial pages
+    LoadAllPages();
 
     //generate World/Zones
     for(int i = 0; i < WORLD_WIDTH; i++){
@@ -50,6 +57,13 @@ void GameStartup()
                 .x = i,
                 .y = j,
                 .type = TILE_TYPE_DIRT
+            };
+
+            tutorialWorld[i][j] = (sTile) // WIP
+            {
+                .x = i,
+                .y = j,
+                .type = GetRandomValue(TILE_TYPE_DIRT, TILE_TYPE_GRASS)
             };
 
         }
@@ -297,7 +311,6 @@ void GameUpdate()
     
     }
 
-
 }
 
 void GameRender() 
@@ -333,6 +346,10 @@ void GameRender()
                 else if (Player.GetZone() == ZONE_DUNGEON)
                 {
                     tile = dungeon[i][j];
+                }
+                else if (Player.GetZone() == ZONE_TUTORIAL) // WIP
+                {
+                    tile = tutorialWorld[i][j];
                 }
 
                 switch (tile.type)
@@ -399,6 +416,11 @@ void GameShutdown()
         UnloadTexture(textures[i]);
     }
 
+    for(int i = 0; i < MAX_PAGE_PICTURES; i++)
+    {
+        UnloadTexture(pagePictures[i]);
+    }
+
     for(int i = 0; i < MAX_SOUNDS; i++)
     {
         UnloadSound(sounds[i]);
@@ -418,6 +440,53 @@ void GameShutdown()
     UnloadMusic();
     CloseAudioDevice();
     
+}
+
+void LoadAllPages()
+{
+    Image pg1 = LoadImage("assets/TutorialAssets/Pg1.png");
+    pagePictures[PAGE1]= LoadTextureFromImage(pg1);
+    UnloadImage(pg1);
+
+    Image pg2 = LoadImage("assets/TutorialAssets/Pg2.png");
+    pagePictures[PAGE2]= LoadTextureFromImage(pg2);
+    UnloadImage(pg2);
+
+    Image pg3 = LoadImage("assets/TutorialAssets/Pg3.png");
+    pagePictures[PAGE3]= LoadTextureFromImage(pg3);
+    UnloadImage(pg3);
+
+    Image pg4 = LoadImage("assets/TutorialAssets/Pg4.png");
+    pagePictures[PAGE4]= LoadTextureFromImage(pg4);
+    UnloadImage(pg4);
+
+    Image pg5 = LoadImage("assets/TutorialAssets/Pg5.png");
+    pagePictures[PAGE5]= LoadTextureFromImage(pg5);
+    UnloadImage(pg5);
+
+    Image pg6 = LoadImage("assets/TutorialAssets/Pg6.png");
+    pagePictures[PAGE6]= LoadTextureFromImage(pg6);
+    UnloadImage(pg6);
+
+    Image pg7 = LoadImage("assets/TutorialAssets/Pg7.png");
+    pagePictures[PAGE7]= LoadTextureFromImage(pg7);
+    UnloadImage(pg7);
+
+    Image pg8 = LoadImage("assets/TutorialAssets/Pg8.png");
+    pagePictures[PAGE8]= LoadTextureFromImage(pg8);
+    UnloadImage(pg8);
+
+    Image pg9 = LoadImage("assets/TutorialAssets/Pg9.png");
+    pagePictures[PAGE9]= LoadTextureFromImage(pg9);
+    UnloadImage(pg9);
+
+    Image pg10 = LoadImage("assets/TutorialAssets/Pg10.png");
+    pagePictures[PAGE10]= LoadTextureFromImage(pg10);
+    UnloadImage(pg10);
+
+    Image pg11 = LoadImage("assets/TutorialAssets/Pg11.png");
+    pagePictures[PAGE11]= LoadTextureFromImage(pg11);
+    UnloadImage(pg11);
 }
 
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y)
@@ -570,6 +639,11 @@ void CutDownTree()
     if(Player.GetZone() == ZONE_WORLD)
     {
         tile = &world[TileX][TileY];
+    }
+    else if(Player.GetZone() == ZONE_DUNGEON)
+    {
+        std::cout << "Invalid Zone!\n";
+        return;
     }
     // add more zones if needed
 

@@ -116,7 +116,6 @@ void EntitiesInit() {
     eyeArr[1] = wanderingEye2;
 
     Player.SetZone(ZONE_WORLD);
-    
 
 }
 

@@ -47,3 +47,5 @@ Jun 4 - Added Rogue SoundFx | added energy foods | fixed some Inventory bugs | a
 Jun 10 - Trees are now obstacles | <strike>added an unstuck feature</strike> | more orcs in dungeon  
 <hr>
 Jun 13 - Added the ability to cut down trees
+<hr>
+Jun 21 - Added a tutorial Book

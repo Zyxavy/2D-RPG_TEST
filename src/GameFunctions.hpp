@@ -12,7 +12,8 @@ const int screenHeight = 600;
 
 
 //definitions
-#define MAX_TEXTURES 2
+#define MAX_TEXTURES 3
+#define MAX_PAGE_PICTURES 11
 #define TILE_WIDTH 8
 #define TILE_HEIGHT  8
 #define MAX_SOUNDS 17
@@ -30,8 +31,14 @@ const int screenHeight = 600;
 typedef enum 
 {
     TEXTURE_TILEMAP = 0,
-    TEXTURE_STAR = 1
+    TEXTURE_STAR = 1,
+    TEXTURE_BOOK = 2
 } texture_asset;
+
+typedef enum
+{
+    PAGE1 = 0, PAGE2, PAGE3, PAGE4, PAGE5, PAGE6, PAGE7, PAGE8, PAGE9, PAGE10, PAGE11
+} page_pictures;
 
 typedef enum 
 {
@@ -77,16 +84,19 @@ typedef enum
    ZONE_ALL = 0,
    ZONE_BATTLE,
    ZONE_WORLD,
-   ZONE_DUNGEON
+   ZONE_DUNGEON, 
+   ZONE_TUTORIAL // WIP
 
 } eZones;
 
 
 //externs
 extern Texture2D textures[MAX_TEXTURES];
+extern Texture2D pagePictures[MAX_PAGE_PICTURES];
 extern Sound sounds[MAX_SOUNDS];
 extern sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
+extern sTile tutorialWorld[WORLD_WIDTH][WORLD_HEIGHT]; // WIP
 extern Camera2D camera;
 extern bool isInventory;
 extern int lastKeyPressed;
@@ -96,6 +106,7 @@ void GameStartup();
 void GameUpdate();
 void GameRender();
 void GameShutdown();
+void LoadAllPages();
 
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y);
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y, float scale);
