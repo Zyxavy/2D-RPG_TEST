@@ -203,60 +203,10 @@ void GameUpdate()
             PlaySound(sounds[SOUND_COINS]);
         }
 
-        //Player Escapes and stuns enemy
-        if (hasKeyPressed) {
-
-            for(int i = 0; i < MAX_ORCS_INSTANCES; i++) 
-            {
-                if(!orcArr[i]->GetStunStatus()) 
-                {
-                    orcArr[i]->MoveAI(Player.GetX(), Player.GetY());
-                }
-                else
-                {
-                    
-                    orcArr[i]->SetStunCounter(count);
-                    if(count > 3) 
-                    {
-                        orcArr[i]->SetStunStatus(false);
-                        count = 0;
-                        
-                    }
-                }
-
-                if(orcArr[i]->GetStunStatus())
-                {
-                    count++;
-                    std::cout << count;
-                }
-            }
-           
-            for(int i = 0; i < MAX_WANDERING_EYE_INSTANCES; i++) 
-            {
-                if(!eyeArr[i]->GetStunStatus()) 
-                {
-                    eyeArr[i]->MoveAI(Player.GetX(), Player.GetY());
-                }
-                else
-                {
-                    
-                    eyeArr[i]->SetStunCounter(count);
-                    if(count > 3) 
-                    {
-                        eyeArr[i]->SetStunStatus(false);
-                        count = 0;
-                        
-                    }
-                }
-
-                if(eyeArr[i]->GetStunStatus())
-                {
-                    count++;
-                    std::cout << count;
-                }
-            }
-
-            
+        //Enemy moves or Player Escapes and stuns enemy
+        if (hasKeyPressed) 
+        {
+            ExecuteEnemyBehaviors();
         }
         
         //mouse wheel zoom
@@ -436,6 +386,26 @@ void GameShutdown()
         delete eyeArr[i];
     }
 
+    for(int i = 0; i < MAX_TREANT_INSTANCES; i++)
+    {
+        delete treantArr[i];
+    }
+
+    for(int i = 0; i < MAX_VENGEFUL_SPIRIT_INSTANCES; i++)
+    {
+        delete vengefulSpiritArr[i];
+    }
+
+    for(int i = 0; i < MAX_GOLEM_INSTANCES; i++)
+    {
+        delete golemArr[i];
+    }
+
+    for(int i = 0; i < MAX_CRAB_THING_INSTANCES; i++)
+    {
+        delete crabArr[i];
+    }
+
     StopCurrentMusic();
     UnloadMusic();
     CloseAudioDevice();
@@ -579,6 +549,46 @@ void CheckContactWithEnemies()
         }
     }
 
+     //check contact with Treant
+    for(int i = 0; i < MAX_TREANT_INSTANCES; i++)
+    {
+        if (treantArr[i] != nullptr && Player.GetZone() == treantArr[i]->GetZone() && Player.GetX() == treantArr[i]->GetX() && Player.GetY() == treantArr[i]->GetY() && treantArr[i]->IsAlive() == true) 
+        {
+            enemy = treantArr[i];
+            battleMode = true;
+        }
+    }
+
+      //check contact with Vengful Spirit
+    for(int i = 0; i < MAX_VENGEFUL_SPIRIT_INSTANCES; i++)
+    {
+        if (vengefulSpiritArr[i] != nullptr && Player.GetZone() == vengefulSpiritArr[i]->GetZone() && Player.GetX() == vengefulSpiritArr[i]->GetX() && Player.GetY() == vengefulSpiritArr[i]->GetY() && vengefulSpiritArr[i]->IsAlive() == true) 
+        {
+            enemy = vengefulSpiritArr[i];
+            battleMode = true;
+        }
+    }
+
+      //check contact with Golem
+    for(int i = 0; i < MAX_GOLEM_INSTANCES; i++)
+    {
+        if (golemArr[i] != nullptr && Player.GetZone() == golemArr[i]->GetZone() && Player.GetX() == golemArr[i]->GetX() && Player.GetY() == golemArr[i]->GetY() && golemArr[i]->IsAlive() == true) 
+        {
+            enemy = golemArr[i];
+            battleMode = true;
+        }
+    }
+
+      //check contact with Crab
+    for(int i = 0; i < MAX_CRAB_THING_INSTANCES; i++)
+    {
+        if (crabArr[i] != nullptr && Player.GetZone() == crabArr[i]->GetZone() && Player.GetX() == crabArr[i]->GetX() && Player.GetY() == crabArr[i]->GetY() && crabArr[i]->IsAlive() == true) 
+        {
+            enemy = crabArr[i];
+            battleMode = true;
+        }
+    }
+
 }
 
 void DrawHotBar()
@@ -654,4 +664,137 @@ void CutDownTree()
         PlaySound(sounds[SOUNDS_TREE_CUTTING]);
     }
 
+}
+
+void ExecuteEnemyBehaviors()
+{
+    
+    for(int i = 0; i < MAX_ORCS_INSTANCES; i++) 
+    {
+        if(!orcArr[i]->GetStunStatus()) 
+        {
+            orcArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            orcArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                orcArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(orcArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+    
+    for(int i = 0; i < MAX_WANDERING_EYE_INSTANCES; i++) 
+    {
+        if(!eyeArr[i]->GetStunStatus()) 
+        {
+            eyeArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            eyeArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                eyeArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(eyeArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    for(int i = 0; i < MAX_TREANT_INSTANCES; i++) 
+    {
+        if(!treantArr[i]->GetStunStatus()) 
+        {
+            treantArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            treantArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                treantArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(treantArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    for(int i = 0; i < MAX_VENGEFUL_SPIRIT_INSTANCES; i++) 
+    {
+        if(!vengefulSpiritArr[i]->GetStunStatus()) 
+        {
+            vengefulSpiritArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            vengefulSpiritArr[i]->SetStunCounter(count);
+            if(count > 2) 
+            {
+                vengefulSpiritArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(vengefulSpiritArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+    
+    //golem does not move or rarely moves (WIP)
+
+    for(int i = 0; i < MAX_CRAB_THING_INSTANCES; i++) 
+    {
+        if(!crabArr[i]->GetStunStatus()) 
+        {
+            crabArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            crabArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                crabArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(crabArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    
 }

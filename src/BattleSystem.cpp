@@ -294,6 +294,10 @@ void BattleRender(Enemy *enemy)
     //enemy Tile
     if(enemy->GetName() == "Orc") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 11, 0, 10.0f);
     else if(enemy->GetName() == "Wandering Eye") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 13, 0, 10.0f);
+    else if(enemy->GetName() == "Treant") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 12, 1, 10.0f);
+    else if(enemy->GetName() == "Vengeful Spirit") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 9, 1, 10.0f);
+    else if(enemy->GetName() == "Golem") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 10, 0, 10.0f);
+    else if(enemy->GetName() == "The Crab Thing") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 12, 0, 10.0f);
 
     //health
     DrawRectangleRounded(playerHealthBox, 0.1, 1, BLACK);

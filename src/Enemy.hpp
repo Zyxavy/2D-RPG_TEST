@@ -53,7 +53,7 @@ public:
     void Wander();
 };
 
-extern Enemy orc, wanderingEye;
+extern Enemy orc, wanderingEye, treant, vengefulSpirit, golem, crabThing;
 
 extern Enemy* orc1;
 extern Enemy* orc2;

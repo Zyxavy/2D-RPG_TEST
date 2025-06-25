@@ -49,3 +49,5 @@ Jun 10 - Trees are now obstacles | <strike>added an unstuck feature</strike> | m
 Jun 13 - Added the ability to cut down trees
 <hr>
 Jun 21 - Added a tutorial Book
+<hr>
+June 25 - Added more Enemies(a tree, a ghost, a crab, and a statue)

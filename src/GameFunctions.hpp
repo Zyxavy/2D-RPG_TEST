@@ -115,6 +115,7 @@ bool IsBarrierCollision(int x, int y);
 void CheckContactWithEnemies();
 void DrawHotBar();
 void CutDownTree();
+void ExecuteEnemyBehaviors();
 
 
 
