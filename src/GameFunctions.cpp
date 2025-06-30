@@ -16,7 +16,7 @@ Texture2D pagePictures[MAX_PAGE_PICTURES];
 Sound sounds[MAX_SOUNDS];
 sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
-sTile tutorialWorld[WORLD_WIDTH][WORLD_HEIGHT]; // WIP
+sTile plainLands[WORLD_WIDTH][WORLD_HEIGHT];
 bool isInventory = false;
 int count;
 int lastKeyPressed;
@@ -59,7 +59,7 @@ void GameStartup()
                 .type = TILE_TYPE_DIRT
             };
 
-            tutorialWorld[i][j] = (sTile) // WIP
+            plainLands[i][j] = (sTile) 
             {
                 .x = i,
                 .y = j,
@@ -240,18 +240,28 @@ void GameUpdate()
         if(IsKeyPressed(KEY_E))
         {
             //Enter dungeon
-            if(Player.GetX() == dungeon_gate.x &&
-                Player.GetY() == dungeon_gate.y)
+            if(Player.GetX() == dungeon_gate.x && Player.GetY() == dungeon_gate.y)
+            {
+                if(Player.GetZone() == ZONE_WORLD)
                 {
-                    if(Player.GetZone() == ZONE_WORLD)
-                    {
-                        Player.SetZone(ZONE_DUNGEON);
-                    }
-                    else if(Player.GetZone() == ZONE_DUNGEON)
-                    {
-                        Player.SetZone(ZONE_WORLD);
-                    }
+                    Player.SetZone(dungeon_gate.zone2);
                 }
+                else if(Player.GetZone() == ZONE_DUNGEON)
+                {
+                    Player.SetZone(dungeon_gate.zone1);
+                }
+            }
+            else if(Player.GetX() == plainLands_gate.x && Player.GetY() == plainLands_gate.y)
+            {
+                if(Player.GetZone() == ZONE_DUNGEON)
+                {
+                    Player.SetZone(plainLands_gate.zone2);
+                }
+                else if(Player.GetZone() == ZONE_WORLD_PLAIN_LANDS)
+                {
+                    Player.SetZone(plainLands_gate.zone1);
+                }
+            }
                 
         }
         else if(IsKeyPressed(KEY_Q))
@@ -297,9 +307,9 @@ void GameRender()
                 {
                     tile = dungeon[i][j];
                 }
-                else if (Player.GetZone() == ZONE_TUTORIAL) // WIP
+                else if (Player.GetZone() == ZONE_WORLD_PLAIN_LANDS) 
                 {
-                    tile = tutorialWorld[i][j];
+                    tile = plainLands[i][j];
                 }
 
                 switch (tile.type)
@@ -344,7 +354,7 @@ void GameRender()
         }
 
         //Gate
-        DrawTile(dungeon_gate.x, dungeon_gate.y, 8, 9); 
+        RenderGates();
         // enemies
         EnemyRender();
         // player

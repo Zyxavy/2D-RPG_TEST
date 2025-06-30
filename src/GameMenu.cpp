@@ -120,6 +120,10 @@ void DeathMenu(){
            Player.SetAlive(true);
            Player.SetZone(ZONE_WORLD);
            Player.SetHealth(Player.GetMaxHealth());
+           Player.SetEnergy(Player.GetMaxEnergy());
+           Player.SetX(TILE_WIDTH * 3);
+           Player.SetY(TILE_WIDTH * 3);
+           ResetAllEnemies();
 
         }
         //Options

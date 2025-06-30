@@ -85,7 +85,7 @@ typedef enum
    ZONE_BATTLE,
    ZONE_WORLD,
    ZONE_DUNGEON, 
-   ZONE_TUTORIAL // WIP
+   ZONE_WORLD_PLAIN_LANDS 
 
 } eZones;
 
@@ -96,7 +96,7 @@ extern Texture2D pagePictures[MAX_PAGE_PICTURES];
 extern Sound sounds[MAX_SOUNDS];
 extern sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
-extern sTile tutorialWorld[WORLD_WIDTH][WORLD_HEIGHT]; // WIP
+extern sTile plainLands[WORLD_WIDTH][WORLD_HEIGHT];
 extern Camera2D camera;
 extern bool isInventory;
 extern int lastKeyPressed;

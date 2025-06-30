@@ -51,3 +51,5 @@ Jun 13 - Added the ability to cut down trees
 Jun 21 - Added a tutorial Book
 <hr>
 June 25 - Added more Enemies(a tree, a ghost, a crab, and a statue)
+<hr>
+June 30 - Added a new zone (Plains land) | adjusted enemy stats and scaling

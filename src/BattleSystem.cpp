@@ -125,7 +125,6 @@ void BattleUpdate(Enemy *enemy)
 
         PlaySound(sounds[SOUND_DEATH]);
         isDead = true;
-        Player.SetZone(enemy->GetZone());
     }
 
     if (!playerAnimating && !enemyAnimating) 

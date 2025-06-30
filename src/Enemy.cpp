@@ -29,7 +29,13 @@ bool Enemy::GetStunStatus() const {return stunned;}
 int Enemy::GetStunCounter() const{return stunCounter;}
 
 //setters
-void Enemy::TakeDamage(int amount) 
+void Enemy::SetDamageMin(int amount) {damageMin = amount;}
+void Enemy::SetDamageMax(int amount) {damageMax = amount;}
+void Enemy::SetDefense(int amount){defense = amount;}
+void Enemy::SetLevel(int amount){level = amount;}
+void Enemy::SetMaxHealth(int amount){maxHealth = amount;}
+void Enemy::SetExperience(int amount){experience = amount;}
+void Enemy::Enemy::TakeDamage(int amount)
 {
     health -= amount;
     if (health <= 0) {

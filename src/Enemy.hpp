@@ -41,6 +41,12 @@ public:
     int GetStunCounter() const;
 
     // Setters
+    void SetDamageMin(int amount);
+    void SetDamageMax(int amount);
+    void SetDefense(int amount);
+    void SetLevel(int amount);
+    void SetMaxHealth(int amount);
+    void SetExperience(int amount);
     void TakeDamage(int amount);
     void Move(int newX, int newY);
     void Render(int tileX, int tileY) const;

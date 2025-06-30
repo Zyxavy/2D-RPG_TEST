@@ -9,6 +9,7 @@
 #include <vector>
 
 sEntity dungeon_gate;
+sEntity plainLands_gate;
 int levelCap = 100;
 bool playerLeveledUp = false;
 
@@ -16,50 +17,50 @@ bool playerLeveledUp = false;
 Enemy orc(
     "Orc", // name
     TILE_WIDTH * 5, TILE_HEIGHT * 5, //spawn pos
-    130, ZONE_DUNGEON, 25, 50, 12, //maxhp, zone, dmgMin, dmgMax, def
+    120, ZONE_DUNGEON, 20, 40, 10, //maxhp, zone, dmgMin, dmgMax, def
     100, 1, "Intelligence" // exp, level, weakness
 );
 
 Enemy wanderingEye(
     "Wandering Eye",
     TILE_WIDTH * 10, TILE_HEIGHT * 20,
-    100, ZONE_WORLD, 20, 45, 8,
+    100, ZONE_WORLD, 20, 48, 8,
     120, 1, "Strenght"
 );
 
 Enemy treant(
     "Treant",
     TILE_WIDTH * 5, TILE_HEIGHT * 8,
-    190, ZONE_WORLD, 10, 79, 11,
+    190, ZONE_WORLD, 10, 80, 11,
     180, 3, "Dexterity"
 );
 
 Enemy vengefulSpirit(
     "Vengeful Spirit",
     TILE_WIDTH * GetRandomValue(1,6), TILE_HEIGHT * GetRandomValue(2,8),
-    100, ZONE_DUNGEON, 25, 70, 5,
+    100, ZONE_DUNGEON, 45, 50, 8,
     160, 2, "Intelligence"
 );
 
 Enemy golem(
     "Golem",
     TILE_WIDTH * GetRandomValue(2,9), TILE_HEIGHT * GetRandomValue(2,8),
-    230, ZONE_DUNGEON, 15, 25, 24,
+    250, ZONE_DUNGEON, 18, 28, 25,
     200, 3, "Strenght"
 );
 
 Enemy crabThing(
     "The Crab Thing",
     TILE_WIDTH * GetRandomValue(2,9), TILE_HEIGHT * GetRandomValue(2,8),
-    100, ZONE_WORLD, 25, 35, 15,
-    170, 2, "Dexterity"
+    120, ZONE_WORLD_PLAIN_LANDS, 30, 50, 15,
+    170, 2, "NULL"
 );
 
 //Init Heroes
 Hero Knight (
-    "Knight", "Strength", 
-    TILE_WIDTH * 3, TILE_HEIGHT * 3,
-    200, 200, 100, 100, 18, 37, 24, 0, 1, 1000, ZONE_WORLD, true, true
+    "Knight", "Strength", //Name, type
+    TILE_WIDTH * 3, TILE_HEIGHT * 3, // pos X, pos Y
+    200, 200, 100, 100, 18, 37, 24, 0, 1, 1000, ZONE_WORLD, true, true // hp, maxhp, energy, maxenergy, damagemin,damagemax,defense, experience, level, money, zone, is alive, is passable
 );
 
 
@@ -113,7 +114,16 @@ void EntitiesInit() {
     {
         .x = TILE_WIDTH * 10,
         .y = TILE_HEIGHT * 10,
-        .zone = ZONE_ALL,
+        .zone1 = ZONE_WORLD,
+        .zone2 = ZONE_DUNGEON
+    };
+
+    plainLands_gate = (sEntity) 
+    {
+        .x = TILE_WIDTH * 4,
+        .y = TILE_HEIGHT * 6,
+        .zone1 = ZONE_DUNGEON,
+        .zone2 = ZONE_WORLD_PLAIN_LANDS
     };
 
 
@@ -275,7 +285,135 @@ void PlayerLevelUp()
             SetMusicVolume(musicAction[i], 0.2f);
         }
 
+        HostileEntitiesLevelUp();
         PlaySound(sounds[SOUNDS_LEVEL_UP]);
     
     }
 }
+
+void HostileEntitiesLevelUp()
+{
+    //orcs
+    for(int i = 0; i < MAX_ORCS_INSTANCES;i++)
+    {
+        orcArr[i]->SetMaxHealth(orc.GetMaxHealth() + 60);
+        orcArr[i]->SetHealth(orc.GetMaxHealth());
+        orcArr[i]->SetDamageMin(orc.GetDamageMin() + 8);
+        orcArr[i]->SetDamageMax(orc.GetDamageMax() + 10);
+        orcArr[i]->SetDefense(orc.GetDefense() + 2);
+        orcArr[i]->SetLevel(orc.GetLevel() + 1);
+        orcArr[i]->SetExperience(orc.GetExperience() + 35);
+    }
+
+    //wandering Eyes
+    for(int i = 0; i < MAX_WANDERING_EYE_INSTANCES;i++)
+    {
+        eyeArr[i]->SetMaxHealth(wanderingEye.GetMaxHealth() + 50);
+        eyeArr[i]->SetHealth(wanderingEye.GetMaxHealth());
+        eyeArr[i]->SetDamageMin(wanderingEye.GetDamageMin() + 10);
+        eyeArr[i]->SetDamageMax(wanderingEye.GetDamageMax() + 15);
+        eyeArr[i]->SetDefense(wanderingEye.GetDefense() + 1);
+        eyeArr[i]->SetLevel(wanderingEye.GetLevel() + 1);
+        eyeArr[i]->SetExperience(wanderingEye.GetExperience() + 40);
+    }
+
+    //Treants
+    for(int i = 0; i < MAX_TREANT_INSTANCES;i++)
+    {
+        treantArr[i]->SetMaxHealth(treant.GetMaxHealth() + 80);
+        treantArr[i]->SetHealth(treant.GetMaxHealth());
+        treantArr[i]->SetDamageMin(treant.GetDamageMin() + 5);
+        treantArr[i]->SetDamageMax(treant.GetDamageMax() + 5);
+        treantArr[i]->SetDefense(treant.GetDefense() + 3);
+        treantArr[i]->SetLevel(treant.GetLevel() + 1);
+        treantArr[i]->SetExperience(treant.GetExperience() + 35);
+    }
+
+    //Vengeful Spirits
+    for(int i = 0; i < MAX_VENGEFUL_SPIRIT_INSTANCES;i++)
+    {
+        vengefulSpiritArr[i]->SetMaxHealth(vengefulSpirit.GetMaxHealth() + 50);
+        vengefulSpiritArr[i]->SetHealth(vengefulSpirit.GetMaxHealth());
+        vengefulSpiritArr[i]->SetDamageMin(vengefulSpirit.GetDamageMin() + 10);
+        vengefulSpiritArr[i]->SetDamageMax(vengefulSpirit.GetDamageMax() + 15);
+        vengefulSpiritArr[i]->SetDefense(vengefulSpirit.GetDefense() + 1);
+        vengefulSpiritArr[i]->SetLevel(vengefulSpirit.GetLevel() + 1);
+        vengefulSpiritArr[i]->SetExperience(vengefulSpirit.GetExperience() + 40);
+    }
+
+    //Golems
+    for(int i = 0; i < MAX_GOLEM_INSTANCES;i++)
+    {
+        golemArr[i]->SetMaxHealth(golem.GetMaxHealth() + 100);
+        golemArr[i]->SetHealth(golem.GetMaxHealth());
+        golemArr[i]->SetDamageMin(golem.GetDamageMin() + 3);
+        golemArr[i]->SetDamageMax(golem.GetDamageMax() + 3);
+        golemArr[i]->SetDefense(golem.GetDefense() + 5);
+        golemArr[i]->SetLevel(golem.GetLevel() + 1);
+        golemArr[i]->SetExperience(golem.GetExperience() + 35);
+    }
+
+    //The Crab
+    for(int i = 0; i < MAX_CRAB_THING_INSTANCES;i++)
+    {
+        crabArr[i]->SetMaxHealth(crabThing.GetMaxHealth() + 70);
+        crabArr[i]->SetHealth(crabThing.GetMaxHealth());
+        crabArr[i]->SetDamageMin(crabThing.GetDamageMin() + 25);
+        crabArr[i]->SetDamageMax(crabThing.GetDamageMax() + 30);
+        crabArr[i]->SetDefense(crabThing.GetDefense() + 3);
+        crabArr[i]->SetLevel(crabThing.GetLevel() + 2);
+        crabArr[i]->SetExperience(crabThing.GetExperience() + 85);
+    }
+}
+
+void ResetAllEnemies()
+{
+    for(int i = 0; i < MAX_ORCS_INSTANCES;i++)
+    {
+        orcArr[i]->SetAlive(true);
+        orcArr[i]->SetHealth(orc.GetMaxHealth());
+        orcArr[i]->Move(TILE_WIDTH * GetRandomValue(1,10), TILE_HEIGHT * GetRandomValue(1,14));
+    }
+
+    for(int i = 0; i < MAX_WANDERING_EYE_INSTANCES;i++)
+    {
+        eyeArr[i]->SetAlive(true);
+        eyeArr[i]->SetHealth(wanderingEye.GetMaxHealth());
+        eyeArr[i]->Move(TILE_WIDTH * GetRandomValue(1,10), TILE_HEIGHT * GetRandomValue(1,14));
+    }
+
+    for(int i = 0; i < MAX_TREANT_INSTANCES;i++)
+    {
+        treantArr[i]->SetAlive(true);
+        treantArr[i]->SetHealth(treant.GetMaxHealth());
+        treantArr[i]->Move(TILE_WIDTH * GetRandomValue(1,10), TILE_HEIGHT * GetRandomValue(1,14));
+    }
+
+    for(int i = 0; i < MAX_VENGEFUL_SPIRIT_INSTANCES;i++)
+    {
+        vengefulSpiritArr[i]->SetAlive(true);
+        vengefulSpiritArr[i]->SetHealth(vengefulSpirit.GetMaxHealth());
+        vengefulSpiritArr[i]->Move(TILE_WIDTH * GetRandomValue(1,10), TILE_HEIGHT * GetRandomValue(1,14));
+    }
+
+    for(int i = 0; i < MAX_GOLEM_INSTANCES;i++)
+    {
+        golemArr[i]->SetAlive(true);
+        golemArr[i]->SetHealth(golem.GetMaxHealth());
+        golemArr[i]->Move(TILE_WIDTH * GetRandomValue(1,10), TILE_HEIGHT * GetRandomValue(1,14));
+    }
+
+    for(int i = 0; i < MAX_CRAB_THING_INSTANCES;i++)
+    {
+        crabArr[i]->SetAlive(true);
+        crabArr[i]->SetHealth(crabThing.GetMaxHealth());
+        crabArr[i]->Move(TILE_WIDTH * GetRandomValue(1,10), TILE_HEIGHT * GetRandomValue(1,14));
+    }
+}
+
+void RenderGates()
+{
+    if(Player.GetZone() == ZONE_WORLD || Player.GetZone() == ZONE_DUNGEON) DrawTile(dungeon_gate.x, dungeon_gate.y, 8, 9); //dungeon gate
+    if(Player.GetZone() == ZONE_DUNGEON || Player.GetZone() == ZONE_WORLD_PLAIN_LANDS) DrawTile(plainLands_gate.x, plainLands_gate.y, 7, 7); //plainsGate
+}
+

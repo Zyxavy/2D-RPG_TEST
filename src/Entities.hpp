@@ -20,7 +20,8 @@ typedef struct
 {
     int x;
     int y;
-    eZones zone;
+    eZones zone1;
+    eZones zone2;
     bool isAlive;
     bool isPassable;
     int health;
@@ -41,6 +42,7 @@ typedef struct
 
 //externs
 extern sEntity dungeon_gate;
+extern sEntity plainLands_gate;
 extern sEntity chest;
 extern int levelCap;
 extern bool playerLeveledUp;
@@ -57,6 +59,9 @@ void EntitiesInit();
 void PlayerRender();
 void EnemyRender();
 void PlayerLevelUp();
+void HostileEntitiesLevelUp();
+void ResetAllEnemies();
+void RenderGates();
 
 
 
