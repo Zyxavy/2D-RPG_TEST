@@ -5,20 +5,21 @@
 #include <string>
 #include <cmath>
 
-Enemy::Enemy(std::string name, int x, int y, int health, eZones zone, int damageMin, int damageMax, int defense, int experience, int level, std::string weakness)
-    : name(name), x(x), y(y), health(health), maxHealth(health), zone(zone),
+Enemy::Enemy(int id, std::string name, int x, int y, int health, eZones zone, int damageMin, int damageMax, int defense, int experience, int level, std::string weakness, bool isSpecial)
+    : id(id), name(name), x(x), y(y), health(health), maxHealth(health), zone(zone),
       damageMin(damageMin), damageMax(damageMax), defense(defense), experience(experience), 
       level(level), isAlive(true), weakness(weakness), stunned(false), stunCounter(0) {}
 
 
 //getters
+int Enemy::GetID() const { return id; }
 std::string Enemy::GetName() const { return name; }
 int Enemy::GetHealth() const { return health; }
 int Enemy::GetMaxHealth() const { return maxHealth; }
 int Enemy::GetDamageMin() const { return damageMin; }
 int Enemy::GetDamageMax() const { return damageMax; }
 int Enemy::GetDefense() const { return defense; }
-int Enemy::GetExperience() const { return experience; }
+int Enemy::GetExperience() const { return experience;}
 int Enemy::GetLevel() const { return level; }
 std::string Enemy::GetWeakness() const { return weakness; }
 bool Enemy::IsAlive() const { return isAlive; }
@@ -27,6 +28,7 @@ int Enemy::GetX() const {return x;}
 int Enemy::GetY() const {return y;}
 bool Enemy::GetStunStatus() const {return stunned;}
 int Enemy::GetStunCounter() const{return stunCounter;}
+bool Enemy::GetSpecialStatus() const{return isSpecial;}
 
 //setters
 void Enemy::SetDamageMin(int amount) {damageMin = amount;}
@@ -60,9 +62,9 @@ void Enemy::SetAlive(bool state)
 {
     isAlive = state;
 }
-void Enemy::SetHealth(int hp)
+void Enemy::SetHealth(int amount)
 {
-    health = hp;
+    health = amount;
 }
 
 void Enemy::SetStunStatus(int state)
@@ -74,6 +76,7 @@ void Enemy::SetStunCounter(int num)
 {
     stunCounter = num;
 }
+void Enemy::SetSpecialStatus(bool state){isSpecial = state;}
 
 //movement
 void Enemy::MoveAI(int playerX, int playerY) 

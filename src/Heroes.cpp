@@ -235,4 +235,5 @@ void Hero::UseSkill(int skillNum, Enemy* target)
             }
         }
     }
+    if(Player.GetEnergy() < 0) Player.SetEnergy(0);
 }

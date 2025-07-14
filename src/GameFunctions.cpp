@@ -5,10 +5,12 @@
 #include "MusicFunctions.hpp"
 #include "Enemy.hpp"
 #include "Heroes.hpp"
+#include "StoryLine.hpp"
+#include "ZoneMaps.hpp"
+#include "Items.hpp"
 #include <iostream>
 
 
-sEntity chest = { 0 };
 Camera2D camera { 0 };
 
 Texture2D textures[MAX_TEXTURES];
@@ -20,6 +22,8 @@ sTile plainLands[WORLD_WIDTH][WORLD_HEIGHT];
 bool isInventory = false;
 int count;
 int lastKeyPressed;
+GameState currentGameState;
+GameState prevGameState;
 
 void GameStartup() 
 {
@@ -43,26 +47,26 @@ void GameStartup()
     LoadAllPages();
 
     //generate World/Zones
-    for(int i = 0; i < WORLD_WIDTH; i++){
-        for(int j = 0; j < WORLD_HEIGHT; j++){
-            world[i][j] = (sTile)
+    for(int y = 0; y < WORLD_HEIGHT; y++){
+        for(int x = 0; x < WORLD_WIDTH; x++){
+            world[x][y] = (sTile)
             {
-                .x = i,
-                .y = j,
-                .type = GetRandomValue(TILE_TYPE_DIRT, TILE_TYPE_TREE)
+                .x = x,
+                .y = y,
+                .type = zone1Map[y][x]
             };
 
-            dungeon[i][j] = (sTile)
+            dungeon[x][y] = (sTile)
             {
-                .x = i,
-                .y = j,
-                .type = TILE_TYPE_DIRT
+                .x = x,
+                .y = y,
+                .type = zoneDungeon1Map[y][x]
             };
 
-            plainLands[i][j] = (sTile) 
+            plainLands[x][y] = (sTile) 
             {
-                .x = i,
-                .y = j,
+                .x = x,
+                .y = y,
                 .type = GetRandomValue(TILE_TYPE_DIRT, TILE_TYPE_GRASS)
             };
 
@@ -71,6 +75,7 @@ void GameStartup()
 
     //initialize entities
     EntitiesInit();
+    ItemsInit();
 
     while(IsBarrierCollision(dungeon_gate.x, dungeon_gate.y))
     {
@@ -123,6 +128,12 @@ void GameUpdate()
     {
         BattleUpdate(enemy);
     }
+    else if (inDialogue || inDialogueWithOptions)
+    {
+        UpdateDialogue();
+        UpdateDialogueWithOptions();
+    }
+    
     else if(isInventory)
     {
         if(IsKeyPressed(KEY_Q)) {isInventory = false;}
@@ -164,29 +175,8 @@ void GameUpdate()
             {  
                 y += TILE_HEIGHT;
                 hasKeyPressed = true;
-            }
-        }
 
-        else if (IsKeyPressed(KEY_TAB))
-        {
-            int num = GetRandomValue(1,4);
-            std::cout << "Tab was pressed\n";
-            switch (num)
-            {
-            case 1:
-                y -= TILE_HEIGHT;
-                break;
-            case 2:
-                y += TILE_HEIGHT;
-                break;
-            case 3: 
-                x -= TILE_WIDTH;
-                break;
-            case 4:
-                x += TILE_WIDTH;
-                break;
             }
-
         }
 
         if(IsKeyPressed(KEY_R))
@@ -194,13 +184,25 @@ void GameUpdate()
             CutDownTree();
         }
 
-        if(Player.GetX() == chest.x && Player.GetY() == chest.y && chest.isAlive) //interact with chest
+        if(chestIsPresent)
         {
-            Player.SetMoney(Player.GetMoney() + chest.money);
-            Player.SetHealthPotions(Player.GetRemainingHealthPotions() + chest.healthPotions);
-            Player.SetEnergyFoods(Player.GetRemainingEnergyFoods() + chest.energyFoods );
-            chest.isAlive = false;
-            PlaySound(sounds[SOUND_COINS]);
+            int j = 0;
+            for(int i = 0; i < MAX_CHEST_INSTANCES; i++)
+            {
+                if(chestArr[i] != nullptr && Player.GetX() == chestArr[i]->x && Player.GetY() == chestArr[i]->y && chestArr[i]->isAlive && chestArr[i]->zone1 == Player.GetZone()) //interact with chestArr[i]
+                {
+                    Player.SetMoney(Player.GetMoney() + chestArr[i]->money);
+                    Player.SetHealthPotions(Player.GetRemainingHealthPotions() + chestArr[i]->healthPotions);
+                    Player.SetEnergyFoods(Player.GetRemainingEnergyFoods() + chestArr[i]->energyFoods );
+                    chestArr[i]->isAlive = false;
+                    PlaySound(sounds[SOUND_COINS]);
+                }
+
+                if(chestArr[i] != nullptr && !chestArr[i]->isAlive)
+                {
+                    if(++j >= 4) chestIsPresent = false;
+                }
+            }
         }
 
         //Enemy moves or Player Escapes and stuns enemy
@@ -220,49 +222,28 @@ void GameUpdate()
 
         //CHECK Contact with enemies
         CheckContactWithEnemies();
-
-            if(hasKeyPressed) // Play FootSteps FX
-            {
-                if(Player.GetZone() == ZONE_WORLD) PlaySound(sounds[SOUND_FOOT_GRASS]);
-                else if (Player.GetZone() == ZONE_DUNGEON) PlaySound(sounds[SOUND_FOOT_STONE]);
-
-            }
-
-            //confirm and set the X&Y coords
-            Player.SetX(x);
-            Player.SetY(y);
-
-            //Camera Follows Player
-            camera.target = (Vector2) {(float)Player.GetX(), (float)Player.GetY()};
         
+        if(hasKeyPressed) // Play FootSteps FX
+        {
+            if(Player.GetZone() == ZONE_WORLD || Player.GetZone() == ZONE_WORLD_PLAIN_LANDS) PlaySound(sounds[SOUND_FOOT_GRASS]);
+            else if (Player.GetZone() == ZONE_DUNGEON) PlaySound(sounds[SOUND_FOOT_STONE]);
 
+        }
+
+        //confirm and set the X&Y coords
+        Player.SetX(x);
+        Player.SetY(y);
+
+        //Camera Follows Player
+        camera.target = (Vector2) {(float)Player.GetX(), (float)Player.GetY()};
     
+        InteractWithItems();
         if(IsKeyPressed(KEY_E))
         {
-            //Enter dungeon
-            if(Player.GetX() == dungeon_gate.x && Player.GetY() == dungeon_gate.y)
-            {
-                if(Player.GetZone() == ZONE_WORLD)
-                {
-                    Player.SetZone(dungeon_gate.zone2);
-                }
-                else if(Player.GetZone() == ZONE_DUNGEON)
-                {
-                    Player.SetZone(dungeon_gate.zone1);
-                }
-            }
-            else if(Player.GetX() == plainLands_gate.x && Player.GetY() == plainLands_gate.y)
-            {
-                if(Player.GetZone() == ZONE_DUNGEON)
-                {
-                    Player.SetZone(plainLands_gate.zone2);
-                }
-                else if(Player.GetZone() == ZONE_WORLD_PLAIN_LANDS)
-                {
-                    Player.SetZone(plainLands_gate.zone1);
-                }
-            }
-                
+            //Enter dungeon / gates
+            EnterGates();
+            //Interact with NPCs
+            InteractWithNPCs();
         }
         else if(IsKeyPressed(KEY_Q))
         {
@@ -270,6 +251,11 @@ void GameUpdate()
         }
     
     }
+
+    //stories and etc
+    
+    
+
 
 }
 
@@ -312,51 +298,20 @@ void GameRender()
                     tile = plainLands[i][j];
                 }
 
-                switch (tile.type)
-                {
-                    case TILE_TYPE_DIRT:
-                        texture_index_x = 4;
-                        texture_index_y = 4;
-                        break;
-                    case TILE_TYPE_GRASS:
-                        texture_index_x = 5;
-                        texture_index_y = 4;
-                        break;
-                    case TILE_TYPE_TREE:  //This is tree
-                        texture_index_x = 4;
-                        texture_index_y = 5;
-                        break;
-                    case TILE_TYPE_STONE:
-                        texture_index_x = 1;
-                        texture_index_y = 6;
-                        break;
-                    case TILE_TYPE_STUMP:
-                        texture_index_x = 8;
-                        texture_index_y = 3;
-                        break;
-                    default:
-                        break;
-                }
+                RenderTile(tile, texture_index_x, texture_index_y);
 
                 DrawTile(tile.x * TILE_WIDTH, tile.y * TILE_HEIGHT, texture_index_x, texture_index_y);
             }
             
         }
 
-        //Borders
-        for (int x = 0; x < WORLD_WIDTH; x++) {
-            DrawTile(x * TILE_WIDTH, WORLD_TOP * TILE_HEIGHT, 13, 1); // Top 
-            DrawTile(x * TILE_WIDTH, WORLD_BOTTOM * TILE_HEIGHT, 13, 1); // Bottom 
-        }
-        for (int y = 0; y < WORLD_HEIGHT; y++) {
-            DrawTile(WORLD_LEFT * TILE_WIDTH, y * TILE_HEIGHT, 13, 1); // Left 
-            DrawTile(WORLD_RIGHT * TILE_WIDTH, y * TILE_HEIGHT, 13, 1); // Right 
-        }
 
         //Gate
         RenderGates();
-        // enemies
+        // enemies | Npcs
         EnemyRender();
+        RenderNPCs();
+        RenderItems();
         // player
         PlayerRender();
 
@@ -364,7 +319,93 @@ void GameRender()
 
         // Top-left thingy
         DrawHotBar();
+        dungeonKey = true;
 
+        if(inDialogue) RenderDialogue();
+        else RenderDialogueWithOptions();
+    }
+}
+
+void RenderTile(const sTile &tile,int &texture_index_x, int &texture_index_y )
+{
+    switch (tile.type) 
+    {
+        case TILE_TYPE_DIRT: // 0
+            texture_index_x = 4; texture_index_y = 4; break;
+        case TILE_TYPE_GRASS: // 1
+            texture_index_x = 5; texture_index_y = 4; break;
+        case TILE_TYPE_TREE:  //2
+            texture_index_x = 4; texture_index_y = 5; break;
+        case TILE_TYPE_STONE: // 3
+            texture_index_x = 1; texture_index_y = 6; break;
+        case TILE_TYPE_STUMP: // 4
+            texture_index_x = 8; texture_index_y = 3; break;
+            //water
+        case TILE_TYPE_WATER_TOP_LEFT: // 5
+            texture_index_x = 11; texture_index_y = 7; break;
+        case TILE_TYPE_WATER_TOP_MID: // 6
+            texture_index_x = 12; texture_index_y = 7; break;
+        case TILE_TYPE_WATER_TOP_RIGHT: 
+            texture_index_x = 13; texture_index_y = 7; break;
+        case TILE_TYPE_WATER_MID_LEFT: // 8
+            texture_index_x = 11; texture_index_y = 8; break;
+        case TILE_TYPE_WATER_MID_MID: //9
+            texture_index_x = 12; texture_index_y = 8; break;
+        case TILE_TYPE_WATER_MID_RIGHT: 
+            texture_index_x = 13; texture_index_y = 8; break;
+        case TILE_TYPE_WATER_BOT_LEFT: // 11
+            texture_index_x = 11; texture_index_y = 9; break;
+        case TILE_TYPE_WATER_BOT_MID: //12
+            texture_index_x = 12; texture_index_y = 9; break;
+        case TILE_TYPE_WATER_BOT_RIGHT: 
+            texture_index_x = 13; texture_index_y = 9; break;
+        case TILE_TYPE_WATER_HORIZONTAL: //14
+            texture_index_x = 12; texture_index_y = 6; break;
+        case TILE_TYPE_WATER_VERTICAL: //15
+            texture_index_x = 13; texture_index_y = 6; break;
+        case TILE_TYPE_WATER_WELL: //16
+            texture_index_x = 11; texture_index_y = 6; break;
+            //dungeon misc
+        case TILE_TYPE_RAIL_STRAIGHT: // 17
+            texture_index_x = 12; texture_index_y = 2; break;
+        case TILE_TYPE_RAIL_CURVE://18
+            texture_index_x = 11; texture_index_y = 2; break;
+        case TILE_TYPE_RAIL_BROKEN://19
+            texture_index_x = 13; texture_index_y = 2; break;
+        case TILE_TYPE_PILLAR://20
+            texture_index_x = 13; texture_index_y = 1; break;
+        case TILE_TYPE_BROKEN_PILLAR://21
+            texture_index_x = 14; texture_index_y = 1; break;
+        case TILE_TYPE_GRAVE://22
+            texture_index_x = 9; texture_index_y = 7; break;
+        case TILE_TYPE_CROSS: //23
+            texture_index_x = 8; texture_index_y = 7; break;
+        case TILE_TYPE_TOP_LEFT_WALL_CORNER: //24 
+            texture_index_x = 0; texture_index_y = 0; break;
+        case  TILE_TYPE_TOP1_WALL: //25
+            texture_index_x = 1; texture_index_y = 0; break; 
+        case TILE_TYPE_TOP2_WALL: //26
+            texture_index_x = 2; texture_index_y = 0; break;
+        case TILE_TYPE_TOP_RIGHT_WALL_CORNER: //27 
+            texture_index_x = 3; texture_index_y = 0; break;
+        case TILE_TYPE_MID_LEFT_WALL_CORNER: //28
+            texture_index_x = 0; texture_index_y = 1; break;
+        case TILE_TYPE_MID_WALL1: //29
+            texture_index_x = 1; texture_index_y = 1; break;
+        case TILE_TYPE_MID_WALL2:// 30
+            texture_index_x = 2; texture_index_y = 1; break;
+        case TILE_TYPE_MID_RIGHT_WALL_CORNER: //31 
+            texture_index_x = 3; texture_index_y = 1; break;
+        case TILE_TYPE_BOT_LEFT_OUTER_WALL_CORNER: //32 
+            texture_index_x = 0; texture_index_y = 2; break;
+        case  TILE_TYPE_BOT_OUTER_WALL1: //33
+            texture_index_x = 1; texture_index_y = 2; break;
+        case TILE_TYPE_BOT_OUTER_WALL2: // 34
+            texture_index_x = 2; texture_index_y = 2; break;
+        case TILE_TYPE_BOT_RIGHT_OUTER_WALL_CORNER: //35 
+            texture_index_x = 3; texture_index_y = 2; break;
+        default:
+            break;
     }
 }
 
@@ -386,36 +427,9 @@ void GameShutdown()
         UnloadSound(sounds[i]);
     }
 
-    for(int i = 0; i < MAX_ORCS_INSTANCES; i++)
-    {
-        delete orcArr[i];
-    }
-    
-    for(int i = 0; i < MAX_WANDERING_EYE_INSTANCES; i++)
-    {
-        delete eyeArr[i];
-    }
 
-    for(int i = 0; i < MAX_TREANT_INSTANCES; i++)
-    {
-        delete treantArr[i];
-    }
-
-    for(int i = 0; i < MAX_VENGEFUL_SPIRIT_INSTANCES; i++)
-    {
-        delete vengefulSpiritArr[i];
-    }
-
-    for(int i = 0; i < MAX_GOLEM_INSTANCES; i++)
-    {
-        delete golemArr[i];
-    }
-
-    for(int i = 0; i < MAX_CRAB_THING_INSTANCES; i++)
-    {
-        delete crabArr[i];
-    }
-
+   
+    DeleteEnemies();
     StopCurrentMusic();
     UnloadMusic();
     CloseAudioDevice();
@@ -469,6 +483,56 @@ void LoadAllPages()
     UnloadImage(pg11);
 }
 
+void DeleteEnemies()
+{
+    for(int i = 0; i < MAX_ORCS_INSTANCES; i++)
+    {
+        delete orcArr[i];
+    }
+    
+    for(int i = 0; i < MAX_WANDERING_EYE_INSTANCES; i++)
+    {
+        delete eyeArr[i];
+    }
+
+    for(int i = 0; i < MAX_TREANT_INSTANCES; i++)
+    {
+        delete treantArr[i];
+    }
+
+    for(int i = 0; i < MAX_VENGEFUL_SPIRIT_INSTANCES; i++)
+    {
+        delete vengefulSpiritArr[i];
+    }
+
+    for(int i = 0; i < MAX_GOLEM_INSTANCES; i++)
+    {
+        delete golemArr[i];
+    }
+
+    for(int i = 0; i < MAX_SNAKE_INSTANCES; i++)
+    {
+        delete snakeArr[i];
+    }
+
+    for(int i = 0; i < MAX_RAT_INSTANCES; i++)
+    {
+        delete ratArr[i];
+    }
+
+    for(int i = 0; i < MAX_CRAB_THING_INSTANCES; i++)
+    {
+        delete crabArr[i];
+    }
+
+
+    //
+    for(int i = 0; i < MAX_CHEST_INSTANCES; i++)
+    {
+        delete chestArr[i];
+    }
+}
+
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y)
 {
 
@@ -514,6 +578,10 @@ bool IsBarrierCollision(int x, int y)
     } else if (Player.GetZone() == ZONE_DUNGEON) 
     {
         tile = dungeon[tileX][tileY];
+    }
+    else if (Player.GetZone() == ZONE_WORLD_PLAIN_LANDS) 
+    {
+        tile = plainLands[tileX][tileY];
     } else
     {
         return false; 
@@ -526,11 +594,28 @@ bool IsBarrierCollision(int x, int y)
         return true; 
     }
 
-    // Check for trees
+    // Check for tiles
     if (tile.type == TILE_TYPE_TREE) 
     {
         std::cout << "Tree Collision at (" << tileX << ", " << tileY << ")\n";
         return true;
+    }
+    else if((tile.type >= TILE_TYPE_WATER_TOP_LEFT && tile.type <= TILE_TYPE_WATER_VERTICAL) || (tile.type == TILE_TYPE_PILLAR || tile.type == TILE_TYPE_BROKEN_PILLAR))
+    {
+        return true;
+    }
+
+    //Npcs
+    if(Player.GetZone() == ZONE_WORLD)
+    {
+        if(x == oldHermit.x && y == oldHermit.y) return true;
+        else if(x == woundedKnight.x && y == woundedKnight.y) return true;
+    }
+
+    //items
+    if(Player.GetZone() == ZONE_DUNGEON)
+    {
+        if(x == goldenRing.GetPosX() && y == goldenRing.GetPosY() && !goldenRing.IsPickedUp()) return true;
     }
 
     return false;
@@ -589,12 +674,32 @@ void CheckContactWithEnemies()
         }
     }
 
+    //check contact with Snakes
+    for(int i = 0; i < MAX_SNAKE_INSTANCES; i++)
+    {
+        if (snakeArr[i] != nullptr && Player.GetZone() == snakeArr[i]->GetZone() && Player.GetX() == snakeArr[i]->GetX() && Player.GetY() == snakeArr[i]->GetY() && snakeArr[i]->IsAlive() == true) 
+        {
+            enemy = snakeArr[i];
+            battleMode = true;
+        }
+    }
+
       //check contact with Crab
     for(int i = 0; i < MAX_CRAB_THING_INSTANCES; i++)
     {
         if (crabArr[i] != nullptr && Player.GetZone() == crabArr[i]->GetZone() && Player.GetX() == crabArr[i]->GetX() && Player.GetY() == crabArr[i]->GetY() && crabArr[i]->IsAlive() == true) 
         {
             enemy = crabArr[i];
+            battleMode = true;
+        }
+    }
+
+      //check contact with Rat
+    for(int i = 0; i < MAX_RAT_INSTANCES; i++)
+    {
+        if (ratArr[i] != nullptr && Player.GetZone() == ratArr[i]->GetZone() && Player.GetX() == ratArr[i]->GetX() && Player.GetY() == ratArr[i]->GetY() && ratArr[i]->IsAlive() == true) 
+        {
+            enemy = ratArr[i];
             battleMode = true;
         }
     }
@@ -778,6 +883,56 @@ void ExecuteEnemyBehaviors()
             std::cout << count;
         }
     }
+
+    for(int i = 0; i < MAX_SNAKE_INSTANCES; i++) 
+    {
+        if(!snakeArr[i]->GetStunStatus()) 
+        {
+            snakeArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            snakeArr[i]->SetStunCounter(count);
+            if(count > 5) 
+            {
+                snakeArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(snakeArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    for(int i = 0; i < MAX_RAT_INSTANCES; i++) 
+    {
+        if(!ratArr[i]->GetStunStatus()) 
+        {
+            ratArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            ratArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                ratArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(ratArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
     
     //golem does not move or rarely moves (WIP)
 
@@ -808,3 +963,86 @@ void ExecuteEnemyBehaviors()
 
     
 }
+
+void EnterGates()
+{
+    if(Player.GetX() == dungeon_gate.x && Player.GetY() == dungeon_gate.y)
+    {
+        if(dungeonKey)
+        {
+            if(Player.GetZone() == ZONE_WORLD)
+            {
+                Player.SetZone(dungeon_gate.zone2);
+                currentGameState = IN_DUNGEON;
+                Act1_Dungeon1();
+            }
+            else if(Player.GetZone() == ZONE_DUNGEON)
+            {
+                Player.SetZone(dungeon_gate.zone1);
+                currentGameState = IN_ZONE_1;
+            }  
+        }
+        else
+        {
+            StartDialogue({"You need Dungeon Key to enter."});
+            return;
+        }
+    }
+
+   
+    if(Player.GetX() == plainLands_gate.x && Player.GetY() == plainLands_gate.y)
+    {   
+        CheckIfDungeonCompleted();
+        if (plainsKey && currentGameState == IN_PLAINS)
+        {
+            StartDialogue({"The Dungeon collapsed..."});
+        }
+        else if(plainsKey)
+        {
+            if(Player.GetZone() == ZONE_DUNGEON)
+            {
+                Player.SetZone(plainLands_gate.zone2);
+                currentGameState = IN_PLAINS;
+            }
+        }
+        else
+        {
+            StartDialogue({"Defeat all enemies first to Enter."});
+        }
+        return;
+    }
+}
+
+void InteractWithNPCs()
+{
+    if(abs(Player.GetX() - oldHermit.x) <= TILE_WIDTH && 
+       abs(Player.GetY() - oldHermit.y) <= TILE_HEIGHT &&
+        Player.GetZone() == oldHermit.zone1)
+    {
+        Act1_HermitLine();
+        Player.SetHealthPotions(Player.GetRemainingHealthPotions() + 2);
+    }
+    else if(abs(Player.GetX() - woundedKnight.x) <= TILE_WIDTH && 
+            abs(Player.GetY() - woundedKnight.y) <= TILE_HEIGHT &&
+        Player.GetZone() == woundedKnight.zone1)
+    {
+        Act1_WoundedKnight();
+        Player.SetEnergyFoods(Player.GetRemainingEnergyFoods() + 2);
+    }
+}
+
+void CheckIfDungeonCompleted()
+{
+    //dungeon 1
+    if(!plainsKey)
+    {
+        if((rat1->IsAlive() == false && rat2->IsAlive() == false) &&
+            (vengefulSpirit1->IsAlive() == false && vengefulSpirit2->IsAlive() == false) &&
+             (golem1->IsAlive() == false && golem2->IsAlive() == false))
+        {
+            plainsKey = true;
+        }
+    }
+
+}
+

@@ -10,6 +10,7 @@ extern bool inMenu;
 extern bool isDead;
 extern bool inCharacterSelect;
 extern bool inTutorial;
+extern int itemID;
 
 
 //buttons

@@ -6,12 +6,13 @@ int main(){
     InitWindow(screenWidth, screenHeight, "2D RPG");
     SetTargetFPS(60);
 
-    GameStartup();
+    GameStartup(); 
     
-    while(!WindowShouldClose()){
+    while(!WindowShouldClose())
+    {
 
             GameUpdate();     
-            BeginDrawing() ;  
+            BeginDrawing();  
             
             if(inMenu)
             {

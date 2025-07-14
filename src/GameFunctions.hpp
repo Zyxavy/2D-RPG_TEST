@@ -64,11 +64,43 @@ typedef enum
 typedef enum
 {
     TILE_TYPE_DIRT = 0,
-    TILE_TYPE_GRASS,
-    TILE_TYPE_TREE,
-    TILE_TYPE_STONE,
-    TILE_TYPE_STUMP,
-
+    TILE_TYPE_GRASS, // 1
+    TILE_TYPE_TREE, // 2
+    TILE_TYPE_STONE, // 3
+    TILE_TYPE_STUMP, // 4
+    //water
+    TILE_TYPE_WATER_TOP_LEFT, // 5
+    TILE_TYPE_WATER_TOP_MID,
+    TILE_TYPE_WATER_TOP_RIGHT,
+    TILE_TYPE_WATER_MID_LEFT,
+    TILE_TYPE_WATER_MID_MID,
+    TILE_TYPE_WATER_MID_RIGHT,
+    TILE_TYPE_WATER_BOT_LEFT,
+    TILE_TYPE_WATER_BOT_MID,
+    TILE_TYPE_WATER_BOT_RIGHT,
+    TILE_TYPE_WATER_HORIZONTAL,
+    TILE_TYPE_WATER_VERTICAL,
+    TILE_TYPE_WATER_WELL, 
+    //dungeon misc
+    TILE_TYPE_RAIL_STRAIGHT, // 17
+    TILE_TYPE_RAIL_CURVE,
+    TILE_TYPE_RAIL_BROKEN,
+    TILE_TYPE_PILLAR,
+    TILE_TYPE_BROKEN_PILLAR,
+    TILE_TYPE_GRAVE,
+    TILE_TYPE_CROSS,
+    TILE_TYPE_TOP_LEFT_WALL_CORNER,
+    TILE_TYPE_TOP1_WALL,
+    TILE_TYPE_TOP2_WALL,
+    TILE_TYPE_TOP_RIGHT_WALL_CORNER,
+    TILE_TYPE_MID_LEFT_WALL_CORNER,
+    TILE_TYPE_MID_WALL1,
+    TILE_TYPE_MID_WALL2,
+    TILE_TYPE_MID_RIGHT_WALL_CORNER,
+    TILE_TYPE_BOT_LEFT_OUTER_WALL_CORNER,
+    TILE_TYPE_BOT_OUTER_WALL1,
+    TILE_TYPE_BOT_OUTER_WALL2,
+    TILE_TYPE_BOT_RIGHT_OUTER_WALL_CORNER
 } tile_type;
 
 typedef struct
@@ -89,8 +121,19 @@ typedef enum
 
 } eZones;
 
+typedef enum
+{
+    HERO_SELECTION,
+    IN_ZONE_1,
+    IN_DUNGEON,
+    IN_PLAINS,
+
+    PICKING_UP_ITEM,
+} GameState;
+
 
 //externs
+
 extern Texture2D textures[MAX_TEXTURES];
 extern Texture2D pagePictures[MAX_PAGE_PICTURES];
 extern Sound sounds[MAX_SOUNDS];
@@ -100,13 +143,16 @@ extern sTile plainLands[WORLD_WIDTH][WORLD_HEIGHT];
 extern Camera2D camera;
 extern bool isInventory;
 extern int lastKeyPressed;
+extern GameState currentGameState, prevGameState;
 
 //functions
 void GameStartup();
 void GameUpdate();
 void GameRender();
+void RenderTile(const sTile &tile,int &texture_index_x, int &texture_index_y);
 void GameShutdown();
 void LoadAllPages();
+void DeleteEnemies();
 
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y);
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y, float scale);
@@ -116,6 +162,9 @@ void CheckContactWithEnemies();
 void DrawHotBar();
 void CutDownTree();
 void ExecuteEnemyBehaviors();
+void EnterGates();
+void InteractWithNPCs();
+void CheckIfDungeonCompleted();
 
 
 

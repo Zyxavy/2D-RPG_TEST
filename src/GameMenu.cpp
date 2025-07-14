@@ -4,6 +4,8 @@
 #include "MusicFunctions.hpp"
 #include "Enemy.hpp"
 #include "Heroes.hpp"
+#include "StoryLine.hpp"
+#include "Items.hpp"
 #include <string>
 
 #define RAYGUI_IMPLEMENTATION
@@ -16,17 +18,19 @@ static double lastHoverSoundTime = 0.0;
 static bool showItemInfo = false;
 static bool healthPotionsWasClicked = false;
 static bool energyFoodWasClicked = false;
+static bool ItemWasClicked = false;
+int itemID = 0;
 
 Rectangle
-		startButton = { button_x, startButton_y, buttonWidth, buttonHeight },
-		optionsButton = { button_x, optionsButton_y, buttonWidth, buttonHeight },
-		exitButton = { button_x, exitButton_y, buttonWidth, buttonHeight },
-      tutorialButton = { button_x + 250 , tutorialButton_y, buttonWidth, buttonHeight},
+   startButton = { button_x, startButton_y, buttonWidth, buttonHeight },
+   optionsButton = { button_x, optionsButton_y, buttonWidth, buttonHeight },
+   exitButton = { button_x, exitButton_y, buttonWidth, buttonHeight },
+   tutorialButton = { button_x + 250 , tutorialButton_y, buttonWidth, buttonHeight},
 
-		startButton_lines = { button_x - 5, startButton_y - 5, buttonWidth + 10, buttonHeight + 10 },
-		optionsButton_lines = { button_x - 5, optionsButton_y - 5, buttonWidth + 10, buttonHeight + 10 },
-		exitButton_lines = { button_x - 5, exitButton_y - 5, buttonWidth + 10, buttonHeight + 10 },
-      tutorialButton_lines = {button_x  + 250, tutorialButton_y - 5, buttonWidth + 10, buttonHeight + 10 };
+   startButton_lines = { button_x - 5, startButton_y - 5, buttonWidth + 10, buttonHeight + 10 },
+   optionsButton_lines = { button_x - 5, optionsButton_y - 5, buttonWidth + 10, buttonHeight + 10 },
+   exitButton_lines = { button_x - 5, exitButton_y - 5, buttonWidth + 10, buttonHeight + 10 },
+   tutorialButton_lines = {button_x  + 250, tutorialButton_y - 5, buttonWidth + 10, buttonHeight + 10 };
 
 
 float buttonWidth = 50, buttonHeight = 25;
@@ -61,7 +65,8 @@ void GameMenu()
       }
       //Exit
       else if (CheckCollisionPointRec(mousePos, exitButton) ) {
-          exit(0);
+         GameShutdown();
+         exit(0);
       }
       else if (CheckCollisionPointRec(mousePos, tutorialButton)) // tutorial
       {
@@ -170,6 +175,7 @@ void DeathMenu(){
 
 void CharacterSelect()
 {
+   currentGameState = HERO_SELECTION;
 
    float knightButton_x = 130;
    float wizardButton_x = 380;
@@ -194,18 +200,20 @@ void CharacterSelect()
         //Knight
         if (CheckCollisionPointRec(mousePos, knightButton)) {
          Player = Knight;     
-         inCharacterSelect = false;                
+         inCharacterSelect = false;
+         Act1_Introduction();
         }
         //Wizard
         else if (CheckCollisionPointRec(mousePos, wizardButton)) {
          Player = Wizard;
          inCharacterSelect = false;
-         
+         Act1_Introduction();
         }
         //Rogue
         else if (CheckCollisionPointRec(mousePos, rougeButton) ) {
          Player = Rogue;
          inCharacterSelect = false;
+         Act1_Introduction();
         }
     } else
     {
@@ -259,6 +267,7 @@ void CharacterSelect()
    DrawTile(knightButton_x - 15, button_y + 30, 6, 0, 10); // knight
    DrawTile(wizardButton_x - 15, button_y + 30, 9, 0, 10); // wizard
    DrawTile(rougeButton_x - 15, button_y + 30, 8, 0, 10); // Rogue
+   
 	EndDrawing();
 }
 
@@ -337,8 +346,9 @@ void Inventory()
    //items-blahblah
    Rectangle healthPotion{41, 71, 45, 45};
    Rectangle energyFood{91, 71, 45, 45};
-   
 
+   Rectangle itemsBox{41, 320, 45, 45};
+   
    DrawRectangleRounded(outer, 0.2, 2, GRAY);
    DrawRectangleRounded(inner, 0.2, 2, LIGHTGRAY);
    DrawRectangleRounded(header, 0.1, 1, BLACK);
@@ -362,9 +372,38 @@ void Inventory()
       distance += 50;
    }
 
-   //Items / Consumable
+
+   //Consumable
    DrawTile(41, 71, 7, 8, 5.8f);
    DrawTile(energyFood.x, energyFood.y,10, 8, 5.8f);
+
+   //Items // all in all
+   distance = 0;
+   for(int i = 0; i < MAX_ITEMS; i++)
+   {
+      if(itemArr[i] != nullptr && itemArr[i]->IsPickedUp())
+      {
+         DrawTile(itemsBox.x + distance, itemsBox.y, itemArr[i]->GetTextureX(), itemArr[i]->GetTextureY(), 5.8f);
+
+         if(CheckCollisionPointRec(mousePos, {itemsBox.x + distance, itemsBox.y, itemsBox.width, itemsBox.height}))
+         {
+            DrawRectangle(itemsBox.x + distance-1, itemsBox.y-1, 50, 50, {255, 255, 255, 150});
+            isCurrentlyHovering = true;
+            PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+         }
+
+         if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+         {
+            if(CheckCollisionPointRec(mousePos, {itemsBox.x + distance, itemsBox.y, itemsBox.width, itemsBox.height}))
+            {
+               showItemInfo = true;
+               ItemWasClicked = true;
+               itemID = i;
+            }
+         }
+         distance += 50;
+      }
+   }
    
    //Player Status
    DrawRectangleLinesEx(charBorder, 4, BLACK);
@@ -416,6 +455,7 @@ void Inventory()
          energyFoodWasClicked = true;       
       }
 
+
    }
 
    if(CheckCollisionPointRec(mousePos, health) && !showItemInfo)
@@ -430,9 +470,7 @@ void Inventory()
       PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
 
    } 
-   
-
-   if (CheckCollisionPointRec(mousePos, defense)&& !showItemInfo)
+   else if (CheckCollisionPointRec(mousePos, defense)&& !showItemInfo)
    {
       DrawRectangle(550, 290, 200, 200, BLACK);
       DrawText(TextFormat("%d damage is reduced \nfrom enemy attacks", Player.GetDefense()), 555, 300, 18, WHITE );
@@ -534,6 +572,26 @@ void ShowItemInfos()
 
       DrawRectangleRec(interactItem, DARKGRAY);
       DrawText("Consume Meat", interactItem.x + 45, interactItem.y + 10, 25, WHITE);
+   }
+
+   switch (itemID)
+   {
+   case 0:  
+      DrawText("A broken ring of an ancient God, it once held\n tremendous power, now it is but a fragment of its\noriginal divinity",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+      DrawText("Provides 100 bonus health",  itemRectBox.x + 30, itemRectBox.y + 90, 17, GREEN);
+      DrawText("Boost enemy defense by 3 points",  itemRectBox.x + 30, itemRectBox.y + 120, 17, RED);
+      break;
+   case 1:  
+      DrawText("CASE 1",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+      break;
+    case 2:  
+      DrawText("CASE 2",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+      break;
+    case 3:  
+      DrawText("CASE 3",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+      break;
+   default:
+      break;
    }
 
 

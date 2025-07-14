@@ -5,6 +5,7 @@
 #include "Enemy.hpp"
 #include "Heroes.hpp"
 #include "raylib.h"
+#include "StoryLine.hpp"
 #include <iostream>
 
 Vector2 playerOriginalPos = {160, 192}; //Original pos of player 
@@ -108,12 +109,13 @@ void BattleUpdate(Enemy *enemy)
         resetAllStates();
 
         //spawn chest
-        chest.x = enemy->GetX();
-        chest.y = enemy->GetY();
-        chest.isAlive = true;
-        chest.money = GetRandomValue(23, 205);
-        chest.healthPotions = GetRandomValue(1,4);
-        chest.energyFoods = GetRandomValue(0,3);
+        spawnChest(enemy);
+        if(enemy->GetName() == "The Crab Thing") 
+        {
+            dungeonKey = true;
+            StartDialogue({"[You obtained Dungeon Key]"});
+        }
+
 
         return;
     } 
@@ -291,12 +293,20 @@ void BattleRender(Enemy *enemy)
     else if(Player.GetName() == Rogue.GetName())  DrawTile(playerCurrentPos.x, playerCurrentPos.y, 8, 0, 10.0f); 
 
     //enemy Tile
-    if(enemy->GetName() == "Orc") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 11, 0, 10.0f);
-    else if(enemy->GetName() == "Wandering Eye") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 13, 0, 10.0f);
-    else if(enemy->GetName() == "Treant") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 12, 1, 10.0f);
-    else if(enemy->GetName() == "Vengeful Spirit") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 9, 1, 10.0f);
-    else if(enemy->GetName() == "Golem") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 10, 0, 10.0f);
-    else if(enemy->GetName() == "The Crab Thing") DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 12, 0, 10.0f);
+    switch(enemy->GetID())
+    {
+        case Enemy::ORC: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 11, 0, 10.0f); break; 
+        case Enemy::WANDERING_EYE: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 13, 0, 10.0f); break; 
+        case Enemy::TREANT: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 12, 1, 10.0f); break; 
+        case Enemy::VENGEFUL_SPIRIT: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 9, 1, 10.0f); break; 
+        case Enemy::GOLEM: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 10, 0, 10.0f); break; 
+        case Enemy::SNAKE: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 4, 1, 10.0f); break; 
+        case Enemy::RAT: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 6, 1, 10.0f); break; 
+        
+        case Enemy::CRAB_THING: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 12, 0, 10.0f); break; 
+    }
+
+
 
     //health
     DrawRectangleRounded(playerHealthBox, 0.1, 1, BLACK);

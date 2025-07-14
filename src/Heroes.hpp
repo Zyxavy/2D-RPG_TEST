@@ -2,6 +2,7 @@
 #define HEROES_HPP
 
 #include "raylib.h"
+#include "Enemy.hpp"
 #include "GameFunctions.hpp"
 #include <string>
 
