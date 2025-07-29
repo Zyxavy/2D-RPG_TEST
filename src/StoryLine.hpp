@@ -23,6 +23,9 @@ extern bool Act1_HermitInteracted, Act1_WoundedKnightInteracted;
 extern bool Act1_Introduced;
 extern bool Act1_firstTimeInDungeon;
 
+extern bool Act2_VillageChiefInteracted,Act2_VillagerInteracted, mutantFrogKilled;
+extern bool Act2_VillageChiefRewardClaimed;
+
 extern bool dungeonKey, plainsKey;
 
 void StartDialogue(const std::vector<std::string>& lines);
@@ -39,6 +42,13 @@ void Act1_HermitLine();
 void Act1_WoundedKnight();
 void Act1_Dungeon1();
 void Act1_GoldenRing();
+
+//Act 2 Village of Emberdale
+void Act2_Introduction();
+void Act2_VillageCheif1();
+void Act2_RandomVillager1();
+void Act2_RandomVillager2();
+void Act2_RandomVillager3();
 
 
 #endif // STORY_LINE_HPP

@@ -8,15 +8,16 @@
 class Enemy;
 
 //definitions
-#define MAX_ORCS_INSTANCES 3
-#define MAX_WANDERING_EYE_INSTANCES 2
+#define MAX_ORCS_INSTANCES 4
+#define MAX_WANDERING_EYE_INSTANCES 4
 #define MAX_TREANT_INSTANCES 2
 #define MAX_VENGEFUL_SPIRIT_INSTANCES 2
 #define MAX_GOLEM_INSTANCES 2
 #define MAX_SNAKE_INSTANCES 4
-#define MAX_DOG_INSTANCES 2
+#define MAX_DOG_INSTANCES 3
 #define MAX_RAT_INSTANCES 2
-#define MAX_SLIME_INSTANCES 2
+#define MAX_SLIME_INSTANCES 4
+#define MAX_FLOATING_CRAB_INSTANCES 4
 
 #define MAX_CRAB_THING_INSTANCES 1
 #define MAX_MONSTER_SQUID_INSTANCES 1
@@ -31,6 +32,8 @@ typedef struct
 {
     int x;
     int y;
+    int textureX;
+    int textureY;
     eZones zone1;
     eZones zone2;
     bool isAlive;
@@ -53,8 +56,9 @@ typedef struct
 
 
 //externs
-extern sEntity dungeon_gate, plainLands_gate;
-extern sEntity oldHermit, woundedKnight;
+extern sEntity dungeon_gate, plainLands_gate, basementStairs, ladderToIsland;
+extern sEntity oldHermit, woundedKnight, villager1, villager2, villager3, basementLockedDoor;
+extern sEntity boat;
 extern sEntity* chest1; 
 extern sEntity* chest2; 
 extern sEntity* chest3;
@@ -74,6 +78,7 @@ extern Enemy* snakeArr[MAX_SNAKE_INSTANCES];
 extern Enemy* dogArr[MAX_DOG_INSTANCES];
 extern Enemy* ratArr[MAX_RAT_INSTANCES];
 extern Enemy* slimeArr[MAX_SLIME_INSTANCES];
+extern Enemy* floatingCrabArr[MAX_FLOATING_CRAB_INSTANCES];
 
 extern Enemy* crabArr[MAX_CRAB_THING_INSTANCES];
 extern Enemy* squidArr[MAX_MONSTER_SQUID_INSTANCES];
@@ -91,7 +96,10 @@ void HostileEntitiesLevelUp();
 void ResetAllEnemies();
 void RenderGates();
 void RenderNPCs();
+void RenderBoat();
 void spawnChest(Enemy *enemy);
+void CheckContactWithEnemies();
+void ExecuteEnemyBehaviors();
 
 
 

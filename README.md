@@ -55,3 +55,5 @@ June 25 - Added more Enemies(a tree, a ghost, a crab, and a statue)
 June 30 - Added a new zone (Plains land) | adjusted enemy stats and scaling
 <hr>
 July 14 - Created a basic story line | added more enemies and bosses | created NPCs and their dialog | added custom maps | added Items and many more
+<hr>
+July 29 - Added 3 new zones & more enemies | added boats and sea traversal | 

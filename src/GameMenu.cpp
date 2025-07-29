@@ -574,25 +574,31 @@ void ShowItemInfos()
       DrawText("Consume Meat", interactItem.x + 45, interactItem.y + 10, 25, WHITE);
    }
 
-   switch (itemID)
+   if(ItemWasClicked)
    {
-   case 0:  
-      DrawText("A broken ring of an ancient God, it once held\n tremendous power, now it is but a fragment of its\noriginal divinity",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
-      DrawText("Provides 100 bonus health",  itemRectBox.x + 30, itemRectBox.y + 90, 17, GREEN);
-      DrawText("Boost enemy defense by 3 points",  itemRectBox.x + 30, itemRectBox.y + 120, 17, RED);
-      break;
-   case 1:  
-      DrawText("CASE 1",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
-      break;
-    case 2:  
-      DrawText("CASE 2",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
-      break;
-    case 3:  
-      DrawText("CASE 3",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
-      break;
-   default:
-      break;
+      switch (itemID)
+      {
+      case 0:  
+         DrawText("A broken ring of an ancient God, it once held\n tremendous power, now it is but a fragment of its\noriginal divinity",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+         DrawText("Provides 100 bonus health",  itemRectBox.x + 30, itemRectBox.y + 90, 17, GREEN);
+         DrawText("Boost enemy defense by 3 points",  itemRectBox.x + 30, itemRectBox.y + 120, 17, RED);
+         break;
+      case 1:  
+         DrawText("A key that can unlock something",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+         DrawText("Provides 20 minimun damage boost\nProvides 30 maximum damage boost",  itemRectBox.x + 30, itemRectBox.y + 90, 17, GREEN);
+         DrawText("Boost enemy health by 150 points",  itemRectBox.x + 30, itemRectBox.y + 120, 17, RED);
+         break;
+      case 2:  
+         DrawText("CASE 2",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+         break;
+      case 3:  
+         DrawText("CASE 3",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+         break;
+      default:
+         break;
+      }
    }
+   
 
 
 
@@ -603,6 +609,7 @@ void ShowItemInfos()
          showItemInfo = false;
          healthPotionsWasClicked = false;
          energyFoodWasClicked = false;
+         ItemWasClicked = false;
       }
 
       //items or consumables

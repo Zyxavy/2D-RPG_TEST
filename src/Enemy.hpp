@@ -77,22 +77,26 @@ public:
         CRAB_THING = 10,
         MONSTER_SQUID = 11,
         MUTATED_FROG = 12,
-        GAURDIAN = 13
+        GAURDIAN = 13,
+        FLOATING_CRAB = 14
     };
 };
 //normal enemies
-extern Enemy orc, wanderingEye, treant, vengefulSpirit, golem, snake, dog, rat, slime;
+extern Enemy orc, wanderingEye, treant, vengefulSpirit, golem, snake, dog, rat, slime, floatingCrab;
 
 //special / boss enemies
 extern Enemy crabThing, monsterSquid, mutatedFrog, guardian;
 
 //enemy pointers
-extern  Enemy* orc1;
+extern Enemy* orc1;
 extern Enemy* orc2;
 extern Enemy* orc3;
+extern Enemy* orc4;
 
 extern Enemy* wanderingEye1;
 extern Enemy* wanderingEye2;
+extern Enemy* wanderingEye3;
+extern Enemy* wanderingEye4;
 
 extern Enemy* treant1;
 extern Enemy* treant2;
@@ -110,13 +114,20 @@ extern Enemy* snake4;
 
 extern Enemy* dog1;
 extern Enemy* dog2;
+extern Enemy* dog3;
 
 extern Enemy* rat1;
 extern Enemy* rat2;
 
 extern Enemy* slime1;
 extern Enemy* slime2;
+extern Enemy* slime3;
+extern Enemy* slime4;
 
+extern Enemy* floatingCrab1;
+extern Enemy* floatingCrab2;
+extern Enemy* floatingCrab3;
+extern Enemy* floatingCrab4;
 
 extern Enemy* crabThing1;
 extern Enemy* monsterSquid1;

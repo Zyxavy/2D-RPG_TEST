@@ -60,7 +60,7 @@ Items goldenRing(
 );
 
 Items cursedGoldenKey(
-    Items::CURSED_GOLDEN_KEY, "({})Cursed Golden Key({})", ZONE_WORLD_PLAIN_LANDS, TILE_WIDTH * 15, TILE_HEIGHT * 15,
+    Items::CURSED_GOLDEN_KEY, "({})Cursed Golden Key({})", ZONE_WORLD_PLAIN_LANDS, TILE_WIDTH * 1, TILE_HEIGHT * 22,
     false, 10,5
 ); 
 

@@ -9,8 +9,9 @@
 #include <iostream>
 #include <vector>
 
-sEntity dungeon_gate, plainLands_gate;
-sEntity oldHermit, woundedKnight;
+sEntity dungeon_gate, plainLands_gate, basementStairs, ladderToIsland;
+sEntity oldHermit, woundedKnight, villager1, villager2, basementLockedDoor;
+sEntity boat;
 int levelCap = 100;
 bool playerLeveledUp = false;
 bool chestIsPresent = false;
@@ -20,14 +21,14 @@ bool chestIsPresent = false;
 Enemy orc(
     Enemy::ORC, "Orc", // id, name
     TILE_WIDTH * 5, TILE_HEIGHT * 5, //spawn pos
-    120, ZONE_WORLD_PLAIN_LANDS, 20, 40, 10, //maxhp, zone, dmgMin, dmgMax, def
-    165, 2, "Intelligence", false // exp, level, weakness, special Status
+    200, ZONE_WORLD_PLAIN_LANDS, 40, 60, 20, //maxhp, zone, dmgMin, dmgMax, def
+    180, 3, "Intelligence", false // exp, level, weakness, special Status
 );
 
 Enemy wanderingEye(
     Enemy::WANDERING_EYE, "Wandering Eye",
     TILE_WIDTH * 10, TILE_HEIGHT * 20,
-    200, ZONE_WORLD_PLAIN_LANDS, 40, 58, 20,
+    240, ZONE_WORLD_PLAIN_LANDS, 50, 70, 12,
     215, 3, "Strenght", false
 );
 
@@ -62,8 +63,8 @@ Enemy snake(
 Enemy dog(
     Enemy::DOG, "Dog",
     TILE_WIDTH * 3, TILE_HEIGHT * 4,
-    100, ZONE_WORLD_PLAIN_LANDS, 35, 55, 15,
-    200, 5, "Dexterity", false
+    190, ZONE_BASEMENT_DUNGEON, 70, 90, 19,
+    260, 5, "Dexterity", false
 );
 
 Enemy rat(
@@ -76,8 +77,15 @@ Enemy rat(
 Enemy slime(
     Enemy::SLIME, "Slime",
     TILE_WIDTH * 3, TILE_HEIGHT * 3,
-    130, ZONE_DUNGEON, 32, 35, 14,
-    190, 3, "Intelligence", false
+    240, ZONE_BASEMENT_DUNGEON, 54, 83, 20,
+    230, 4, "Intelligence", false
+);
+
+Enemy floatingCrab(
+    Enemy::FLOATING_CRAB, "Floating Crab",
+    TILE_WIDTH * 3, TILE_HEIGHT * 3,
+    300, ZONE_ISLAND, 68, 101, 25,
+    300, 5, "Dexterity", false
 );
 
 //bosses | special
@@ -98,8 +106,8 @@ Enemy monsterSquid(
 Enemy mutatedFrog(
     Enemy::MUTATED_FROG, "The Mutant Frog | 0-02",
     TILE_WIDTH * 2, TILE_HEIGHT * 5,
-    180, ZONE_WORLD_PLAIN_LANDS, 30, 90, 25,
-    490, 8, "NULL", true
+    300, ZONE_WORLD_PLAIN_LANDS, 50, 90, 30,
+    510, 8, "NULL", true
 );
 
 Enemy guardian(
@@ -136,9 +144,13 @@ Hero Player = Knight;
 Enemy* orc1 = nullptr;
 Enemy* orc2 = nullptr;
 Enemy* orc3 = nullptr;
+Enemy* orc4 = nullptr;
 
 Enemy* wanderingEye1 = nullptr;
 Enemy* wanderingEye2 = nullptr;
+Enemy* wanderingEye3 = nullptr;
+Enemy* wanderingEye4 = nullptr;
+
 
 Enemy* treant1 = nullptr;
 Enemy* treant2 = nullptr;
@@ -156,12 +168,20 @@ Enemy* snake4 = nullptr;
 
 Enemy* dog1 = nullptr;
 Enemy* dog2 = nullptr;
+Enemy* dog3 = nullptr;
 
 Enemy* rat1 = nullptr;
 Enemy* rat2 = nullptr;
 
 Enemy* slime1 = nullptr;
 Enemy* slime2 = nullptr;
+Enemy* slime3 = nullptr;
+Enemy* slime4 = nullptr;
+
+Enemy* floatingCrab1 = nullptr;
+Enemy* floatingCrab2 = nullptr; 
+Enemy* floatingCrab3 = nullptr;
+Enemy* floatingCrab4 = nullptr;
 
 Enemy* crabThing1 = nullptr;
 Enemy* monsterSquid1 = nullptr;
@@ -180,6 +200,7 @@ Enemy* snakeArr[MAX_SNAKE_INSTANCES];
 Enemy* dogArr[MAX_DOG_INSTANCES];
 Enemy* ratArr[MAX_RAT_INSTANCES];
 Enemy* slimeArr[MAX_SLIME_INSTANCES];
+Enemy* floatingCrabArr[MAX_FLOATING_CRAB_INSTANCES];
 
 Enemy* crabArr[MAX_CRAB_THING_INSTANCES];
 Enemy* squidArr[MAX_MONSTER_SQUID_INSTANCES];
@@ -220,10 +241,27 @@ void EntitiesInit() {
         .zone1 = ZONE_DUNGEON,
         .zone2 = ZONE_WORLD_PLAIN_LANDS
     };
+
+    basementStairs = (sEntity) 
+    {
+        .x = TILE_WIDTH * 22,
+        .y = TILE_HEIGHT * 18,
+        .zone1 = ZONE_WORLD_PLAIN_LANDS,
+        .zone2 = ZONE_BASEMENT_DUNGEON
+    };
+
+    ladderToIsland = (sEntity) 
+    {
+        .x = TILE_WIDTH * 11,
+        .y = TILE_HEIGHT * 9,
+        .zone1 = ZONE_BASEMENT_DUNGEON,
+        .zone2 = ZONE_ISLAND
+    };
+
     //NPCs - Zone1
     oldHermit = (sEntity)
     {
-        .x = TILE_WIDTH * 15,
+        .x = TILE_WIDTH * 11,
         .y = TILE_HEIGHT * 3,
         .zone1 = ZONE_WORLD,
         .zone2 = ZONE_WORLD_PLAIN_LANDS,
@@ -235,10 +273,48 @@ void EntitiesInit() {
         .x = TILE_WIDTH * 13,
         .y = TILE_HEIGHT * 15,
         .zone1 = ZONE_WORLD,
-        .zone2 = ZONE_DUNGEON,
+        .zone2 = ZONE_BASEMENT_DUNGEON,
         .isPassable = false
     };
 
+    //ZONE2
+    villager1 = (sEntity)
+    {
+        .x = TILE_WIDTH * 23,
+        .y = TILE_HEIGHT * 4,
+        .zone1 = ZONE_WORLD_PLAIN_LANDS,
+        .zone2 = ZONE_WORLD_PLAIN_LANDS,
+        .isPassable = false
+    };
+
+    villager2 = (sEntity)
+    {
+        .x = TILE_WIDTH * 20,
+        .y = TILE_HEIGHT * 3,
+        .zone1 = ZONE_WORLD_PLAIN_LANDS,
+        .zone2 = ZONE_WORLD_PLAIN_LANDS,
+        .isPassable = false
+    };
+
+    //basement
+    
+    basementLockedDoor = (sEntity)
+    {
+        .x = TILE_WIDTH * 11,
+        .y = TILE_HEIGHT * 12,
+        .zone1 = ZONE_BASEMENT_DUNGEON,
+        .zone2 = ZONE_BASEMENT_DUNGEON,
+        .isPassable = false
+    };
+
+    boat = (sEntity)
+    {
+        .x = TILE_WIDTH * 14,
+        .y = TILE_HEIGHT * 12,
+        .zone1 = ZONE_ISLAND,
+        .zone2 = ZONE_ISLAND, 
+        .isPassable = false 
+    };
 
     //Place enemy instances
 
@@ -296,21 +372,69 @@ void EntitiesInit() {
     orc3 = new Enemy(orc);
     orc3->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
 
+    orc4 = new Enemy(orc);
+    orc4->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
+
     wanderingEye1 = new Enemy(wanderingEye);
     wanderingEye1->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
 
     wanderingEye2 = new Enemy(wanderingEye);
     wanderingEye2->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
 
+    wanderingEye3 = new Enemy(wanderingEye);
+    wanderingEye3->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
+
+    wanderingEye4 = new Enemy(wanderingEye);
+    wanderingEye4->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
+
+    mutatedFrog1 = new Enemy(mutatedFrog);
+    mutatedFrog1->Move(TILE_WIDTH * 2, TILE_HEIGHT * 21);
+
+    //dungeon Basement
+    slime1 = new Enemy(slime);
+    slime1->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
+
+    slime2 = new Enemy(slime);
+    slime2->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
+
+    slime3 = new Enemy(slime);
+    slime3->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
+
+    slime4 = new Enemy(slime);
+    slime4->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
+
+    dog1 = new Enemy(dog);
+    dog1->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
+
+    dog2 = new Enemy(dog);
+    dog2->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
+
+    dog3 = new Enemy(dog);
+    dog3->Move(TILE_WIDTH * GetRandomValue(1,14), TILE_HEIGHT * GetRandomValue(1,20));
+
+    //Island
+    floatingCrab1 = new Enemy(floatingCrab);
+    floatingCrab1->Move(TILE_WIDTH * GetRandomValue(1,23), TILE_HEIGHT * GetRandomValue(1,23));
+
+    floatingCrab2 = new Enemy(floatingCrab);
+    floatingCrab2->Move(TILE_WIDTH * GetRandomValue(1,23), TILE_HEIGHT * GetRandomValue(1,23));
+
+    floatingCrab3 = new Enemy(floatingCrab);
+    floatingCrab3->Move(TILE_WIDTH * GetRandomValue(1,23), TILE_HEIGHT * GetRandomValue(1,23));
+
+    floatingCrab4 = new Enemy(floatingCrab);
+    floatingCrab4->Move(TILE_WIDTH * GetRandomValue(1,23), TILE_HEIGHT * GetRandomValue(1,23));
 
     //array of enemies
     orcArr[0] = orc1;
     orcArr[1] = orc2;
     orcArr[2] = orc3;
-    //3 more 
+    orcArr[3] = orc4;
 
     eyeArr[0] = wanderingEye1;
     eyeArr[1] = wanderingEye2;
+    eyeArr[2] = wanderingEye3;
+    eyeArr[3] = wanderingEye4;
 
     treantArr[0] = treant1;
     treantArr[1] = treant2;
@@ -329,7 +453,22 @@ void EntitiesInit() {
     ratArr[0] = rat1;
     ratArr[1] = rat2;
 
+    slimeArr[0] = slime1;
+    slimeArr[1] = slime2;
+    slimeArr[2] = slime3;
+    slimeArr[3] = slime4;
+
+    dogArr[0] = dog1;
+    dogArr[1] = dog2;
+    dogArr[2] = dog3;
+
+    floatingCrabArr[0] = floatingCrab1;
+    floatingCrabArr[1] = floatingCrab2;
+    floatingCrabArr[2] = floatingCrab3;
+    floatingCrabArr[3] = floatingCrab4;
+
     crabArr[0] = crabThing1;
+    mutantFrogArr[0] = mutatedFrog1;
 
     Player.SetZone(ZONE_WORLD);
 
@@ -337,9 +476,23 @@ void EntitiesInit() {
 
 void PlayerRender()
 {
-    if(Player.GetName() == Knight.GetName())  DrawTile(camera.target.x, camera.target.y, 6, 0);
-    else if(Player.GetName() == Wizard.GetName())  DrawTile(camera.target.x, camera.target.y, 9, 0); 
-    else if(Player.GetName() == Rogue.GetName())  DrawTile(camera.target.x, camera.target.y, 8, 0);  
+    if (isRidingBoat)
+    {
+        if (isBoatFacingRight)
+        {
+            DrawTexture(textures[TEXTURE_BOAT_RIGHT], camera.target.x, camera.target.y, WHITE);
+        }
+        else
+        {
+            DrawTexture(textures[TEXTURE_BOAT_LEFT], camera.target.x, camera.target.y, WHITE);
+        }
+    }
+    else
+    {
+        if(Player.GetName() == Knight.GetName())  DrawTexture(textures[TEXTURE_KNIGHT], camera.target.x, camera.target.y, WHITE);
+        else if(Player.GetName() == Wizard.GetName()) DrawTexture(textures[TEXTURE_WIZARD], camera.target.x, camera.target.y, WHITE); 
+        else if(Player.GetName() == Rogue.GetName())  DrawTexture(textures[TEXTURE_ROGUE], camera.target.x, camera.target.y, WHITE);  
+    }
 }
 
 void EnemyRender()
@@ -429,6 +582,50 @@ void EnemyRender()
             if(ratArr[i]->IsAlive() == true) 
             {
                 DrawTile(ratArr[i]->GetX(), ratArr[i]->GetY(), 6, 1); 
+            }
+        }   
+    }
+
+    for(int i = 0; i < MAX_MUTATED_FROG_INSTANCES; i++)
+    {
+        if(mutantFrogArr[i]->GetZone() == Player.GetZone())
+        {
+            if(mutantFrogArr[i]->IsAlive() == true) 
+            {
+                DrawTile(mutantFrogArr[i]->GetX(), mutantFrogArr[i]->GetY(), 10, 1); 
+            }
+        }   
+    }
+
+    for(int i = 0; i < MAX_SLIME_INSTANCES; i++)
+    {
+        if(slimeArr[i]->GetZone() == Player.GetZone())
+        {
+            if(slimeArr[i]->IsAlive() == true) 
+            {
+                DrawTile(slimeArr[i]->GetX(), slimeArr[i]->GetY(), 8, 1); 
+            }
+        }   
+    }
+
+    for(int i = 0; i < MAX_DOG_INSTANCES; i++)
+    {
+        if(dogArr[i]->GetZone() == Player.GetZone())
+        {
+            if(dogArr[i]->IsAlive() == true) 
+            {
+                DrawTile(dogArr[i]->GetX(), dogArr[i]->GetY(), 5, 1); 
+            }
+        }   
+    }
+
+    for(int i = 0; i < MAX_FLOATING_CRAB_INSTANCES; i++)
+    {
+        if(floatingCrabArr[i]->GetZone() == Player.GetZone())
+        {
+            if(floatingCrabArr[i]->IsAlive() == true) 
+            {
+                DrawTexture(textures[TEXTURE_FLOATING_CRAB], floatingCrabArr[i]->GetX(), floatingCrabArr[i]->GetY(), WHITE);
             }
         }   
     }
@@ -628,6 +825,9 @@ void RenderGates()
 {
     if(Player.GetZone() == ZONE_WORLD || Player.GetZone() == ZONE_DUNGEON) DrawTile(dungeon_gate.x, dungeon_gate.y, 8, 9); //dungeon gate
     if(Player.GetZone() == ZONE_DUNGEON || Player.GetZone() == ZONE_WORLD_PLAIN_LANDS) DrawTile(plainLands_gate.x, plainLands_gate.y, 7, 7); //plainsGate
+    if(Player.GetZone() == ZONE_WORLD_PLAIN_LANDS || Player.GetZone() == ZONE_BASEMENT_DUNGEON) DrawTile(basementStairs.x, basementStairs.y, 4, 3); //BasementStairs
+    if(Player.GetZone() == ZONE_BASEMENT_DUNGEON || Player.GetZone() == ZONE_ISLAND) DrawTile(ladderToIsland.x, ladderToIsland.y, 11, 5);  //LaddertoIsland
+
 }
 
 void RenderNPCs()
@@ -635,6 +835,22 @@ void RenderNPCs()
     if(Player.GetZone() == ZONE_WORLD ) DrawTile(oldHermit.x, oldHermit.y, 14, 0); //Old Hermit
     
     if(Player.GetZone() == ZONE_WORLD ) DrawTile(woundedKnight.x, woundedKnight.y, 5, 0); //Wounded Knight
+
+    if(Player.GetZone() == ZONE_WORLD_PLAIN_LANDS ) DrawTile(villager1.x, villager1.y, 4, 0); //villager1
+
+    if(Player.GetZone() == ZONE_WORLD_PLAIN_LANDS ) DrawTile(villager2.x, villager2.y, 7, 0); //Wounded Knight
+
+    if(Player.GetZone() == ZONE_BASEMENT_DUNGEON) DrawTile(basementLockedDoor.x, basementLockedDoor.y, 7, 2); //Wounded Knight
+
+
+}
+
+void RenderBoat()
+{
+    if(Player.GetZone() == boat.zone1 && !isRidingBoat)
+    {
+        DrawTexture(textures[TEXTURE_BOAT_RIGHT], boat.x, boat.y, WHITE);
+    }
 }
 
 void spawnChest(Enemy *enemy)
@@ -658,3 +874,385 @@ void spawnChest(Enemy *enemy)
     }
 
 }
+
+void CheckContactWithEnemies()
+{
+
+    //check contact with orc
+    for(int i = 0; i < MAX_ORCS_INSTANCES; i++)
+    {
+        if (orcArr[i] != nullptr && Player.GetZone() == orcArr[i]->GetZone() && Player.GetX() == orcArr[i]->GetX() && Player.GetY() == orcArr[i]->GetY() && orcArr[i]->IsAlive() == true) 
+        {
+            enemy = orcArr[i];
+            battleMode = true;
+        }
+    }
+
+    //check contact with Eye
+    for(int i = 0; i < MAX_WANDERING_EYE_INSTANCES; i++)
+    {
+        if (eyeArr[i] != nullptr && Player.GetZone() == eyeArr[i]->GetZone() && Player.GetX() == eyeArr[i]->GetX() && Player.GetY() == eyeArr[i]->GetY() && eyeArr[i]->IsAlive() == true) 
+        {
+            enemy = eyeArr[i];
+            battleMode = true;
+        }
+    }
+
+     //check contact with Treant
+    for(int i = 0; i < MAX_TREANT_INSTANCES; i++)
+    {
+        if (treantArr[i] != nullptr && Player.GetZone() == treantArr[i]->GetZone() && Player.GetX() == treantArr[i]->GetX() && Player.GetY() == treantArr[i]->GetY() && treantArr[i]->IsAlive() == true) 
+        {
+            enemy = treantArr[i];
+            battleMode = true;
+        }
+    }
+
+      //check contact with Vengful Spirit
+    for(int i = 0; i < MAX_VENGEFUL_SPIRIT_INSTANCES; i++)
+    {
+        if (vengefulSpiritArr[i] != nullptr && Player.GetZone() == vengefulSpiritArr[i]->GetZone() && Player.GetX() == vengefulSpiritArr[i]->GetX() && Player.GetY() == vengefulSpiritArr[i]->GetY() && vengefulSpiritArr[i]->IsAlive() == true) 
+        {
+            enemy = vengefulSpiritArr[i];
+            battleMode = true;
+        }
+    }
+
+      //check contact with Golem
+    for(int i = 0; i < MAX_GOLEM_INSTANCES; i++)
+    {
+        if (golemArr[i] != nullptr && Player.GetZone() == golemArr[i]->GetZone() && Player.GetX() == golemArr[i]->GetX() && Player.GetY() == golemArr[i]->GetY() && golemArr[i]->IsAlive() == true) 
+        {
+            enemy = golemArr[i];
+            battleMode = true;
+        }
+    }
+
+    //check contact with Snakes
+    for(int i = 0; i < MAX_SNAKE_INSTANCES; i++)
+    {
+        if (snakeArr[i] != nullptr && Player.GetZone() == snakeArr[i]->GetZone() && Player.GetX() == snakeArr[i]->GetX() && Player.GetY() == snakeArr[i]->GetY() && snakeArr[i]->IsAlive() == true) 
+        {
+            enemy = snakeArr[i];
+            battleMode = true;
+        }
+    }
+
+      //check contact with Crab
+    for(int i = 0; i < MAX_CRAB_THING_INSTANCES; i++)
+    {
+        if (crabArr[i] != nullptr && Player.GetZone() == crabArr[i]->GetZone() && Player.GetX() == crabArr[i]->GetX() && Player.GetY() == crabArr[i]->GetY() && crabArr[i]->IsAlive() == true) 
+        {
+            enemy = crabArr[i];
+            battleMode = true;
+        }
+    }
+
+      //check contact with Rat
+    for(int i = 0; i < MAX_RAT_INSTANCES; i++)
+    {
+        if (ratArr[i] != nullptr && Player.GetZone() == ratArr[i]->GetZone() && Player.GetX() == ratArr[i]->GetX() && Player.GetY() == ratArr[i]->GetY() && ratArr[i]->IsAlive() == true) 
+        {
+            enemy = ratArr[i];
+            battleMode = true;
+        }
+    }
+
+    for(int i = 0; i < MAX_MUTATED_FROG_INSTANCES; i++) //check contact with Frog
+    {
+        if (mutantFrogArr[i] != nullptr && Player.GetZone() == mutantFrogArr[i]->GetZone() && Player.GetX() == mutantFrogArr[i]->GetX() && Player.GetY() == mutantFrogArr[i]->GetY() && mutantFrogArr[i]->IsAlive() == true) 
+        {
+            enemy = mutantFrogArr[i];
+            battleMode = true;
+        }
+    }
+
+    for(int i = 0; i < MAX_SLIME_INSTANCES; i++)  //check contact with SLime
+    {
+        if (slimeArr[i] != nullptr && Player.GetZone() == slimeArr[i]->GetZone() && Player.GetX() == slimeArr[i]->GetX() && Player.GetY() == slimeArr[i]->GetY() && slimeArr[i]->IsAlive() == true) 
+        {
+            enemy = slimeArr[i];
+            battleMode = true;
+        }
+    }
+
+    for(int i = 0; i < MAX_DOG_INSTANCES; i++) //check contact with Dog
+    {
+        if (dogArr[i] != nullptr && Player.GetZone() == dogArr[i]->GetZone() && Player.GetX() == dogArr[i]->GetX() && Player.GetY() == dogArr[i]->GetY() && dogArr[i]->IsAlive() == true) 
+        {
+            enemy = dogArr[i];
+            battleMode = true;
+        }
+    }
+
+    for(int i = 0; i < MAX_FLOATING_CRAB_INSTANCES; i++) //check contact with Floating Crab
+    {
+        if (floatingCrabArr[i] != nullptr && Player.GetZone() == floatingCrabArr[i]->GetZone() && Player.GetX() == floatingCrabArr[i]->GetX() && Player.GetY() == floatingCrabArr[i]->GetY() && floatingCrabArr[i]->IsAlive() == true) 
+        {
+            enemy = floatingCrabArr[i];
+            battleMode = true;
+        }
+    }
+
+}
+
+void ExecuteEnemyBehaviors()
+{
+    
+    for(int i = 0; i < MAX_ORCS_INSTANCES; i++) 
+    {
+        if(!orcArr[i]->GetStunStatus()) 
+        {
+            orcArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            orcArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                orcArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(orcArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+    
+    for(int i = 0; i < MAX_WANDERING_EYE_INSTANCES; i++) 
+    {
+        if(!eyeArr[i]->GetStunStatus()) 
+        {
+            eyeArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            eyeArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                eyeArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(eyeArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    for(int i = 0; i < MAX_TREANT_INSTANCES; i++) 
+    {
+        if(!treantArr[i]->GetStunStatus()) 
+        {
+            treantArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            treantArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                treantArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(treantArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    for(int i = 0; i < MAX_VENGEFUL_SPIRIT_INSTANCES; i++) 
+    {
+        if(!vengefulSpiritArr[i]->GetStunStatus()) 
+        {
+            vengefulSpiritArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            vengefulSpiritArr[i]->SetStunCounter(count);
+            if(count > 2) 
+            {
+                vengefulSpiritArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(vengefulSpiritArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    for(int i = 0; i < MAX_SNAKE_INSTANCES; i++) 
+    {
+        if(!snakeArr[i]->GetStunStatus()) 
+        {
+            snakeArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            snakeArr[i]->SetStunCounter(count);
+            if(count > 5) 
+            {
+                snakeArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(snakeArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    for(int i = 0; i < MAX_RAT_INSTANCES; i++) 
+    {
+        if(!ratArr[i]->GetStunStatus()) 
+        {
+            ratArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            ratArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                ratArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(ratArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+    
+    //golem does not move or rarely moves (WIP)
+
+    for(int i = 0; i < MAX_CRAB_THING_INSTANCES; i++) 
+    {
+        if(!crabArr[i]->GetStunStatus()) 
+        {
+            crabArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            crabArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                crabArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(crabArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    for(int i = 0; i < MAX_SLIME_INSTANCES; i++) 
+    {
+        if(!slimeArr[i]->GetStunStatus()) 
+        {
+            slimeArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            slimeArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                slimeArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(slimeArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    for(int i = 0; i < MAX_DOG_INSTANCES; i++) 
+    {
+        if(!dogArr[i]->GetStunStatus()) 
+        {
+            dogArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            dogArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                dogArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(dogArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    for(int i = 0; i < MAX_FLOATING_CRAB_INSTANCES; i++) 
+    {
+        if(!floatingCrabArr[i]->GetStunStatus()) 
+        {
+            floatingCrabArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            floatingCrabArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                floatingCrabArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(floatingCrabArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    
+}
+
+
+

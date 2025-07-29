@@ -73,5 +73,6 @@ void ShowRogueSkill();
 void CheckEnemyStatus(Enemy *enemy);
 void CheckPlayerStatus();
 void resetAllStates();
+void GetRewardFromBosses();
 
 #endif // BATTLE_SYSTEM_HPP

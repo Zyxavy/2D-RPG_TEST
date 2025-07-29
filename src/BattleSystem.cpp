@@ -110,18 +110,14 @@ void BattleUpdate(Enemy *enemy)
 
         //spawn chest
         spawnChest(enemy);
-        if(enemy->GetName() == "The Crab Thing") 
-        {
-            dungeonKey = true;
-            StartDialogue({"[You obtained Dungeon Key]"});
-        }
 
-
+        GetRewardFromBosses();
         return;
     } 
     else if(Player.GetHealth() <= 0) // player dies
     {
         Player.SetAlive(false);
+        Player.SetZone(enemy->GetZone());
 
         resetAllStates();
 
@@ -302,8 +298,13 @@ void BattleRender(Enemy *enemy)
         case Enemy::GOLEM: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 10, 0, 10.0f); break; 
         case Enemy::SNAKE: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 4, 1, 10.0f); break; 
         case Enemy::RAT: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 6, 1, 10.0f); break; 
+        case Enemy::SLIME: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 8, 1, 10.0f); break; 
+        case Enemy::DOG: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 5, 1, 10.0f); break; 
+        case Enemy::FLOATING_CRAB: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 7, 1, 10.0f); break;
         
         case Enemy::CRAB_THING: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 12, 0, 10.0f); break; 
+        case Enemy::MUTATED_FROG: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 10, 1, 10.0f); break; 
+        
     }
 
 
@@ -868,6 +869,24 @@ void CheckPlayerStatus()
     playerStatusDisplayTime = 0;
 }
 
-
+void GetRewardFromBosses()
+{
+    switch (enemy->GetID())
+    {
+    case Enemy::CRAB_THING:
+    {
+        dungeonKey = true;
+        StartDialogue({"[You obtained Dungeon Key]"});
+        break;
+    }
+    case Enemy::MUTATED_FROG:
+    {
+        mutantFrogKilled = true;
+        break;
+    }    
+    default:
+        break;
+    }
+}
 
 

@@ -1,6 +1,8 @@
 #include "StoryLine.hpp"
 #include "GameFunctions.hpp"
 #include "Items.hpp"
+#include "Heroes.hpp"
+#include "Entities.hpp"
 #include <iostream>
 
 bool inDialogue = false;
@@ -16,6 +18,9 @@ bool YesorNo;
 bool Act1_HermitInteracted = false, Act1_WoundedKnightInteracted = false;
 bool Act1_Introduced = false;
 bool Act1_firstTimeInDungeon;
+bool Act2_VillageChiefInteracted = false, Act2_VillagerInteracted = false, mutantFrogKilled = false;
+bool Act2_VillageChiefRewardClaimed = false;
+
 
 bool dungeonKey = false, plainsKey = false;
 
@@ -239,4 +244,58 @@ void Act1_GoldenRing()
             "Do you wish to pick this ring?"
         });
     }
+}
+
+//act 2
+void Act2_Introduction()
+{
+    if(currentGameState == IN_PLAINS)
+    {
+        StartDialogue({
+            "Finally.. I got out",
+            "That Dungeon gave me the creeps",
+            "I see a village... I should check it out"
+        });
+    }
+}
+
+void Act2_VillageCheif1()
+{
+    if(!Act2_VillageChiefInteracted)StartDialogue
+    ({
+        "Village Chief: Please help us...",
+        "Village Chief: A frog monster has been attacking our \nvillage recently.",
+        "Village Chief: Many of us are scared to even come out...",
+        "Village Chief: If you manage to kill that...thing.",
+        "Village Chief: I will reward you handsomely.",
+        "[Objective: Kill the Mutant Frog]",
+    });
+    else StartDialogue({"Is it gone?"});
+
+    if(mutantFrogKilled && !Act2_VillageChiefRewardClaimed) StartDialogue
+    ({
+        "Thank you, kind hero...",
+        "Here take this.",
+        "[Obtained 2300 Gold]",
+        "[Obtained 7 Health Potions]",
+        "[Obtained 5 Foods]"
+    });
+
+    Act2_VillageChiefInteracted = true;
+}
+
+void Act2_RandomVillager1()
+{
+    if(!Act2_VillagerInteracted)StartDialogue
+    ({
+        "Random Villager: Hi there!",
+        "Random Villager: I'm in charge of keeping this village safe \nfrom that monster.",
+        "Random Villager: I may not look strong, but I can handle myself.",
+        "Random Villager: Talk to the village chief if you need something.",
+        "Random Villager: ...",
+        "Random Villager: Scram!",
+    });
+    else StartDialogue({"What?"});
+
+    Act2_VillagerInteracted = true;
 }

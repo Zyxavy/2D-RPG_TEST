@@ -12,7 +12,7 @@ const int screenHeight = 600;
 
 
 //definitions
-#define MAX_TEXTURES 3
+#define MAX_TEXTURES 10
 #define MAX_PAGE_PICTURES 11
 #define TILE_WIDTH 8
 #define TILE_HEIGHT  8
@@ -32,7 +32,14 @@ typedef enum
 {
     TEXTURE_TILEMAP = 0,
     TEXTURE_STAR = 1,
-    TEXTURE_BOOK = 2
+    TEXTURE_BOOK = 2,
+    TEXTURE_SAND = 3,
+    TEXTURE_BOAT_LEFT = 4,
+    TEXTURE_BOAT_RIGHT = 5,
+    TEXTURE_KNIGHT = 6,
+    TEXTURE_WIZARD = 7,
+    TEXTURE_ROGUE = 8,
+    TEXTURE_FLOATING_CRAB = 9,
 } texture_asset;
 
 typedef enum
@@ -100,7 +107,18 @@ typedef enum
     TILE_TYPE_BOT_LEFT_OUTER_WALL_CORNER,
     TILE_TYPE_BOT_OUTER_WALL1,
     TILE_TYPE_BOT_OUTER_WALL2,
-    TILE_TYPE_BOT_RIGHT_OUTER_WALL_CORNER
+    TILE_TYPE_BOT_RIGHT_OUTER_WALL_CORNER,
+    //
+    TILE_TYPE_HOUSE,
+    TILE_TYPE_STAIRS_DOWN,
+    // basement
+    TILE_TYPE_CAULDRON,
+    TILE_TYPE_BED,
+    TILE_TYPE_DOOR_LOCKED,
+    TILE_TYPE_DOOR_UNLOCEKD,
+    TILE_TYPE_SQUARE_RAIL,
+    //island
+    TILE_TYPE_SAND = 99,
 } tile_type;
 
 typedef struct
@@ -117,7 +135,9 @@ typedef enum
    ZONE_BATTLE,
    ZONE_WORLD,
    ZONE_DUNGEON, 
-   ZONE_WORLD_PLAIN_LANDS 
+   ZONE_WORLD_PLAIN_LANDS ,
+   ZONE_BASEMENT_DUNGEON,
+   ZONE_ISLAND,
 
 } eZones;
 
@@ -127,6 +147,8 @@ typedef enum
     IN_ZONE_1,
     IN_DUNGEON,
     IN_PLAINS,
+    IN_DUNGEON_BASEMENT,
+    IN_ISLAND,
 
     PICKING_UP_ITEM,
 } GameState;
@@ -140,10 +162,16 @@ extern Sound sounds[MAX_SOUNDS];
 extern sTile world[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile plainLands[WORLD_WIDTH][WORLD_HEIGHT];
+extern sTile basementDungeon[WORLD_WIDTH][WORLD_HEIGHT];
+extern sTile island[WORLD_WIDTH][WORLD_HEIGHT];
 extern Camera2D camera;
 extern bool isInventory;
 extern int lastKeyPressed;
+extern int count;
 extern GameState currentGameState, prevGameState;
+extern bool isRidingBoat; 
+extern bool isBoatFacingRight; 
+
 
 //functions
 void GameStartup();
@@ -158,10 +186,8 @@ void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y);
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y, float scale);
 bool IsBarrierCollision(int x, int y);
 
-void CheckContactWithEnemies();
 void DrawHotBar();
 void CutDownTree();
-void ExecuteEnemyBehaviors();
 void EnterGates();
 void InteractWithNPCs();
 void CheckIfDungeonCompleted();
