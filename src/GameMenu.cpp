@@ -19,6 +19,10 @@ static bool showItemInfo = false;
 static bool healthPotionsWasClicked = false;
 static bool energyFoodWasClicked = false;
 static bool ItemWasClicked = false;
+static bool defensePotionsWasClicked = false;
+static bool strengthPotionsWasClicked = false;
+static bool experiencePotionsWasClicked = false;
+static int whatItemWasClicked = -1; 
 int itemID = 0;
 
 Rectangle
@@ -45,7 +49,9 @@ bool inMenu = true;
 bool isDead = false;
 bool inCharacterSelect = false;
 bool inTutorial = false;
+bool inShop = false;
 int page = 1;
+
 
 void GameMenu()
 {
@@ -123,7 +129,7 @@ void DeathMenu(){
            isDead = false;
           //enemies
            Player.SetAlive(true);
-           Player.SetZone(ZONE_WORLD);
+           Player.SetZone(lastZone);
            Player.SetHealth(Player.GetMaxHealth());
            Player.SetEnergy(Player.GetMaxEnergy());
            Player.SetX(TILE_WIDTH * 3);
@@ -135,10 +141,14 @@ void DeathMenu(){
         else if (CheckCollisionPointRec(mousePos, optionsButton)) {
            inOptions = true;
            isDead = false;
-           //eniemies
+           
            Player.SetAlive(true);
-           Player.SetZone(ZONE_WORLD);
+           Player.SetZone(lastZone);
            Player.SetHealth(Player.GetMaxHealth());
+           Player.SetEnergy(Player.GetMaxEnergy());
+           Player.SetX(TILE_WIDTH * 3);
+           Player.SetY(TILE_WIDTH * 3);
+           ResetAllEnemies();
         }
         //Exit
         else if (CheckCollisionPointRec(mousePos, exitButton) ) {
@@ -346,6 +356,9 @@ void Inventory()
    //items-blahblah
    Rectangle healthPotion{41, 71, 45, 45};
    Rectangle energyFood{91, 71, 45, 45};
+   Rectangle defensePotion{141, 71, 45, 45};
+   Rectangle strengthPotion{191, 71, 45, 45};
+   Rectangle experiencePotion{241, 71, 45, 45};
 
    Rectangle itemsBox{41, 320, 45, 45};
    
@@ -376,6 +389,9 @@ void Inventory()
    //Consumable
    DrawTile(41, 71, 7, 8, 5.8f);
    DrawTile(energyFood.x, energyFood.y,10, 8, 5.8f);
+   DrawTextureEx(textures[TEXTURE_DEFENSE_POTION], {defensePotion.x, defensePotion.y}, 0.0f, 5.8f, WHITE);
+   DrawTextureEx(textures[TEXTURE_STRENGTH_POTION], {strengthPotion.x, strengthPotion.y}, 0.0f, 5.8f, WHITE);
+   DrawTextureEx(textures[TEXTURE_EXPERIENCE_POTION], {experiencePotion.x, experiencePotion.y}, 0.0f, 5.8f, WHITE);
 
    //Items // all in all
    distance = 0;
@@ -455,9 +471,27 @@ void Inventory()
          energyFoodWasClicked = true;       
       }
 
+      if(CheckCollisionPointRec(mousePos, defensePotion))
+      {
+         showItemInfo = true;  
+         defensePotionsWasClicked = true;       
+      }
+      
+      if(CheckCollisionPointRec(mousePos, strengthPotion))
+      {
+         showItemInfo = true;  
+         strengthPotionsWasClicked = true;       
+      }
+
+      if(CheckCollisionPointRec(mousePos, experiencePotion))
+      {
+         showItemInfo = true;  
+         experiencePotionsWasClicked = true;       
+      }
 
    }
 
+   //stats
    if(CheckCollisionPointRec(mousePos, health) && !showItemInfo)
    {
 
@@ -523,6 +557,30 @@ void Inventory()
       PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
       
    }
+   else if (CheckCollisionPointRec(mousePos, defensePotion)&& !showItemInfo)
+   {
+      DrawRectangle(defensePotion.x-1, defensePotion.y-1, 50, 50, {255, 255, 255, 150});
+      
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+      
+   }
+   else if (CheckCollisionPointRec(mousePos, strengthPotion)&& !showItemInfo)
+   {
+      DrawRectangle(strengthPotion.x-1, strengthPotion.y-1, 50, 50, {255, 255, 255, 150});
+      
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+      
+   }
+   else if (CheckCollisionPointRec(mousePos, experiencePotion)&& !showItemInfo)
+   {
+      DrawRectangle(experiencePotion.x-1, experiencePotion.y-1, 50, 50, {255, 255, 255, 150});
+      
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+      
+   }
 
    if(showItemInfo)
    {
@@ -564,7 +622,7 @@ void ShowItemInfos()
       DrawText("Drink Potion", interactItem.x + 40, interactItem.y + 10, 25, WHITE);
    }
 
-   if(energyFoodWasClicked)
+   else if(energyFoodWasClicked)
    {
       DrawText("Food provides 15-40 points of energy \nwhen consumed.",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
       DrawText(TextFormat(" X %d", Player.GetRemainingEnergyFoods()), itemRectBox.x + 430, itemRectBox.y + 30, 30, WHITE);
@@ -573,6 +631,34 @@ void ShowItemInfos()
       DrawRectangleRec(interactItem, DARKGRAY);
       DrawText("Consume Meat", interactItem.x + 45, interactItem.y + 10, 25, WHITE);
    }
+   else if (defensePotionsWasClicked)
+   {
+      DrawText("Defense Potion provides 20% more \ndefense when consumed.",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+      DrawText(TextFormat(" X %d", Player.GetRemainingDefensePotions()), itemRectBox.x + 430, itemRectBox.y + 30, 30, WHITE);
+      DrawTextureEx(textures[TEXTURE_DEFENSE_POTION], {itemRectBox.x + 395, itemRectBox.y + 20}, 0.0f, 5.8f, WHITE);
+
+      DrawRectangleRec(interactItem, DARKGRAY);
+      DrawText("Drink Potion", interactItem.x + 40, interactItem.y + 10, 25, WHITE);
+   }
+   else if(strengthPotionsWasClicked)
+   {
+      DrawText("Strength Potion provides a boost of \n30% more damage.",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+      DrawText(TextFormat(" X %d", Player.GetRemainingStrengthPotions()), itemRectBox.x + 430, itemRectBox.y + 30, 30, WHITE);
+      DrawTextureEx(textures[TEXTURE_STRENGTH_POTION], {itemRectBox.x + 395, itemRectBox.y + 20}, 0.0f, 5.8f, WHITE);
+
+      DrawRectangleRec(interactItem, DARKGRAY);
+      DrawText("Drink Potion", interactItem.x + 40, interactItem.y + 10, 25, WHITE);
+   }
+   else if(experiencePotionsWasClicked)
+   {
+      DrawText("Experience Potion provides a boost of \n100 experience points.", itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+      DrawText(TextFormat(" X %d", Player.GetRemainingExperiencePotions()), itemRectBox.x + 430, itemRectBox.y + 30, 30, WHITE);
+      DrawTextureEx(textures[TEXTURE_EXPERIENCE_POTION], {itemRectBox.x + 395, itemRectBox.y + 20}, 0.0f, 5.8f, WHITE);
+
+      DrawRectangleRec(interactItem, DARKGRAY);
+      DrawText("Drink Potion", interactItem.x + 40, interactItem.y + 10, 25, WHITE);
+   }
+
 
    if(ItemWasClicked)
    {
@@ -589,18 +675,23 @@ void ShowItemInfos()
          DrawText("Boost enemy health by 150 points",  itemRectBox.x + 30, itemRectBox.y + 120, 17, RED);
          break;
       case 2:  
-         DrawText("CASE 2",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+         DrawText("A heart of an ancient giant, it once was a \nsource of great power, now it is but a relic",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+         DrawText("Provides 100 energy points\nProvides 20 defense boost",  itemRectBox.x + 30, itemRectBox.y + 90, 17, GREEN);
+         DrawText("Boost enemy damage by 30 points",  itemRectBox.x + 30, itemRectBox.y + 120, 17, RED);
          break;
       case 3:  
-         DrawText("CASE 3",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+         DrawText("The eyes of a demon, it witnessed the fall of \nancient civilizations, now it is but a memory",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+         DrawText("Provides 200 health points\nProvides 50 energy points\nProvides 100 experience boost\nProvides 23 defense points",  itemRectBox.x + 30, itemRectBox.y + 90, 17, GREEN);
+         DrawText("Boost enemy damage by 70 points",  itemRectBox.x + 30, itemRectBox.y + 165, 17, RED);
          break;
+      case 4:
+         DrawText("A pitchfork of unimaginable power, once held by \nan ancient golem",  itemRectBox.x + 30, itemRectBox.y + 30, 17, WHITE);
+         DrawText("Provides 150 minumum damage boost\nProvides 200 maximum damage boost",  itemRectBox.x + 30, itemRectBox.y + 90, 17, GREEN);
       default:
          break;
       }
    }
    
-
-
 
    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
    {
@@ -609,10 +700,13 @@ void ShowItemInfos()
          showItemInfo = false;
          healthPotionsWasClicked = false;
          energyFoodWasClicked = false;
+         defensePotionsWasClicked = false;
+         strengthPotionsWasClicked = false;
+         experiencePotionsWasClicked = false;
          ItemWasClicked = false;
       }
 
-      //items or consumables
+      //items or consumables used
       if(CheckCollisionPointRec(mousePos, interactItem) && healthPotionsWasClicked) // Health Potion
       {
          if(Player.GetRemainingHealthPotions() <= 0 || Player.GetHealth() == Player.GetMaxHealth()) return;
@@ -620,6 +714,7 @@ void ShowItemInfos()
          int hpAmount = GetRandomValue(25, 75);
          Player.SetHealth(Player.GetHealth() + hpAmount);
          Player.SetHealthPotions(Player.GetRemainingHealthPotions() - 1);
+         PlaySound(sounds[SOUNDS_KNIGHT_SKILL2]);
          
          if(Player.GetHealth() > Player.GetMaxHealth())
          {
@@ -634,11 +729,54 @@ void ShowItemInfos()
          int energyAmount = GetRandomValue(15, 45);
          Player.SetEnergy(Player.GetEnergy() + energyAmount);
          Player.SetEnergyFoods(Player.GetRemainingEnergyFoods() - 1);
+         PlaySound(sounds[SOUNDS_KNIGHT_SKILL2]);
 
          if(Player.GetEnergy() > Player.GetMaxEnergy())
          {
             Player.SetEnergy(Player.GetMaxEnergy());
          }
+      }
+
+      if(CheckCollisionPointRec(mousePos, interactItem) && defensePotionsWasClicked) //Defense Potion
+      {
+         if(Player.GetRemainingDefensePotions() <= 0) return;
+         if(!battleMode)
+         {
+            StartDialogue({"Defense Potions can only be used in battle mode."});
+            PlaySound(sounds[SOUNDS_ERROR_SOUND]);
+            return;
+         }
+
+         defensePotionBuff = Player.GetDefense() * 0.2f; // 20% of defense
+         Player.SetDefensePotions(Player.GetRemainingDefensePotions() - 1);
+         PlaySound(sounds[SOUNDS_ROGUE_SKILL2]);
+      }
+
+      if(CheckCollisionPointRec(mousePos, interactItem) && strengthPotionsWasClicked) //Strength Potion
+      {
+         if(Player.GetRemainingStrengthPotions() <= 0) return;
+         if(!battleMode)
+         {
+            StartDialogue({"Strength Potions can only be used in battle mode."});
+            PlaySound(sounds[SOUNDS_ERROR_SOUND]);
+            return;
+         }
+
+         strengthPotionBuff = Player.GetDamageMax() * 0.3f; // 30% of max damage
+         Player.SetStrengthPotions(Player.GetRemainingStrengthPotions() - 1);
+         PlaySound(sounds[SOUNDS_ROGUE_SKILL2]);
+      }
+
+      if(CheckCollisionPointRec(mousePos, interactItem) && experiencePotionsWasClicked) // Experience Potion
+      {
+         if(Player.GetRemainingExperiencePotions() <= 0) return;
+
+         Player.GiveExperience(100);
+         PlaySound(sounds[SOUNDS_BUY_SOUND]);
+         StartDialogue({"You gained 100 experience points!"});
+         Player.SetExperiencePotions(Player.GetRemainingExperiencePotions() - 1);
+         PlayerLevelUp();
+         
       }
 
       
@@ -837,4 +975,273 @@ void Tutorial()
    }
    
    EndDrawing();
+}
+
+void islanderShop()
+{
+   if(!inShop) return;
+
+   //for sound FX
+   const double cooldownDuration = 100.0;
+   bool isCurrentlyHovering = false;
+   double currentTime = GetTime();
+
+   Vector2 mousePos = GetMousePosition();
+
+   //shop layout
+   Rectangle shopItemsLayout = {24, 24, 432, 544};
+   Rectangle itemDescriptionBox = { 496, 24, 256, 544 };
+   Rectangle itemDescriptionPicture = {512, 40, 224, 168};
+   Rectangle itemDescriptionTextBox = {512, 224, 224, 240};
+   Rectangle buyItemButton = {568, 504, 112, 48};
+   Rectangle exitButton = { 680, 0, 120, 24 };
+
+   //shop items
+   Rectangle healthPotions = { 40, 48, 88, 64 };
+   Rectangle energyFood = { 40, 152, 88, 64 };
+   Rectangle strengthPotion = { 40, 256, 88, 64 };
+   Rectangle defensePotion = { 40, 360, 88, 64 };
+   Rectangle experiencePotion = { 40, 464, 88, 64 };
+
+   Rectangle healthPotionTextBox = { 144, 48, 288, 64 };
+   Rectangle energyFoodTextBox = { 144, 152, 288, 64 };
+   Rectangle strengthPotionTextBox = { 144, 256, 288, 64 };
+   Rectangle defensePotionTextBox = { 144, 360, 288, 64 };
+   Rectangle experiencePotionTextBox = { 144, 464, 288, 64};
+
+   //shapes
+   ClearBackground({171, 141, 65, 255});
+   DrawRectangleRounded(shopItemsLayout, 0.1f, 1, {138, 109, 37, 255});
+   DrawRectangleRounded(itemDescriptionBox, 0.1f, 1, {138, 109, 37, 255});
+   DrawRectangleRounded(buyItemButton, 0.1f, 1, {61, 168, 75, 255});
+   DrawRectangleRounded(exitButton, 0.1f, 1, {61, 168, 75, 255});
+
+   //text
+   DrawText("Buy Item", buyItemButton.x + 15, buyItemButton.y + 10, 20, WHITE);
+   DrawText("Exit", exitButton.x + 15, exitButton.y + 2, 20, WHITE);
+
+   //items
+   DrawTextureEx(textures[TEXTURE_HEALTH_POTION], {healthPotions.x + 20, healthPotions.y}, 0.0f, 8.0f, WHITE);
+   DrawTextureEx(textures[TEXTURE_ENERGY_FOOD], {energyFood.x + 20, energyFood.y}, 0.0f, 8.0f, WHITE);
+   DrawTextureEx(textures[TEXTURE_STRENGTH_POTION], {strengthPotion.x + 20, strengthPotion.y}, 0.0f, 8.0f, WHITE);
+   DrawTextureEx(textures[TEXTURE_DEFENSE_POTION], {defensePotion.x + 20, defensePotion.y}, 0.0f, 8.0f, WHITE);
+   DrawTextureEx(textures[TEXTURE_EXPERIENCE_POTION], {experiencePotion.x + 20, experiencePotion.y}, 0.0f, 8.0f, WHITE);
+
+   //item text
+   DrawText("Health Potion", healthPotionTextBox.x + 5, healthPotionTextBox.y + 10, 20, BLACK);
+   DrawText("Energy Food", energyFoodTextBox.x + 5, energyFoodTextBox.y + 10, 20, BLACK);
+   DrawText("Strength Potion", strengthPotionTextBox.x + 5, strengthPotionTextBox.y + 10, 20, BLACK);
+   DrawText("Defense Potion", defensePotionTextBox.x + 5, defensePotionTextBox.y + 10, 20, BLACK);
+   DrawText("Experience Potion", experiencePotionTextBox.x + 5, experiencePotionTextBox.y + 10, 20, BLACK);
+
+   //item prices
+   DrawText("Price: 250", healthPotionTextBox.x + 200, healthPotionTextBox.y + 10, 20, BLACK);
+   DrawText("Price: 300", energyFoodTextBox.x + 200, energyFoodTextBox.y + 10, 20, BLACK);
+   DrawText("Price: 670", strengthPotionTextBox.x + 200, strengthPotionTextBox.y + 10, 20, BLACK);
+   DrawText("Price: 670", defensePotionTextBox.x + 200, defensePotionTextBox.y + 10, 20, BLACK);
+   DrawText("Price: 700", experiencePotionTextBox.x + 200, experiencePotionTextBox.y + 10, 20, BLACK);
+
+   //Display Money
+   DrawText(TextFormat("Money: %d", Player.GetMoney()), 25, 10, 20, BLACK);
+
+   //Display item description
+   switch (whatItemWasClicked)
+   {
+   case 0:
+   { // Health Potion
+      DrawTextureEx(textures[TEXTURE_HEALTH_POTION], {itemDescriptionPicture.x + 10, itemDescriptionPicture.y}, 0.0f, 14.0f, WHITE);
+      DrawText("Health Potion", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 10, 20, BLACK);
+      DrawText("Restores 25-75 HP", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 40, 20, BLACK);
+      DrawText("Price: 250", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 70, 20, BLACK);
+      DrawText("A potion that restores \n\nthe hero's health.", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 100, 20, BLACK);   
+      break;
+   }
+   case 1:
+   { // Energy Food
+      DrawTextureEx(textures[TEXTURE_ENERGY_FOOD], {itemDescriptionPicture.x + 10, itemDescriptionPicture.y}, 0.0f, 14.0f, WHITE);
+      DrawText("Energy Food", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 10, 20, BLACK);
+      DrawText("Restores 15-40 Energy", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 40, 20, BLACK);
+      DrawText("Price: 300", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 70, 20, BLACK);
+      DrawText("A food that restores \n\nthe hero's energy.", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 100, 20, BLACK);   
+      break;
+   }
+   case 2:
+   { // Strength Potion
+      DrawTextureEx(textures[TEXTURE_STRENGTH_POTION], {itemDescriptionPicture.x + 10, itemDescriptionPicture.y}, 0.0f, 14.0f, WHITE);
+      DrawText("Strength Potion", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 10, 20, BLACK);
+      DrawText("Increases min and max damage \nby 30%, can only be used \nduring battle.", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 40, 17, BLACK);
+      DrawText("Price: 670", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 100, 20, BLACK);
+      DrawText("A potion that increases \n\nthe hero's damage.", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 140, 20, BLACK);   
+      break;
+   }
+   case 3:
+   { // Defense Potion
+      DrawTextureEx(textures[TEXTURE_DEFENSE_POTION], {itemDescriptionPicture.x + 10, itemDescriptionPicture.y}, 0.0f, 14.0f, WHITE);
+      DrawText("Defense Potion", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 10, 20, BLACK);
+      DrawText("Increases defense \nby 20%, can only be used \nduring battle.", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 40, 17, BLACK);
+      DrawText("Price: 670", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 100, 20, BLACK);
+      DrawText("A potion that increases \n\nthe hero's defense.", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 140, 20, BLACK);   
+      break;
+   }
+   case 4:
+   { // Experience Potion
+      DrawTextureEx(textures[TEXTURE_EXPERIENCE_POTION], {itemDescriptionPicture.x + 10, itemDescriptionPicture.y}, 0.0f, 14.0f, WHITE);
+      DrawText("Experience Potion", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 10, 20, BLACK);
+      DrawText("Grants 100 experience \npoints.", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 40, 20, BLACK);
+      DrawText("Price: 700", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 100, 20, BLACK);
+      DrawText("A potion that grants \n\nthe hero experience \npoints.", itemDescriptionTextBox.x + 5, itemDescriptionTextBox.y + 140, 20, BLACK);   
+      break;
+   }
+   default:
+      break;
+   }
+
+
+   //Logic
+   //hovering over items
+   if(CheckCollisionPointRec(mousePos, healthPotions))
+   {
+      DrawRectangleRec(healthPotions, {255, 255, 255, 150});
+
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+      
+   }
+   else if(CheckCollisionPointRec(mousePos, energyFood))
+   {
+      DrawRectangleRec(energyFood, {255, 255, 255, 150});
+
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+   }
+   else if(CheckCollisionPointRec(mousePos, strengthPotion))
+   {
+      DrawRectangleRec(strengthPotion, {255, 255, 255, 150});
+
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+      
+   }
+   else if(CheckCollisionPointRec(mousePos, defensePotion))
+   {
+      DrawRectangleRec(defensePotion, {255, 255, 255, 150});
+
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+      
+   }
+   else if(CheckCollisionPointRec(mousePos, experiencePotion))
+   {
+      DrawRectangleRec(experiencePotion, {255, 255, 255, 150});
+
+      isCurrentlyHovering = true;
+      PlaySoundWhenHoveringItem(hoveringOverItems, currentTime, lastHoverSoundTime, cooldownDuration);
+      
+   }
+
+   if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+   {
+      if(CheckCollisionPointRec(mousePos, exitButton))
+      {
+         inShop = false;
+      }
+      
+      if(CheckCollisionPointRec(mousePos, healthPotions))
+      {
+         whatItemWasClicked = 0;
+      }
+      else if(CheckCollisionPointRec(mousePos, energyFood))
+      {
+         whatItemWasClicked = 1;
+      }
+      else if(CheckCollisionPointRec(mousePos, strengthPotion))
+      {
+         whatItemWasClicked = 2;
+      }
+      else if(CheckCollisionPointRec(mousePos, defensePotion))
+      {
+         whatItemWasClicked = 3;
+      }
+      else if(CheckCollisionPointRec(mousePos, experiencePotion))
+      {
+         whatItemWasClicked = 4;
+      }
+
+      //buy item button
+      if(CheckCollisionPointRec(mousePos, buyItemButton))
+      {
+         switch (whatItemWasClicked)
+         {
+         case 0: // Health Potion
+         {
+            if(Player.GetMoney() >= 250)
+            {
+               Player.SetMoney(Player.GetMoney() - 250);
+               Player.SetHealthPotions(Player.GetRemainingHealthPotions() + 1);
+               PlaySound(sounds[SOUNDS_BUY_SOUND]);
+            }
+            else PlaySound(sounds[SOUNDS_ERROR_SOUND]);
+            break;
+         }
+         case 1: // Energy Food
+         {
+            if(Player.GetMoney() >= 300)
+            {
+               Player.SetMoney(Player.GetMoney() - 300);
+               Player.SetEnergyFoods(Player.GetRemainingEnergyFoods() + 1);
+               PlaySound(sounds[SOUNDS_BUY_SOUND]);
+            }
+            else PlaySound(sounds[SOUNDS_ERROR_SOUND]);
+            break;
+         }
+         case 2: // Strength Potion
+         {
+            if(Player.GetMoney() >= 670)
+            {
+               Player.SetMoney(Player.GetMoney() - 670);
+               Player.SetStrengthPotions(Player.GetRemainingStrengthPotions() + 1);
+               PlaySound(sounds[SOUNDS_BUY_SOUND]);
+            }
+            else PlaySound(sounds[SOUNDS_ERROR_SOUND]);
+            break;
+         }
+         case 3: // Defense Potion
+         {
+            if(Player.GetMoney() >= 670)
+            {
+               Player.SetMoney(Player.GetMoney() - 670);
+               Player.SetDefensePotions(Player.GetRemainingDefensePotions() + 1);
+               PlaySound(sounds[SOUNDS_BUY_SOUND]);
+            }
+            else PlaySound(sounds[SOUNDS_ERROR_SOUND]);
+            break;
+         }
+         case 4: // Experience Potion
+         {
+            if(Player.GetMoney() >= 700)
+            {
+               Player.SetMoney(Player.GetMoney() - 700);
+               Player.SetExperiencePotions(Player.GetRemainingExperiencePotions() + 1);
+               PlaySound(sounds[SOUNDS_BUY_SOUND]);
+            }
+            else PlaySound(sounds[SOUNDS_ERROR_SOUND]);
+            break;
+         }
+         default:
+            break;
+         }
+
+         if(Player.GetMoney() < 0) Player.SetMoney(0); 
+   
+      }
+   }
+
+
+
+   //plays sound fx only once when hovering over an item
+   if (!isCurrentlyHovering) 
+   {
+      hoveringOverItems = false;
+   }
+
 }

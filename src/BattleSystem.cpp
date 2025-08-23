@@ -6,6 +6,7 @@
 #include "Heroes.hpp"
 #include "raylib.h"
 #include "StoryLine.hpp"
+#include "Items.hpp"
 #include <iostream>
 
 Vector2 playerOriginalPos = {160, 192}; //Original pos of player 
@@ -46,6 +47,10 @@ bool itemButtonIsPressed = false;
 bool skillButtonIsPressed = false;
 bool attackButtonIsPressed = false;
 bool aTabIsOpen = false;
+
+// Buffs
+int defensePotionBuff = 0;
+int strengthPotionBuff = 0;
 
 //skills
 int damageBuff = 0;
@@ -101,12 +106,15 @@ void BattleUpdate(Enemy *enemy)
         enemy->SetAlive(false); 
         PlaySound(sounds[SOUND_DEATH]);
 
-        Player.GiveExperience(Player.GetExperience() + GetRandomValue(5, enemy->GetExperience()));
+        if(enemy->GetSpecialStatus()) Player.GiveExperience(Player.GetExperience() +  enemy->GetExperience());
+        else Player.GiveExperience(Player.GetExperience() + GetRandomValue(20, enemy->GetExperience()));
+
         Player.SetZone(enemy->GetZone());
         Player.SetX(enemy->GetX() + TILE_WIDTH);
         
         PlayerLevelUp();
         resetAllStates();
+        CheckIfDungeonCompleted();
 
         //spawn chest
         spawnChest(enemy);
@@ -118,6 +126,7 @@ void BattleUpdate(Enemy *enemy)
     {
         Player.SetAlive(false);
         Player.SetZone(enemy->GetZone());
+        lastZone = enemy->GetZone();
 
         resetAllStates();
 
@@ -301,15 +310,18 @@ void BattleRender(Enemy *enemy)
         case Enemy::SLIME: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 8, 1, 10.0f); break; 
         case Enemy::DOG: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 5, 1, 10.0f); break; 
         case Enemy::FLOATING_CRAB: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 7, 1, 10.0f); break;
+        case Enemy::WATER_SLIME: DrawTextureEx(textures[TEXTURE_WATER_SLIME], {enemyCurrentPos.x, enemyCurrentPos.y}, 0.0f, 10.0f, WHITE); break;
         
         case Enemy::CRAB_THING: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 12, 0, 10.0f); break; 
         case Enemy::MUTATED_FROG: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 10, 1, 10.0f); break; 
+        case Enemy::MONSTER_SQUID: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 11, 1, 10.0f); break; 
+        case Enemy::SPECIAL_GOLEM: DrawTextureEx(textures[TEXTURE_SPECIAL_GOLEM], {enemyCurrentPos.x, enemyCurrentPos.y}, 0.0f, 10.0f, WHITE); break;
         
     }
 
 
 
-    //health
+    //healthz
     DrawRectangleRounded(playerHealthBox, 0.1, 1, BLACK);
     DrawRectangleRounded(enemyHealthBox, 0.1, 1, BLACK);
     //player HP
@@ -591,7 +603,10 @@ void PlayerAttacks(Enemy *enemy)
     showDamage = true;
     damageToShow = GetRandomValue(Player.GetDamageMin(), Player.GetDamageMax()) - enemy->GetDefense();
     if(damageBuffCounter > 0) damageToShow += damageBuff;
+    if(strengthPotionBuff > 0) damageToShow += strengthPotionBuff;
+
     if (enemy->GetWeakness() == Player.GetType()) damageToShow *= 2;
+
     if (damageToShow <= 0) damageToShow = 1;
     enemy->TakeDamage(damageToShow);
 
@@ -605,6 +620,7 @@ void EnemyAttacks(Enemy *enemy)
     
     int enemyDamage = GetRandomValue(enemy->GetDamageMin(), enemy->GetDamageMax()) - Player.GetDefense();
     if(defenseBuffCounter > 0) enemyDamage = GetRandomValue(enemy->GetDamageMin(), enemy->GetDamageMax()) - (Player.GetDefense() + defenseBuff);
+    if(defensePotionBuff > 0) enemyDamage -= defensePotionBuff;
 
     if (playerDefending) 
     {
@@ -714,6 +730,7 @@ void RenderEnemyHearts(Enemy *enemy)
 
 void resetAllStates()
 {
+    //reset all states
     battleMode = false;
     playerTurn = true;
     playerDefending = false;
@@ -735,6 +752,14 @@ void resetAllStates()
     enemyIsPoisoned = 0;
     playerCurrentPos = playerOriginalPos;
     enemyCurrentPos = enemyOriginalPos;
+
+    damageToShow = 0;
+    defensePotionBuff = 0;
+    strengthPotionBuff = 0;
+
+    //reset boat position
+    boat.x = TILE_WIDTH * 14;
+    boat.y = TILE_HEIGHT * 12;
 }
 
 void ShowKnightSkill()
@@ -884,6 +909,20 @@ void GetRewardFromBosses()
         mutantFrogKilled = true;
         break;
     }    
+    case Enemy::MONSTER_SQUID:
+    {
+        Act3_MonsterSquidKilled = true;
+        StartDialogue({"[You obtained the Squid's Eye Core ]"});
+        eyeCore.SetPickedUpState(true);
+        break;
+    }
+    case Enemy::SPECIAL_GOLEM:
+    {
+        Act4_SpecialGolemKilled = true;
+        StartDialogue({"[The Golem dropped it's weapon.]"});
+        pitchFork.SetPickedUpState(true);
+        break;
+    }
     default:
         break;
     }

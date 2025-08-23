@@ -64,6 +64,21 @@ Items cursedGoldenKey(
     false, 10,5
 ); 
 
+Items greenHeart(
+    Items::GREEN_HEART, "Green Heart of A_rm!r", ZONE_BASEMENT_DUNGEON, TILE_WIDTH * 99, TILE_HEIGHT * 22,
+    false, 1,8
+); 
+
+Items eyeCore(
+    Items::EYE_CORE, "Squid's Eye Core", ZONE_SEA, TILE_WIDTH * 99, TILE_HEIGHT * 22,
+    false, 3,8
+); 
+
+
+Items pitchFork(
+    Items::PITCH_FORK, "Farbauti's Pitch Fork", ZONE_SEA, TILE_WIDTH * 99, TILE_HEIGHT * 22,
+    false, 10,4
+); 
 
 Items* itemArr[MAX_ITEMS] = {nullptr};
 
@@ -75,10 +90,29 @@ void ItemsInit()
     goldenRing.SetEnemyDefenseBoost(3);
     itemArr[0] = &goldenRing;
 
-    cursedGoldenKey.SetDamageBoostMin(20);
-    cursedGoldenKey.SetDamageBoostMax(30);
+    cursedGoldenKey.SetDamageBoostMin(25);
+    cursedGoldenKey.SetDamageBoostMax(40);
     cursedGoldenKey.SetEnemyHealthBooost(150);
     itemArr[1] = &cursedGoldenKey;
+
+    greenHeart.SetEnergyBoost(100);
+    greenHeart.SetDefenseBoost(20);
+    greenHeart.SetEnemyDamageBoostMin(30);
+    greenHeart.SetEnemyDamageBoostMax(40);
+    itemArr[2] = &greenHeart;
+
+    eyeCore.SetHealthBoost(200);
+    eyeCore.SetEnergyBoost(50);
+    eyeCore.SetExperienceBoost(100);
+    eyeCore.SetDefenseBoost(23);
+    eyeCore.SetEnemyDamageBoostMin(50);
+    eyeCore.SetEnemyDamageBoostMax(70);
+    itemArr[3] = &eyeCore;
+
+    pitchFork.SetDamageBoostMin(150);
+    pitchFork.SetDamageBoostMax(200);
+    itemArr[4] = &pitchFork;
+
 
 }
 

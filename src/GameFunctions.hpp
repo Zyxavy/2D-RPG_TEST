@@ -12,11 +12,11 @@ const int screenHeight = 600;
 
 
 //definitions
-#define MAX_TEXTURES 10
+#define MAX_TEXTURES 22
 #define MAX_PAGE_PICTURES 11
 #define TILE_WIDTH 8
 #define TILE_HEIGHT  8
-#define MAX_SOUNDS 17
+#define MAX_SOUNDS 18
 #define WORLD_WIDTH 25
 #define WORLD_HEIGHT 25
 
@@ -40,6 +40,19 @@ typedef enum
     TEXTURE_WIZARD = 7,
     TEXTURE_ROGUE = 8,
     TEXTURE_FLOATING_CRAB = 9,
+    TEXTURE_PALM_TREE = 10,
+    TEXTURE_ISLANDER = 11,
+    TEXTURE_RANDOM_TRINKET = 12,
+    TEXTURE_MONSTER_SQUID = 13,
+    TEXTURE_WATER_SLIME = 14,
+    TEXTURE_HEALTH_POTION = 15,
+    TEXTURE_DEFENSE_POTION = 16,
+    TEXTURE_STRENGTH_POTION = 17,
+    TEXTURE_EXPERIENCE_POTION = 18,
+    TEXTURE_ENERGY_FOOD = 19,
+    TEXTURE_SPECIAL_GOLEM = 20,
+    TEXTURE_STONE_WALL = 21,
+
 } texture_asset;
 
 typedef enum
@@ -65,7 +78,9 @@ typedef enum
     SOUNDS_WIZARD_SKILL3,
     SOUNDS_ROGUE_SKILL1,
     SOUNDS_ROGUE_SKILL2,
-    SOUNDS_ROGUE_SKILL3
+    SOUNDS_ROGUE_SKILL3,
+    SOUNDS_ERROR_SOUND,
+    SOUNDS_BUY_SOUND,
 } sound_asset;
 
 typedef enum
@@ -118,7 +133,9 @@ typedef enum
     TILE_TYPE_DOOR_UNLOCEKD,
     TILE_TYPE_SQUARE_RAIL,
     //island
+    TILE_TYPE_STONE_WALL = 98,
     TILE_TYPE_SAND = 99,
+
 } tile_type;
 
 typedef struct
@@ -131,14 +148,18 @@ typedef struct
 
 typedef enum
 {
-   ZONE_ALL = 0,
-   ZONE_BATTLE,
-   ZONE_WORLD,
-   ZONE_DUNGEON, 
-   ZONE_WORLD_PLAIN_LANDS ,
-   ZONE_BASEMENT_DUNGEON,
-   ZONE_ISLAND,
-
+    ZONE_ALL = 0,
+    ZONE_BATTLE,
+    ZONE_WORLD,
+    ZONE_DUNGEON, 
+    ZONE_WORLD_PLAIN_LANDS ,
+    ZONE_BASEMENT_DUNGEON,
+    ZONE_ISLAND,
+    ZONE_SEA,
+    ZONE_LOST_TEMPLE_ENTRANCE,
+    ZONE_LOST_TEMPLE_LEVEL1,
+    ZONE_LOST_TEMPLE_LEVEL2,
+    ZONE_LOST_TEMPLE_LEVEL3,
 } eZones;
 
 typedef enum
@@ -149,6 +170,11 @@ typedef enum
     IN_PLAINS,
     IN_DUNGEON_BASEMENT,
     IN_ISLAND,
+    IN_SEA,
+    IN_LOST_TEMPLE_ENTRANCE,
+    IN_LOST_TEMPLE_LEVEL1,
+    IN_LOST_TEMPLE_LEVEL2,
+    IN_LOST_TEMPLE_LEVEL3,
 
     PICKING_UP_ITEM,
 } GameState;
@@ -164,6 +190,11 @@ extern sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile plainLands[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile basementDungeon[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile island[WORLD_WIDTH][WORLD_HEIGHT];
+extern sTile sea[WORLD_WIDTH][WORLD_HEIGHT];
+extern sTile lostTemple[WORLD_WIDTH][WORLD_HEIGHT];
+extern sTile lostTempleLevel1[WORLD_WIDTH][WORLD_HEIGHT];
+extern sTile lostTempleLevel2[WORLD_WIDTH][WORLD_HEIGHT];
+extern sTile lostTempleLevel3[WORLD_WIDTH][WORLD_HEIGHT];
 extern Camera2D camera;
 extern bool isInventory;
 extern int lastKeyPressed;
@@ -171,6 +202,7 @@ extern int count;
 extern GameState currentGameState, prevGameState;
 extern bool isRidingBoat; 
 extern bool isBoatFacingRight; 
+extern eZones lastZone;
 
 
 //functions
@@ -178,9 +210,11 @@ void GameStartup();
 void GameUpdate();
 void GameRender();
 void RenderTile(const sTile &tile,int &texture_index_x, int &texture_index_y);
+void LoadAllTextures();
 void GameShutdown();
 void LoadAllPages();
 void DeleteEnemies();
+
 
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y);
 void DrawTile(int pos_x, int pos_y, int texture_index_x, int texture_index_y, float scale);
@@ -188,8 +222,6 @@ bool IsBarrierCollision(int x, int y);
 
 void DrawHotBar();
 void CutDownTree();
-void EnterGates();
-void InteractWithNPCs();
 void CheckIfDungeonCompleted();
 
 

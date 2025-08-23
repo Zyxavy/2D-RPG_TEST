@@ -57,3 +57,5 @@ June 30 - Added a new zone (Plains land) | adjusted enemy stats and scaling
 July 14 - Created a basic story line | added more enemies and bosses | created NPCs and their dialog | added custom maps | added Items and many more
 <hr>
 July 29 - Added 3 new zones & more enemies | added boats and sea traversal | 
+<hr>
+August 23(Change Date to latest) - added Sea Zone & Map| added new NPC in basement | added new enemies / boss | added islander merchant and shop | added new potions | Created last zone & Levels to it| Added a special Golem | added 2 more zones (almost finished)

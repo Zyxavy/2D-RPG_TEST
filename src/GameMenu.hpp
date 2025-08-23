@@ -11,6 +11,7 @@ extern bool isDead;
 extern bool inCharacterSelect;
 extern bool inTutorial;
 extern int itemID;
+extern bool inShop;
 
 
 //buttons
@@ -30,6 +31,7 @@ void Inventory();
 void ShowItemInfos();
 void LevelUpScreen();
 void Tutorial();
+void islanderShop();
 
 
 #endif

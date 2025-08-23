@@ -1,5 +1,6 @@
 #include "StoryLine.hpp"
 #include "GameFunctions.hpp"
+#include "GameMenu.hpp"
 #include "Items.hpp"
 #include "Heroes.hpp"
 #include "Entities.hpp"
@@ -18,8 +19,15 @@ bool YesorNo;
 bool Act1_HermitInteracted = false, Act1_WoundedKnightInteracted = false;
 bool Act1_Introduced = false;
 bool Act1_firstTimeInDungeon;
-bool Act2_VillageChiefInteracted = false, Act2_VillagerInteracted = false, mutantFrogKilled = false;
-bool Act2_VillageChiefRewardClaimed = false;
+
+bool Act2_VillageChiefInteracted = false, Act2_VillagerInteracted = false, Act2_WeirdManInteracted = false, mutantFrogKilled = false;
+bool Act2_VillageChiefRewardClaimed = false, Act2_BasementCleared = false, Act2_WeirdManRewardClaimed = false;
+
+bool Act3_IslanderInteracted = false, Act3_IslandersQuestCompleted = false;
+bool Act3_LostTrinketFound = false, Act3_MonsterSquidKilled = false;
+
+bool Act4_LostTempleIntroduced = false, Act4_OldHermitInteracted = false;
+bool Act4_LostTempleLevel1Cleared = false, Act4_SpecialGolemKilled = false;
 
 
 bool dungeonKey = false, plainsKey = false;
@@ -213,12 +221,12 @@ void Act1_WoundedKnight()
 {
     if(!Act1_WoundedKnightInteracted)StartDialogue
     ({
-        "Wounded Knight: The dungeon...",
-        "Wounded Knight: it was supposed to be sealed.",
-        "Wounded Knight: Something has awakened inside...",
-        "Wounded Knight: Something ancient.",
-        "Wounded Knight: I won't live long, take this...",
+        "Wounded Knight: I won't last long...",
+        "Wounded Knight: I was attacked by a monster...",
+        "Wounded Knight: I tried to fight it, but it was too strong...",
+        "Wounded Knight: Please, take this...",
         "[Obtained Food]",
+        "Wounded Knight: I hope you fare better than I did...",
     });
     else StartDialogue({"....."});
 
@@ -230,7 +238,10 @@ void Act1_Dungeon1()
     if(currentGameState == IN_DUNGEON && !Act1_firstTimeInDungeon)
     {
         StartDialogue({
-            "This dungeon feels ominous..."
+            "This place is dark and eerie...",
+            "I can feel the presence of monsters lurking around.",
+            "I must be careful, I don't know what awaits me here.",
+            "I should find a way to get out of here as soon as possible."
         });
         Act1_firstTimeInDungeon = true;
     }
@@ -252,9 +263,9 @@ void Act2_Introduction()
     if(currentGameState == IN_PLAINS)
     {
         StartDialogue({
-            "Finally.. I got out",
-            "That Dungeon gave me the creeps",
-            "I see a village... I should check it out"
+            "Finally, I made it out of that dungeon.",
+            "This place seems peaceful, but I must stay alert.",
+            "I should explore this village and see if anyone needs help.",
         });
     }
 }
@@ -298,4 +309,126 @@ void Act2_RandomVillager1()
     else StartDialogue({"What?"});
 
     Act2_VillagerInteracted = true;
+}
+
+void Act2_WeirdMan()
+{
+    if(!Act2_WeirdManInteracted) StartDialogue
+    ({
+        "Weird Man: We are all cursed...",
+        "Weird Man: We are all doomed...",
+        "Weird Man: We are all lost...",
+        "Weird Man: We are all...",
+        "Weird Man: We are all...",
+        "Weird Man: We are all... dead.",
+        "[Eliminate all the enemies in the basement]"
+    });
+    else 
+    {
+        StartDialogue
+        ({
+            "Weird Man: Hehe...",
+            "Weird Man: Hehehhehehhehehhehhhehhehehhehehhehheh",
+        });
+    }   
+
+    if(Act2_BasementCleared && !Act2_WeirdManRewardClaimed)
+    {
+        StartDialogue
+        ({
+            "Weird Man: ahhh... you...",
+            "Weird Man: MONSTER!",
+            "Weird Man: You killed them all!",
+            "Weird Man: You killed my friends!",
+            "Weird Man: You killed my family!",
+            "Weird Man: You killed my... Please... Please... don't hurt me...",
+            "Weird Man: Here take this... Please... don't kill me...",
+            "[Obtained Green Heart of Aurmir]",
+            
+        });
+
+        Act2_WeirdManRewardClaimed = true;
+        greenHeart.SetPickedUpState(true);
+    }
+    Act2_WeirdManInteracted = true;
+}
+
+//act 3
+void Act3_Islander()
+{
+
+    if(Act3_IslandersQuestCompleted)
+    {
+        StartDialogue
+        ({
+            "Islander: Talk to me again if you want to buy something.",
+            
+        });
+
+        inShop = true;
+        return;
+    }
+
+    if(Act3_LostTrinketFound && !Act3_IslandersQuestCompleted)
+    {
+        StartDialogue
+        ({
+            "Islander: You found it!",
+            "Islander: Thank you so much!",
+            "Islander: Here, take this as a reward.",
+            "[Obtained 10x Health Potions]",
+            "[Obtained 7x Foods]",
+            "Islander: I'll let you in on a deal, there's even a discount for you.",
+            "Islander: talk to me again if you want to buy something.",
+        });
+
+        Player.SetHealthPotions(Player.GetRemainingHealthPotions() + 10);
+        Player.SetEnergyFoods(Player.GetRemainingEnergyFoods() + 7);
+        Act3_IslandersQuestCompleted = true;
+        return;
+    }
+
+    if(!Act3_IslanderInteracted) StartDialogue
+    ({
+        "Islander: Hello there, stranger.",
+        "Islander: I am the islander of this place.",
+        "Islander: I can help you with your journey, but first, \nI need you to do something for me.",
+        "Islander: I lost my trinket somewhere, \ncan you find it for me?",
+        "[Objective: Find the Lost Trinket]",
+    });
+    else StartDialogue({"Have you found it?"});
+
+    Act3_IslanderInteracted = true;
+
+}
+
+//act 4
+void Act4_LostTempleIntroduction()
+{
+    if(currentGameState == IN_LOST_TEMPLE_ENTRANCE && !Act4_LostTempleIntroduced)
+    {
+        StartDialogue({
+            "This place feels ancient...",
+            "I wonder what secrets it holds..."
+        });
+        Act4_LostTempleIntroduced = true;
+    }
+}
+
+void Act4_oldHermit()
+{
+    if(!Act4_OldHermitInteracted) StartDialogue
+    ({
+        "Old Hermit: Oho! if it isn't you!",
+        "Old Hermit: You have come far.",
+        "Old Hermit: This temple holds many secrets.",
+        "Old Hermit: But beware, not all is as it seems.",
+        "Old Hermit: If you seek the truth, you must be \nprepared to face the darkness within.",
+
+    });
+    else StartDialogue({
+        "Old Hermit: I have nothing more to say.",
+        "Old Hermit: What lies ahead is not for the faint of heart."});
+
+    Act4_OldHermitInteracted = true;
 }

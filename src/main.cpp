@@ -19,7 +19,7 @@ int main(){
                 GameMenu();
             }
             else if(inTutorial)
-            {
+            { 
                 Tutorial();
             }
             else if (inCharacterSelect)

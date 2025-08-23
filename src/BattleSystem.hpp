@@ -17,6 +17,8 @@ extern bool skillButtonIsPressed;
 extern bool attackButtonIsPressed;
 extern bool defendButtonIsPressed;
 extern bool aTabIsOpen;
+extern int defensePotionBuff;
+extern int strengthPotionBuff;
 
 //Skills externs
 extern int damageBuff;

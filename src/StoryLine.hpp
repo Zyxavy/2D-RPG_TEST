@@ -23,8 +23,14 @@ extern bool Act1_HermitInteracted, Act1_WoundedKnightInteracted;
 extern bool Act1_Introduced;
 extern bool Act1_firstTimeInDungeon;
 
-extern bool Act2_VillageChiefInteracted,Act2_VillagerInteracted, mutantFrogKilled;
-extern bool Act2_VillageChiefRewardClaimed;
+extern bool Act2_VillageChiefInteracted, Act2_VillagerInteracted,  Act2_WeirdManInteracted, mutantFrogKilled;
+extern bool Act2_VillageChiefRewardClaimed, Act2_BasementCleared, Act2_WeirdManRewardClaimed;
+
+extern bool Act3_IslanderInteracted, Act3_IslandersQuestCompleted;
+extern bool Act3_LostTrinketFound, Act3_MonsterSquidKilled;
+
+extern bool Act4_LostTempleIntroduced, Act4_OldHermitInteracted;
+extern bool Act4_LostTempleLevel1Cleared, Act4_SpecialGolemKilled;
 
 extern bool dungeonKey, plainsKey;
 
@@ -47,8 +53,13 @@ void Act1_GoldenRing();
 void Act2_Introduction();
 void Act2_VillageCheif1();
 void Act2_RandomVillager1();
-void Act2_RandomVillager2();
-void Act2_RandomVillager3();
+void Act2_WeirdMan();
 
+//Act 3 Island of Aurmir
+void Act3_Islander();
+
+//ACT 4 Lost Temple
+void Act4_LostTempleIntroduction();
+void Act4_oldHermit();
 
 #endif // STORY_LINE_HPP

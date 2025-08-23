@@ -11,7 +11,7 @@ class Hero
     private:
     std::string name, type;
     int x, y;
-    int health, maxHealth, energy, maxEnergy, healthPotions, energyFoods; 
+    int health, maxHealth, energy, maxEnergy, healthPotions, energyFoods, defensePotions, strengthPotions, experiencePotions; 
     int damageMin, damageMax, defense, experience, level, money;
     eZones zone;  
     bool isAlive, isPassable;
@@ -33,6 +33,9 @@ class Hero
     int GetMaxEnergy() const;
     int GetRemainingHealthPotions() const;
     int GetRemainingEnergyFoods() const;
+    int GetRemainingDefensePotions() const;
+    int GetRemainingStrengthPotions() const;
+    int GetRemainingExperiencePotions() const;
     int GetDamageMin() const;
     int GetDamageMax() const;
     int GetDefense() const;
@@ -54,6 +57,9 @@ class Hero
     void SetDamageMax(int amount);
     void SetHealthPotions(int amount);
     void SetEnergyFoods(int amount);
+    void SetDefensePotions(int amount);
+    void SetStrengthPotions(int amount);
+    void SetExperiencePotions(int amount);
     void SetDefense(int amount);
     void GiveExperience(int amount);
     void SetLevel(int amount);

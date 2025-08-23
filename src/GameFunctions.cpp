@@ -21,69 +21,31 @@ sTile dungeon[WORLD_WIDTH][WORLD_HEIGHT];
 sTile plainLands[WORLD_WIDTH][WORLD_HEIGHT];
 sTile basementDungeon[WORLD_WIDTH][WORLD_HEIGHT];
 sTile island[WORLD_WIDTH][WORLD_HEIGHT];
+sTile sea[WORLD_WIDTH][WORLD_HEIGHT];
+sTile lostTemple[WORLD_WIDTH][WORLD_HEIGHT];
+sTile lostTempleLevel1[WORLD_WIDTH][WORLD_HEIGHT];
+sTile lostTempleLevel2[WORLD_WIDTH][WORLD_HEIGHT];
+sTile lostTempleLevel3[WORLD_WIDTH][WORLD_HEIGHT];
+eZones lastZone = ZONE_WORLD;
 bool isInventory = false;
 int count;
 int lastKeyPressed;
+
 GameState currentGameState;
 GameState prevGameState;
 bool isRidingBoat = false; 
 bool isBoatFacingRight = true; 
-
-void GameStartup() 
-{
+void GameStartup() {
 
     dungeonKey = true;
     plainsKey = true;
     mutantFrogKilled = true;
-    cursedGoldenKey.SetPickedUpState(true);
+    cursedGoldenKey.SetPickedUpState(true); 
 
     InitAudioDevice();
 
-    //init tiles/graphics
-    Image image = LoadImage("assets/colored_tilemap_packed.png");
-    textures[TEXTURE_TILEMAP] = LoadTextureFromImage(image);
-    UnloadImage(image);
-
-    Image StarImage = LoadImage("assets/Star.png");
-    textures[TEXTURE_STAR]= LoadTextureFromImage(StarImage);
-    UnloadImage(StarImage);
-
-    Image BookImage = LoadImage("assets/Book.png");
-    textures[TEXTURE_BOOK]= LoadTextureFromImage(BookImage);
-    UnloadImage(BookImage);
-
-    Image SandTile = LoadImage("assets/sand.png");
-    textures[TEXTURE_SAND] = LoadTextureFromImage(SandTile);
-    UnloadImage(SandTile);
-
-    //Load boat textures
-    Image boatFacingLeft = LoadImage("assets/Boat/boatFacingLeft.png");
-    textures[TEXTURE_BOAT_LEFT] = LoadTextureFromImage(boatFacingLeft);
-    UnloadImage(boatFacingLeft);
-
-    Image boatFacingRight = LoadImage("assets/Boat/boatFacingRight.png");
-    textures[TEXTURE_BOAT_RIGHT] = LoadTextureFromImage(boatFacingRight);
-    UnloadImage(boatFacingRight);
-
-    //heroes textures
-
-    Image knightPNG = LoadImage("assets/Heroes/knight.png");
-    textures[TEXTURE_KNIGHT] = LoadTextureFromImage(knightPNG);
-    UnloadImage(knightPNG);
-
-    Image wizardPNG = LoadImage("assets/Heroes/wizard.png");
-    textures[TEXTURE_WIZARD] = LoadTextureFromImage(wizardPNG);
-    UnloadImage(wizardPNG);
-
-    Image roguePNG = LoadImage("assets/Heroes/rogue.png");
-    textures[TEXTURE_ROGUE] = LoadTextureFromImage(roguePNG);
-    UnloadImage(roguePNG);
-
-    //enemies
-    Image floatingCrabPNG = LoadImage("assets/Enemies/floatingCrab.png");
-    textures[TEXTURE_FLOATING_CRAB] = LoadTextureFromImage(floatingCrabPNG);
-    UnloadImage(floatingCrabPNG);
-    
+    //Load Textures
+    LoadAllTextures();
 
     //Tutorial pages
     LoadAllPages();
@@ -126,6 +88,41 @@ void GameStartup()
                 .type = zoneIsland[y][x]
             };
 
+            sea[x][y] = (sTile) 
+            {
+                .x = x,
+                .y = y,
+                .type = zoneSea[y][x]
+            };
+
+            lostTemple[x][y] = (sTile) 
+            {
+                .x = x,
+                .y = y,
+                .type = zoneLostTempleEntrance[y][x]
+            };
+
+            lostTempleLevel1[x][y] = (sTile) 
+            {
+                .x = x,
+                .y = y,
+                .type = zoneLostTempleLevel1[y][x]
+            };
+
+            lostTempleLevel2[x][y] = (sTile) 
+            {
+                .x = x,
+                .y = y,
+                .type = zoneLostTempleLevel2[y][x]
+            };
+
+            lostTempleLevel3[x][y] = (sTile) 
+            {
+                .x = x,
+                .y = y,
+                .type = zoneLostTempleLevel3[y][x]
+            };
+
         }
     }
 
@@ -157,6 +154,7 @@ void GameStartup()
     sounds[SOUND_HOVER_ITEMS] = LoadSound("assets/HoverItems.wav");
     sounds[SOUNDS_LEVEL_UP] = LoadSound("assets/LevelUp FX.wav");
     sounds[SOUNDS_TREE_CUTTING] = LoadSound("assets/TreeCutting.wav");
+    sounds[SOUNDS_ERROR_SOUND] = LoadSound("assets/ErrorSound.wav");
     //skils sounds
     sounds[SOUNDS_KNIGHT_SKILL1] = LoadSound("assets/KnightSkill1.wav");
     sounds[SOUNDS_KNIGHT_SKILL2] = LoadSound("assets/KnightSkill2.wav");
@@ -167,6 +165,7 @@ void GameStartup()
     sounds[SOUNDS_ROGUE_SKILL1] = LoadSound("assets/RogueSkill1.wav");
     sounds[SOUNDS_ROGUE_SKILL2] = LoadSound("assets/RogueSkill2.wav");
     sounds[SOUNDS_ROGUE_SKILL3] = LoadSound("assets/RogueSkill3.wav");
+    sounds[SOUNDS_BUY_SOUND] = LoadSound("assets/BuySound.wav");
     
     LoadMusic();
 }
@@ -287,7 +286,7 @@ void GameUpdate()
         //CHECK Contact with enemies
         CheckContactWithEnemies();
         
-        if(hasKeyPressed && !isRidingBoat) // Play FootSteps FX only when on foot
+        if(hasKeyPressed && !isRidingBoat) //Play FootSteps when on foot
         {
             if(Player.GetZone() == ZONE_WORLD || Player.GetZone() == ZONE_WORLD_PLAIN_LANDS) PlaySound(sounds[SOUND_FOOT_GRASS]);
             else if (Player.GetZone() == ZONE_DUNGEON) PlaySound(sounds[SOUND_FOOT_STONE]);
@@ -302,11 +301,12 @@ void GameUpdate()
         camera.target = (Vector2) {(float)Player.GetX(), (float)Player.GetY()};
     
         InteractWithItems();
+
         if(IsKeyPressed(KEY_E))
         {
             bool boatInteraction = false;
     
-            if (!isRidingBoat && Player.GetZone() == boat.zone1 && 
+            if (!isRidingBoat && Player.GetZone() >= ZONE_ISLAND && Player.GetZone() <= ZONE_LOST_TEMPLE_ENTRANCE  && 
             abs(Player.GetX() - boat.x) <= TILE_WIDTH && 
             abs(Player.GetY() - boat.y) <= TILE_HEIGHT)
             {
@@ -323,7 +323,7 @@ void GameUpdate()
                 int playerTileY = Player.GetY() / TILE_HEIGHT;
                 int landTileX = -1, landTileY = -1; 
 
-                //Check all 4 adjacent tiles for a valid landing spot 
+                //Check all 4 adjacent tiles for a landing spot 
                 int directions[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
                 for (int i = 0; i < 4; ++i) 
                 {
@@ -363,6 +363,43 @@ void GameUpdate()
         {
             if(isInventory == false) {isInventory = true;}
         }
+
+        //gates with no interaction
+        //islands
+        if(Player.GetX() == seaExtensionEntrance.x && Player.GetY() == seaExtensionEntrance.y && Player.GetZone() == ZONE_ISLAND)
+        {
+            Player.SetZone(ZONE_SEA);
+            currentGameState = IN_SEA;
+            Player.SetX(seaExtensionEntrance.x2 - TILE_WIDTH);
+            Player.SetY(seaExtensionEntrance.y2);
+        }
+        else if(Player.GetX() == lostTempleEntrance.x && Player.GetY() == lostTempleEntrance.y && Player.GetZone() == ZONE_ISLAND)
+        {
+            Player.SetZone(ZONE_LOST_TEMPLE_ENTRANCE);
+            currentGameState = IN_LOST_TEMPLE_ENTRANCE;
+            Player.SetX(lostTempleEntrance.x2 + TILE_WIDTH);
+            Player.SetY(lostTempleEntrance.y2);
+            Act4_LostTempleIntroduction();
+
+        }
+
+        //sea
+        if(Player.GetX() == seaExtensionEntrance.x2 && Player.GetY() == seaExtensionEntrance.y2 && Player.GetZone() == ZONE_SEA)
+        {
+            Player.SetZone(ZONE_ISLAND);
+            currentGameState = IN_ISLAND;
+            Player.SetX(seaExtensionEntrance.x + TILE_WIDTH);
+            Player.SetY(seaExtensionEntrance.y);
+        }
+
+        //temple
+        if(Player.GetX() == lostTempleEntrance.x2 && Player.GetY() == lostTempleEntrance.y2 && Player.GetZone() == ZONE_LOST_TEMPLE_ENTRANCE)
+        {
+            Player.SetZone(ZONE_ISLAND);
+            currentGameState = IN_ISLAND;
+            Player.SetX(lostTempleEntrance.x - TILE_WIDTH);
+            Player.SetY(lostTempleEntrance.y);
+        }
     
     }
     
@@ -379,6 +416,10 @@ void GameRender()
     else if(isInventory)
     {
         Inventory();
+    }
+    else if (inShop)
+    {
+        islanderShop();
     }
     else if (playerLeveledUp)
     {
@@ -415,12 +456,36 @@ void GameRender()
                 {
                     tile = island[i][j];
                 }
+                else if (Player.GetZone() == ZONE_SEA) 
+                {
+                    tile = sea[i][j];
+                }
+                else if (Player.GetZone() == ZONE_LOST_TEMPLE_ENTRANCE) 
+                {
+                    tile = lostTemple[i][j];
+                }
+                else if (Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL1) 
+                {
+                    tile = lostTempleLevel1[i][j];
+                }
+                else if (Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL2) 
+                {
+                    tile = lostTempleLevel2[i][j];
+                }
+                else if (Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL3) 
+                {
+                    tile = lostTempleLevel3[i][j];
+                }
 
                 RenderTile(tile, texture_index_x, texture_index_y);
 
                 if (tile.type == TILE_TYPE_SAND)
                 {
                     DrawTexture(textures[TEXTURE_SAND], tile.x * TILE_WIDTH, tile.y * TILE_HEIGHT, WHITE);
+                }
+                else if (tile.type == TILE_TYPE_STONE_WALL)
+                {
+                    DrawTexture(textures[TEXTURE_STONE_WALL], tile.x * TILE_WIDTH, tile.y * TILE_HEIGHT, WHITE);
                 }
                 else
                 {
@@ -546,9 +611,109 @@ void RenderTile(const sTile &tile,int &texture_index_x, int &texture_index_y )
             texture_index_x = 14; texture_index_y = 2; break;
         case TILE_TYPE_SAND:
             texture_index_x = -1; texture_index_y = -1; break;
+        case TILE_TYPE_STONE_WALL:
+             texture_index_x = -2; texture_index_y = -2; break;
         default:
             break;
     }
+}
+
+void LoadAllTextures()
+{
+    //init tiles/graphics
+    Image image = LoadImage("assets/colored_tilemap_packed.png");
+    textures[TEXTURE_TILEMAP] = LoadTextureFromImage(image);
+    UnloadImage(image);
+
+    Image StarImage = LoadImage("assets/Star.png");
+    textures[TEXTURE_STAR]= LoadTextureFromImage(StarImage);
+    UnloadImage(StarImage);
+
+    Image BookImage = LoadImage("assets/Book.png");
+    textures[TEXTURE_BOOK]= LoadTextureFromImage(BookImage);
+    UnloadImage(BookImage);
+
+    Image SandTile = LoadImage("assets/sand.png");
+    textures[TEXTURE_SAND] = LoadTextureFromImage(SandTile);
+    UnloadImage(SandTile);
+
+    Image palmTreeTile = LoadImage("assets/palmTree.png");
+    textures[TEXTURE_PALM_TREE] = LoadTextureFromImage(palmTreeTile);
+    UnloadImage(palmTreeTile);
+
+    Image randomTrinketPNG = LoadImage("assets/randomTrinket.png");
+    textures[TEXTURE_RANDOM_TRINKET] = LoadTextureFromImage(randomTrinketPNG);
+    UnloadImage(randomTrinketPNG);
+
+    Image stoneWallPNG = LoadImage("assets/StoneWall.png");
+    textures[TEXTURE_STONE_WALL] = LoadTextureFromImage(stoneWallPNG);
+    UnloadImage(stoneWallPNG);
+
+    //Load boat textures
+    Image boatFacingLeft = LoadImage("assets/Boat/boatFacingLeft.png");
+    textures[TEXTURE_BOAT_LEFT] = LoadTextureFromImage(boatFacingLeft);
+    UnloadImage(boatFacingLeft);
+
+    Image boatFacingRight = LoadImage("assets/Boat/boatFacingRight.png");
+    textures[TEXTURE_BOAT_RIGHT] = LoadTextureFromImage(boatFacingRight);
+    UnloadImage(boatFacingRight);
+
+    //heroes textures
+
+    Image knightPNG = LoadImage("assets/Heroes/knight.png");
+    textures[TEXTURE_KNIGHT] = LoadTextureFromImage(knightPNG);
+    UnloadImage(knightPNG);
+
+    Image wizardPNG = LoadImage("assets/Heroes/wizard.png");
+    textures[TEXTURE_WIZARD] = LoadTextureFromImage(wizardPNG);
+    UnloadImage(wizardPNG);
+
+    Image roguePNG = LoadImage("assets/Heroes/rogue.png");
+    textures[TEXTURE_ROGUE] = LoadTextureFromImage(roguePNG);
+    UnloadImage(roguePNG);
+
+    //enemies
+    Image floatingCrabPNG = LoadImage("assets/Enemies/floatingCrab.png");
+    textures[TEXTURE_FLOATING_CRAB] = LoadTextureFromImage(floatingCrabPNG);
+    UnloadImage(floatingCrabPNG);
+
+    Image monsterSquidPNG = LoadImage("assets/Enemies/monsterSquid.png");
+    textures[TEXTURE_MONSTER_SQUID] = LoadTextureFromImage(monsterSquidPNG);
+    UnloadImage(monsterSquidPNG);
+
+    Image waterSlimePNG = LoadImage("assets/Enemies/waterSlime.png");
+    textures[TEXTURE_WATER_SLIME] = LoadTextureFromImage(waterSlimePNG);
+    UnloadImage(waterSlimePNG);
+
+    Image specialGolemPNG = LoadImage("assets/Enemies/SpecialGolem.png");
+    textures[TEXTURE_SPECIAL_GOLEM] = LoadTextureFromImage(specialGolemPNG);
+    UnloadImage(specialGolemPNG);
+
+    Image islanderPNG = LoadImage("assets/islander.png");
+    textures[TEXTURE_ISLANDER] = LoadTextureFromImage(islanderPNG);
+    UnloadImage(islanderPNG);
+
+    //potions
+    Image healthPotionPNG = LoadImage("assets/Potions/healthPotion.png");
+    textures[TEXTURE_HEALTH_POTION] = LoadTextureFromImage(healthPotionPNG);
+    UnloadImage(healthPotionPNG);
+
+    Image defensePotionPNG = LoadImage("assets/Potions/defensePotion.png");
+    textures[TEXTURE_DEFENSE_POTION] = LoadTextureFromImage(defensePotionPNG);
+    UnloadImage(defensePotionPNG);
+
+    Image strengthPotionPNG = LoadImage("assets/Potions/strengthPotion.png");
+    textures[TEXTURE_STRENGTH_POTION] = LoadTextureFromImage(strengthPotionPNG);
+    UnloadImage(strengthPotionPNG);
+
+    Image experiencePotionPNG = LoadImage("assets/Potions/experiencePotion.png");
+    textures[TEXTURE_EXPERIENCE_POTION] = LoadTextureFromImage(experiencePotionPNG);
+    UnloadImage(experiencePotionPNG);
+
+    Image energyFoodPNG = LoadImage("assets/Potions/energyFood.png");
+    textures[TEXTURE_ENERGY_FOOD] = LoadTextureFromImage(energyFoodPNG);
+    UnloadImage(energyFoodPNG);
+
 }
 
 void GameShutdown() 
@@ -662,13 +827,50 @@ void DeleteEnemies()
         delete ratArr[i];
     }
 
+    for(int i = 0; i < MAX_DOG_INSTANCES; i++)
+    {
+        delete dogArr[i];
+    }
+
+    for(int i = 0; i < MAX_SLIME_INSTANCES; i++)
+    {
+        delete slimeArr[i];
+    }
+
+    for(int i = 0; i < MAX_FLOATING_CRAB_INSTANCES; i++)
+    {
+        delete floatingCrabArr[i];
+    }
+
+
+    for(int i = 0; i < MAX_WATER_SLIME_INSTANCES; i++)
+    {
+        delete waterSlimeArr[i];
+    }
+
+    
+    //special or bosses
     for(int i = 0; i < MAX_CRAB_THING_INSTANCES; i++)
     {
         delete crabArr[i];
     }
 
+    for(int i = 0; i < MAX_MONSTER_SQUID_INSTANCES; i++)
+    {
+        delete squidArr[i];
+    }
 
-    //
+    for(int i = 0; i < MAX_MUTATED_FROG_INSTANCES; i++)
+    {
+        delete mutantFrogArr[i];
+    }
+
+    for(int i = 0; i < MAX_SPECIAL_GOLEM_INSTANCES; i++)
+    {
+        delete specialGolemArr[i];
+    }
+
+    //chest
     for(int i = 0; i < MAX_CHEST_INSTANCES; i++)
     {
         delete chestArr[i];
@@ -729,6 +931,11 @@ bool IsBarrierCollision(int x, int y)
     else if (currentZone == ZONE_WORLD_PLAIN_LANDS) { tile = plainLands[tileX][tileY]; }
     else if (currentZone == ZONE_BASEMENT_DUNGEON) { tile = basementDungeon[tileX][tileY]; }
     else if (currentZone == ZONE_ISLAND) { tile = island[tileX][tileY]; }
+    else if (currentZone == ZONE_SEA) { tile = sea[tileX][tileY]; }
+    else if (currentZone == ZONE_LOST_TEMPLE_ENTRANCE) { tile = lostTemple[tileX][tileY]; }
+    else if (currentZone == ZONE_LOST_TEMPLE_LEVEL1) { tile = lostTempleLevel1[tileX][tileY]; }
+    else if (currentZone == ZONE_LOST_TEMPLE_LEVEL2) { tile = lostTempleLevel2[tileX][tileY]; }
+    else if (currentZone == ZONE_LOST_TEMPLE_LEVEL3) { tile = lostTempleLevel3[tileX][tileY]; }
     else { return false; }
 
     if (isRidingBoat)
@@ -747,7 +954,8 @@ bool IsBarrierCollision(int x, int y)
         else if((tile.type >= TILE_TYPE_WATER_TOP_LEFT && tile.type <= TILE_TYPE_WATER_WELL) || 
                 (tile.type == TILE_TYPE_PILLAR || tile.type == TILE_TYPE_BROKEN_PILLAR) ||
                 (tile.type >= TILE_TYPE_TOP_LEFT_WALL_CORNER && tile.type <= TILE_TYPE_HOUSE) || 
-                tile.type == TILE_TYPE_DOOR_LOCKED) 
+                tile.type == TILE_TYPE_DOOR_LOCKED||
+                tile.type == TILE_TYPE_STONE_WALL) 
         {
             return true;
         }
@@ -772,8 +980,9 @@ bool IsBarrierCollision(int x, int y)
         else if(Player.GetZone() == ZONE_BASEMENT_DUNGEON)
         {
             if(x == basementLockedDoor.x && y == basementLockedDoor.y) return true;
+            if(x == weirdMan.x && y == weirdMan.y) return true;
         }
-
+        
         // Check for Item collision
         if(Player.GetZone() == ZONE_DUNGEON)
         {
@@ -848,7 +1057,8 @@ void CutDownTree()
     {
         tile = &plainLands[TileX][TileY];
     }
-    else if(Player.GetZone() == ZONE_DUNGEON)
+    else if(Player.GetZone() == ZONE_DUNGEON || Player.GetZone() == ZONE_BASEMENT_DUNGEON ||
+             Player.GetZone() == ZONE_ISLAND || Player.GetZone() == ZONE_SEA)
     {
         std::cout << "Invalid Zone!\n";
         return;
@@ -864,162 +1074,29 @@ void CutDownTree()
 
 }
 
-void EnterGates()
-{
-    if(Player.GetX() == dungeon_gate.x && Player.GetY() == dungeon_gate.y)
-    {
-        if(dungeonKey)
-        {
-            if(Player.GetZone() == ZONE_WORLD)
-            {
-                Player.SetZone(dungeon_gate.zone2);
-                currentGameState = IN_DUNGEON;
-                Act1_Dungeon1();
-            }
-            else if(Player.GetZone() == ZONE_DUNGEON)
-            {
-                Player.SetZone(dungeon_gate.zone1);
-                currentGameState = IN_ZONE_1;
-            }  
-        }
-        else
-        {
-            StartDialogue({"You need Dungeon Key to enter."});
-            return;
-        }
-    }
-
-   
-    if(Player.GetX() == plainLands_gate.x && Player.GetY() == plainLands_gate.y)
-    {   
-        CheckIfDungeonCompleted();
-        if (plainsKey && currentGameState == IN_PLAINS)
-        {
-            StartDialogue({"The Dungeon collapsed..."});
-        }
-        else if(plainsKey)
-        {
-            if(Player.GetZone() == ZONE_DUNGEON)
-            {
-                Player.SetZone(plainLands_gate.zone2);
-                currentGameState = IN_PLAINS;
-                Act2_Introduction();
-            }
-        }
-        else
-        {
-            StartDialogue({"Defeat all enemies first to Enter."});
-        }
-        return;
-    }
-
-    if(Player.GetX() == basementStairs.x && Player.GetY() == basementStairs.y)
-    {   
-        if (mutantFrogKilled && currentGameState == IN_PLAINS)
-        {
-            Player.SetZone(basementStairs.zone2);
-            currentGameState = IN_DUNGEON_BASEMENT;
-        }
-        else if (currentGameState == IN_DUNGEON_BASEMENT)
-        {
-            
-            Player.SetZone(basementStairs.zone1);
-            currentGameState = IN_PLAINS;
-        }
-        else
-        {
-            StartDialogue({"Defeat the mutant frog first to enter."});
-        }
-        return;
-    }
-
-    if(Player.GetX() == ladderToIsland.x && Player.GetY() == ladderToIsland.y)
-    {   
-        if (currentGameState == IN_DUNGEON_BASEMENT)
-        {
-            Player.SetZone(ladderToIsland.zone2);
-            currentGameState = IN_ISLAND;
-        }
-        else if (currentGameState == IN_ISLAND)
-        {
-            
-            Player.SetZone(ladderToIsland.zone1);
-            currentGameState = IN_DUNGEON_BASEMENT;
-        }
-        return;
-    }
-}
-
-void InteractWithNPCs()
-{
-    if(abs(Player.GetX() - oldHermit.x) <= TILE_WIDTH && 
-       abs(Player.GetY() - oldHermit.y) <= TILE_HEIGHT &&
-        Player.GetZone() == oldHermit.zone1)
-    {
-        Act1_HermitLine();
-        Player.SetHealthPotions(Player.GetRemainingHealthPotions() + 4);
-    }
-    else if(abs(Player.GetX() - woundedKnight.x) <= TILE_WIDTH && 
-            abs(Player.GetY() - woundedKnight.y) <= TILE_HEIGHT &&
-        Player.GetZone() == woundedKnight.zone1)
-    {
-        Act1_WoundedKnight();
-        Player.SetEnergyFoods(Player.GetRemainingEnergyFoods() + 2);
-    }
-    
-    if(abs(Player.GetX() - villager1.x) <= TILE_WIDTH && 
-       abs(Player.GetY() - villager1.y) <= TILE_HEIGHT &&
-        Player.GetZone() == villager1.zone1)
-    {
-       Act2_VillageCheif1();
-       if(mutantFrogKilled  && !Act2_VillageChiefRewardClaimed)
-       {
-        Player.SetMoney(Player.GetMoney() + 2300);
-        Player.SetHealthPotions(Player.GetRemainingHealthPotions() + 7);
-        Player.SetEnergyFoods(Player.GetRemainingEnergyFoods() + 5);
-        Act2_VillageChiefRewardClaimed = true;
-       }
-    }
-
-    if(abs(Player.GetX() - villager2.x) <= TILE_WIDTH && 
-       abs(Player.GetY() - villager2.y) <= TILE_HEIGHT &&
-        Player.GetZone() == villager2.zone1)
-    {
-        Act2_RandomVillager1();
-    }
-
-    if(abs(Player.GetX() - basementLockedDoor.x) <= TILE_WIDTH && 
-       abs(Player.GetY() - basementLockedDoor.y) <= TILE_HEIGHT &&
-        Player.GetZone() == basementLockedDoor.zone1)
-    {
-        if(cursedGoldenKey.IsPickedUp())
-        {
-            StartDialogue({
-                "[You unlocked the door.]"
-            });
-            basementLockedDoor.x = TILE_WIDTH * 99;
-            basementLockedDoor.y = TILE_HEIGHT * 99;
-        }
-        else
-        {
-            StartDialogue({
-                "[You need a key to unlock this door.]"
-            });
-        }
-    }
-
-}
-
 void CheckIfDungeonCompleted()
 {
     //dungeon 1
-    if(!plainsKey)
+    if(!plainsKey && currentGameState == IN_DUNGEON)
     {
         if((rat1->IsAlive() == false && rat2->IsAlive() == false) &&
             (vengefulSpirit1->IsAlive() == false && vengefulSpirit2->IsAlive() == false) &&
              (golem1->IsAlive() == false && golem2->IsAlive() == false))
-        {
+        {   
+            StartDialogue({"[You have cleared the dungeon.]"});
             plainsKey = true;
+        }
+    }
+
+    //basement dungeon
+    if(!Act2_BasementCleared && currentGameState == IN_DUNGEON_BASEMENT)
+    {
+        if((slime1->IsAlive() == false && slime2->IsAlive() == false) &&
+            (slime3->IsAlive() == false && slime4->IsAlive() == false) &&
+            (dog1->IsAlive() == false && dog2->IsAlive() == false) && dog3->IsAlive() == false)
+        {
+            Act2_BasementCleared = true;
+            StartDialogue({"[You have cleared the basement dungeon.]"});
         }
     }
 

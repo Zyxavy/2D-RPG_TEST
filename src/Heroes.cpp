@@ -9,7 +9,8 @@
 Hero::Hero(std::string name, std::string type, int x, int y, int health, int maxHealth, int energy, int maxEnergy, int damageMin, int damageMax, int defense, int experience,
     int level, int money, eZones zone, bool isAlive, bool isPassable )
     :
-    name(name), type(type), x(x), y(y), health(health), maxHealth(maxHealth), energy(energy), maxEnergy(maxEnergy), healthPotions(3), energyFoods(2), damageMin(damageMin), damageMax(damageMax), defense(defense),
+    name(name), type(type), x(x), y(y), health(health), maxHealth(maxHealth), energy(energy), maxEnergy(maxEnergy), healthPotions(3), energyFoods(2),
+    defensePotions(0), strengthPotions(0), experiencePotions(0), damageMin(damageMin), damageMax(damageMax), defense(defense),
     experience(0), level(1), money(1000), zone(ZONE_WORLD), isAlive(true), isPassable(true) {}
 
 
@@ -24,6 +25,9 @@ int Hero::GetEnergy() const {return energy;}
 int Hero::GetMaxEnergy() const {return maxEnergy;}
 int Hero::GetRemainingHealthPotions() const {return healthPotions;}
 int Hero::GetRemainingEnergyFoods() const {return energyFoods;}
+int Hero::GetRemainingDefensePotions() const {return defensePotions;}
+int Hero::GetRemainingStrengthPotions() const {return strengthPotions;}
+int Hero::GetRemainingExperiencePotions() const {return experiencePotions;}
 int Hero::GetDamageMin() const { return damageMin; }
 int Hero::GetDamageMax() const { return damageMax; }
 int Hero::GetDefense() const { return defense; }
@@ -59,6 +63,12 @@ void Hero::SetDamageMax(int amount) {damageMax = amount;}
 void Hero::SetHealthPotions(int amount) {healthPotions = amount;}
 
 void Hero::SetEnergyFoods(int amount) {energyFoods = amount;}
+
+void Hero::SetDefensePotions(int amount) {defensePotions = amount;}
+
+void Hero::SetStrengthPotions(int amount) {strengthPotions = amount;}
+
+void Hero::SetExperiencePotions(int amount) {experiencePotions = amount;}
 
 void Hero::SetDefense(int amount) {defense = amount;}
 

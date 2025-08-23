@@ -17,13 +17,15 @@ private:
     int level;
     bool isAlive;
     std::string weakness;
+    bool isSpecial;
+    int moneyMin, moneyMax;
     bool stunned;
     int stunCounter;
-    bool isSpecial;
     
 public:
     // Constructor
-    Enemy(int id, std::string name, int x, int y, int health, eZones zone, int damageMin, int damageMax, int defense, int experience, int level, std::string weakness, bool isSpecial);
+    Enemy(int id, std::string name, int x, int y, int health, eZones zone, int damageMin, int damageMax, int defense, 
+        int experience, int level, std::string weakness, bool isSpecial, int moneyMin, int moneyMax);
 
     // Getters
     int GetID() const;
@@ -43,6 +45,8 @@ public:
     bool GetStunStatus() const;
     int GetStunCounter() const;
     bool GetSpecialStatus() const;
+    int GetMoneyMin() const;
+    int GetMoneyMax() const;
 
     // Setters
     void SetDamageMin(int amount);
@@ -59,6 +63,9 @@ public:
     void SetStunStatus(int state);
     void SetStunCounter(int num);
     void SetSpecialStatus(bool status);
+    void SetZone(eZones newZone);
+    void SetMoneyMin(int amount);
+    void SetMoneyMax(int amount);
 
     void MoveAI(int playerX, int playerY);  
     void Wander();
@@ -78,14 +85,16 @@ public:
         MONSTER_SQUID = 11,
         MUTATED_FROG = 12,
         GAURDIAN = 13,
-        FLOATING_CRAB = 14
+        FLOATING_CRAB = 14,
+        WATER_SLIME = 15,
+        SPECIAL_GOLEM = 16
     };
 };
 //normal enemies
-extern Enemy orc, wanderingEye, treant, vengefulSpirit, golem, snake, dog, rat, slime, floatingCrab;
+extern Enemy orc, wanderingEye, treant, vengefulSpirit, golem, snake, dog, rat, slime, floatingCrab, waterSlime;
 
 //special / boss enemies
-extern Enemy crabThing, monsterSquid, mutatedFrog, guardian;
+extern Enemy crabThing, monsterSquid, mutatedFrog, guardian, specialGolem;
 
 //enemy pointers
 extern Enemy* orc1;
@@ -103,9 +112,17 @@ extern Enemy* treant2;
 
 extern Enemy* vengefulSpirit1;
 extern Enemy* vengefulSpirit2;
+extern Enemy* vengefulSpirit3;
+extern Enemy* vengefulSpirit4;
 
 extern Enemy* golem1;
 extern Enemy* golem2;
+extern Enemy* golem3;
+extern Enemy* golem4;
+extern Enemy* golem5;
+extern Enemy* golem6;
+extern Enemy* golem7;
+extern Enemy* golem8;
 
 extern Enemy* snake1;
 extern Enemy* snake2;
@@ -118,21 +135,40 @@ extern Enemy* dog3;
 
 extern Enemy* rat1;
 extern Enemy* rat2;
+extern Enemy* rat3;
+extern Enemy* rat4;
+extern Enemy* rat5;
 
 extern Enemy* slime1;
 extern Enemy* slime2;
 extern Enemy* slime3;
 extern Enemy* slime4;
+extern Enemy* slime5;
+extern Enemy* slime6;
+extern Enemy* slime7;
 
 extern Enemy* floatingCrab1;
 extern Enemy* floatingCrab2;
 extern Enemy* floatingCrab3;
 extern Enemy* floatingCrab4;
+extern Enemy* floatingCrab5;
+extern Enemy* floatingCrab6;
+extern Enemy* floatingCrab7;
+extern Enemy* floatingCrab8;
+extern Enemy* floatingCrab9;
+
+extern Enemy* waterSlime1;
+extern Enemy* waterSlime2;
+extern Enemy* waterSlime3;
+extern Enemy* waterSlime4;
+extern Enemy* waterSlime5;
+extern Enemy* waterSlime6;
 
 extern Enemy* crabThing1;
 extern Enemy* monsterSquid1;
 extern Enemy* mutatedFrog1;
 extern Enemy* guardian1;
+extern Enemy* specialGolem1;
 
 extern Enemy* enemy;
 

@@ -5,10 +5,11 @@
 #include <string>
 #include <cmath>
 
-Enemy::Enemy(int id, std::string name, int x, int y, int health, eZones zone, int damageMin, int damageMax, int defense, int experience, int level, std::string weakness, bool isSpecial)
+Enemy::Enemy(int id, std::string name, int x, int y, int health, eZones zone, int damageMin, int damageMax, 
+    int defense, int experience, int level, std::string weakness, bool isSpecial, int moneyMin, int moneyMax)
     : id(id), name(name), x(x), y(y), health(health), maxHealth(health), zone(zone),
       damageMin(damageMin), damageMax(damageMax), defense(defense), experience(experience), 
-      level(level), isAlive(true), weakness(weakness), stunned(false), stunCounter(0) {}
+      level(level), isAlive(true), weakness(weakness), isSpecial(isSpecial), moneyMin(moneyMin), moneyMax(moneyMax), stunned(false), stunCounter(0) {}
 
 
 //getters
@@ -29,6 +30,8 @@ int Enemy::GetY() const {return y;}
 bool Enemy::GetStunStatus() const {return stunned;}
 int Enemy::GetStunCounter() const{return stunCounter;}
 bool Enemy::GetSpecialStatus() const{return isSpecial;}
+int Enemy::GetMoneyMin() const { return moneyMin; }
+int Enemy::GetMoneyMax() const { return moneyMax; }
 
 //setters
 void Enemy::SetDamageMin(int amount) {damageMin = amount;}
@@ -77,6 +80,14 @@ void Enemy::SetStunCounter(int num)
     stunCounter = num;
 }
 void Enemy::SetSpecialStatus(bool state){isSpecial = state;}
+
+void Enemy::SetZone(eZones newZone)
+{
+    zone = newZone;
+}
+void Enemy::SetMoneyMin(int amount) { moneyMin = amount; }
+void Enemy::SetMoneyMax(int amount) { moneyMax = amount; }
+
 
 //movement
 void Enemy::MoveAI(int playerX, int playerY) 
