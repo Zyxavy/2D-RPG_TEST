@@ -3,7 +3,7 @@ Work In Progress
 ------------------
 <br>
 <p>A 2d game I made using c++ with the raylib and raygui library. The code is a bit messy and unoptimized but it works, most of the time.</p>
-<p><em><b>Click on main.exe to play the game.</b></em></p>
+<p><em><b>Click on main.exe to play the game or press f5 when opened in vscode.</b></em></p>
 <br>
 <br>
 <h1>Music by Alkakrab
