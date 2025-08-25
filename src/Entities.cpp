@@ -11,7 +11,7 @@
 #include <vector>
 
 sEntity dungeon_gate, plainLands_gate, basementStairs, ladderToIsland, seaExtensionEntrance, lostTempleEntrance, 
-          lostTempleStairsToLevel1, lostTempleStairsToLevel2, lostTempleStairsToLevel3;
+          lostTempleStairsToLevel1, lostTempleStairsToLevel2;
 sEntity oldHermit, woundedKnight, villager1, villager2, basementLockedDoor, weirdMan, islander;
 sEntity randomTrinket;
 sEntity boat;
@@ -347,16 +347,6 @@ void EntitiesInit() {
         .zone2 = ZONE_LOST_TEMPLE_LEVEL2
     };
 
-    lostTempleStairsToLevel3 = (sEntity) 
-    {
-        .x = TILE_WIDTH * 1,
-        .y = TILE_HEIGHT * 22,
-
-        .x2 = TILE_WIDTH * 12,
-        .y2 = TILE_HEIGHT * 12,
-        .zone1 = ZONE_LOST_TEMPLE_LEVEL2,
-        .zone2 = ZONE_LOST_TEMPLE_LEVEL3
-    };
 
     //NPCs - Zone1
     oldHermit = (sEntity)
@@ -414,8 +404,11 @@ void EntitiesInit() {
     {
         .x = TILE_WIDTH * 20,
         .y = TILE_HEIGHT * 4,
+        .x2 = TILE_WIDTH * 5,
+        .y2 = TILE_HEIGHT * 6,
+
         .zone1 = ZONE_BASEMENT_DUNGEON,
-        .zone2 = ZONE_BASEMENT_DUNGEON,
+        .zone2 = ZONE_LOST_TEMPLE_LEVEL2,
         .isPassable = false
     };
 
@@ -1211,10 +1204,6 @@ void RenderGates()
     if(Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL1) DrawTile(lostTempleStairsToLevel2.x, lostTempleStairsToLevel2.y, 4, 3);  //templeStairs
     else if(Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL2) DrawTile(lostTempleStairsToLevel2.x2, lostTempleStairsToLevel2.y2, 4, 3); //templeStairs
 
-    //level3
-    if(Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL2) DrawTile(lostTempleStairsToLevel3.x, lostTempleStairsToLevel3.y, 4, 3);  //templeStairs
-    else if(Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL3) DrawTile(lostTempleStairsToLevel3.x2, lostTempleStairsToLevel3.y2, 4, 3); //templeStairs
-
 }
 
 void RenderNPCs()
@@ -1237,6 +1226,7 @@ void RenderNPCs()
 
     if(Player.GetZone() == ZONE_LOST_TEMPLE_ENTRANCE ) DrawTile(oldHermit.x2, oldHermit.y2, 14, 0); //Old Hermit
 
+    if(Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL2) DrawTile(weirdMan.x2, weirdMan.y2, 15, 0); //Weird Man
 }
 
 void RenderBoat()
@@ -1743,8 +1733,8 @@ void EnterGates()
         {
             if(Player.GetZone() == ZONE_WORLD)
             {
-                Player.SetZone(ZONE_BASEMENT_DUNGEON); // this aswell to dungeon_gate.zone2
-                currentGameState = IN_DUNGEON_BASEMENT; // CHANGE THIS TO IN_DUNGEON
+                Player.SetZone(dungeon_gate.zone2); // this aswell to dungeon_gate.zone2
+                currentGameState = IN_DUNGEON; // CHANGE THIS TO IN_DUNGEON
                 Act1_Dungeon1();
             }
             else if(Player.GetZone() == ZONE_DUNGEON)
@@ -1859,25 +1849,6 @@ void EnterGates()
         return;
     }
 
-    if(Player.GetX() == lostTempleStairsToLevel3.x && Player.GetY() == lostTempleStairsToLevel3.y)
-    {   
-        if (currentGameState == IN_LOST_TEMPLE_LEVEL2)
-        {
-            Player.SetZone(lostTempleStairsToLevel3.zone2);
-            Player.SetX(lostTempleStairsToLevel3.x2);
-            Player.SetY(lostTempleStairsToLevel3.y2);
-            currentGameState = IN_LOST_TEMPLE_LEVEL3;
-        }
-        else if (currentGameState == IN_LOST_TEMPLE_LEVEL3)
-        {
-            
-            Player.SetZone(lostTempleStairsToLevel3.zone1);
-            Player.SetX(lostTempleStairsToLevel3.x);
-            Player.SetY(lostTempleStairsToLevel3.y);
-            currentGameState = IN_LOST_TEMPLE_LEVEL2;
-        }
-        return;
-    }
 }
 
 void InteractWithNPCs()
@@ -1978,5 +1949,15 @@ void InteractWithNPCs()
     {
         Act4_oldHermit();
     }
+
+    //lost temple level2
+     if(abs(Player.GetX() - weirdMan.x2) <= TILE_WIDTH && 
+       abs(Player.GetY() - weirdMan.y2) <= TILE_HEIGHT &&
+        Player.GetZone() == weirdMan.zone2)
+    {
+        Act4_WeirdManSecondMeeting();
+
+    }
+
 
 }

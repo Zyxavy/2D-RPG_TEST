@@ -25,7 +25,8 @@ sTile sea[WORLD_WIDTH][WORLD_HEIGHT];
 sTile lostTemple[WORLD_WIDTH][WORLD_HEIGHT];
 sTile lostTempleLevel1[WORLD_WIDTH][WORLD_HEIGHT];
 sTile lostTempleLevel2[WORLD_WIDTH][WORLD_HEIGHT];
-sTile lostTempleLevel3[WORLD_WIDTH][WORLD_HEIGHT];
+sTile lostTempleBadEnding[WORLD_WIDTH][WORLD_HEIGHT];
+sTile lostTempleGoodEnding[WORLD_WIDTH][WORLD_HEIGHT];
 eZones lastZone = ZONE_WORLD;
 bool isInventory = false;
 int count;
@@ -116,11 +117,18 @@ void GameStartup() {
                 .type = zoneLostTempleLevel2[y][x]
             };
 
-            lostTempleLevel3[x][y] = (sTile) 
+            lostTempleBadEnding[x][y] = (sTile) 
             {
                 .x = x,
                 .y = y,
-                .type = zoneLostTempleLevel3[y][x]
+                .type = zoneLostTempleBadEnding[y][x]
+            };
+
+            lostTempleGoodEnding[x][y] = (sTile) 
+            {
+                .x = x,
+                .y = y,
+                .type = zoneLostTempleGoodEnding[y][x]
             };
 
         }
@@ -176,8 +184,9 @@ void GameUpdate()
     //Music
     UpdateMusic();
     if((Player.GetZone() == ZONE_WORLD || Player.GetZone() == ZONE_WORLD_PLAIN_LANDS
-    || Player.GetZone() == ZONE_ISLAND) && currentMusicZone != LIGHT) {PlayRandomMusic(LIGHT);}
-    else if((Player.GetZone() == ZONE_DUNGEON || Player.GetZone() == ZONE_BASEMENT_DUNGEON) && currentMusicZone != DARK) {PlayRandomMusic(DARK);}
+    || Player.GetZone() == ZONE_ISLAND || Player.GetZone() == ZONE_SEA || Player.GetZone() == ZONE_LOST_TEMPLE_ENTRANCE) && currentMusicZone != LIGHT) {PlayRandomMusic(LIGHT);}
+    else if((Player.GetZone() == ZONE_DUNGEON || Player.GetZone() == ZONE_BASEMENT_DUNGEON ||
+             Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL1 || Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL2 ) && currentMusicZone != DARK) {PlayRandomMusic(DARK);}
     else if (Player.GetZone() == ZONE_BATTLE && currentMusicZone != ACTION){ PlayRandomMusic(ACTION);}
 
     if(battleMode)
@@ -189,7 +198,6 @@ void GameUpdate()
         UpdateDialogue();
         UpdateDialogueWithOptions();
     }
-    
     else if(isInventory)
     {
         if(IsKeyPressed(KEY_Q)) {isInventory = false;}
@@ -271,6 +279,18 @@ void GameUpdate()
         if (hasKeyPressed) 
         {
             ExecuteEnemyBehaviors();
+
+            if(Act4_WeirdManSecondMeetingInteracted)
+            {
+                if(Act4_BadEndingAchieved)
+                {
+                    Act4_BadEnding();
+                }
+                else if(Act4_GoodEndingAchieved)
+                {
+                    Act4_GoodEnding();
+                }
+            }
         }
         
         //mouse wheel zoom
@@ -472,9 +492,13 @@ void GameRender()
                 {
                     tile = lostTempleLevel2[i][j];
                 }
-                else if (Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL3) 
+                else if (Player.GetZone() == ZONE_LOST_TEMPLE_BAD_ENDING) 
                 {
-                    tile = lostTempleLevel3[i][j];
+                    tile = lostTempleBadEnding[i][j];
+                }
+                else if (Player.GetZone() == ZONE_LOST_TEMPLE_GOOD_ENDING) 
+                {
+                    tile = lostTempleGoodEnding[i][j];
                 }
 
                 RenderTile(tile, texture_index_x, texture_index_y);
@@ -935,7 +959,8 @@ bool IsBarrierCollision(int x, int y)
     else if (currentZone == ZONE_LOST_TEMPLE_ENTRANCE) { tile = lostTemple[tileX][tileY]; }
     else if (currentZone == ZONE_LOST_TEMPLE_LEVEL1) { tile = lostTempleLevel1[tileX][tileY]; }
     else if (currentZone == ZONE_LOST_TEMPLE_LEVEL2) { tile = lostTempleLevel2[tileX][tileY]; }
-    else if (currentZone == ZONE_LOST_TEMPLE_LEVEL3) { tile = lostTempleLevel3[tileX][tileY]; }
+    else if (currentZone == ZONE_LOST_TEMPLE_BAD_ENDING) { tile = lostTempleBadEnding[tileX][tileY]; }
+    else if (currentZone == ZONE_LOST_TEMPLE_GOOD_ENDING) { tile = lostTempleGoodEnding[tileX][tileY]; }
     else { return false; }
 
     if (isRidingBoat)

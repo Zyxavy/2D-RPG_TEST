@@ -28,6 +28,7 @@ bool Act3_LostTrinketFound = false, Act3_MonsterSquidKilled = false;
 
 bool Act4_LostTempleIntroduced = false, Act4_OldHermitInteracted = false;
 bool Act4_LostTempleLevel1Cleared = false, Act4_SpecialGolemKilled = false;
+bool Act4_AllItemsCollected = false, Act4_WeirdManSecondMeetingInteracted = false, Act4_BadEndingAchieved = false, Act4_GoodEndingAchieved = false;
 
 
 bool dungeonKey = false, plainsKey = false;
@@ -431,4 +432,90 @@ void Act4_oldHermit()
         "Old Hermit: What lies ahead is not for the faint of heart."});
 
     Act4_OldHermitInteracted = true;
+}
+
+void Act4_WeirdManSecondMeeting()
+{
+
+    if(goldenRing.IsPickedUp() && cursedGoldenKey.IsPickedUp() && greenHeart.IsPickedUp()
+       && eyeCore.IsPickedUp() && pitchFork.IsPickedUp())
+    {
+        Act4_AllItemsCollected = true;
+    }
+    else Act4_AllItemsCollected = false;
+
+
+    if(!Act4_WeirdManSecondMeetingInteracted) 
+    {StartDialogue
+    ({
+        "Weird Man?: We have met again... hehehe...",
+        "Weird Man?: I see you have grown stronger... hehehe...",
+        "Weird Man?: But strength alone will not save you...",
+        "Weird Man?: The Guardian of this temple is not to be trifled with...\n\nhehehe...",
+        "Weird Man?: Let me tell you a tale... hehehe...",
+        "Weird Man?: long ago, this temple was built to protect a great power...\n\nhehehe...",
+        "Weird Man?: A power that could change the fate of the world...",
+        "Weird Man?: Many have tried to claim it... hehehe...\n\nBut none have succeeded...Because they were not worthy...",
+        "Weird Man?: The only way to defeat the Guardian is by collecting \n\nall the sacred items...\nhehehe...",
+        "Weird Man?: Only then will you be able to face it and claim \n\nthe power within... \nhehehe...",
+        "Weird Man?: So... do you have all the items? hehehe...",
+    });
+     Act4_WeirdManSecondMeetingInteracted = true;
+    }
+    else if (Act4_WeirdManSecondMeetingInteracted && !Act4_AllItemsCollected)
+    {
+        StartDialogue
+        ({
+            "Weird Man: Hehehe...",
+            "Weird Man: Hehehehhehehhehehhehhhehhehehhehehhehheh",
+            "Weird Man: AHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA\nHAHAHHAHAHHAHAHHAHAHAHA!!",
+            "Weird Man: You are not worthy... hehehe...\n\nyou are just like the others...",
+            "Weird Man: You will never defeat the Guardian... hehehe...",
+            "Weird Man: You will never defeat me... hehehe...",
+        });
+
+        Act4_BadEndingAchieved = true;
+    }
+    else if (Act4_WeirdManSecondMeetingInteracted && Act4_AllItemsCollected)
+    {
+        StartDialogue
+        ({
+            "Weird Man: I see you have collected all the items... hehehe...",
+            "Weird Man: You are indeed worthy... hehehe...",
+            "Weird Man: Do not disappoint me now... hehehe...",
+            "Weird Man: Go forth and claim your destiny.",
+        });
+
+        Act4_GoodEndingAchieved = true;
+    }
+}
+
+void Act4_BadEnding()
+{
+    Player.SetZone(ZONE_LOST_TEMPLE_BAD_ENDING);
+    currentGameState = IN_LOST_TEMPLE_BAD_ENDING;
+
+    StartDialogue
+    ({
+        "????: Foolish mortal...",
+        "????: Where do you think you're going?",
+        "????: You are not worthy of the power you seek...",
+        "????: You shall suffer the same fate as those before you...",
+    });
+
+}
+
+void Act4_GoodEnding()
+{
+    Player.SetZone(ZONE_LOST_TEMPLE_GOOD_ENDING);
+    currentGameState = IN_LOST_TEMPLE_GOOD_ENDING;
+
+    StartDialogue
+    ({
+        "Guardian: You have proven yourself worthy...",
+        "Guardian: The power you seek will be yours to command...",
+        "Guardian: But first, you must take it from me...",
+        "Guardian: Prepare yourself brave mortal.",
+    });
+
 }

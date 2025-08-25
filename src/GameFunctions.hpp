@@ -159,7 +159,8 @@ typedef enum
     ZONE_LOST_TEMPLE_ENTRANCE,
     ZONE_LOST_TEMPLE_LEVEL1,
     ZONE_LOST_TEMPLE_LEVEL2,
-    ZONE_LOST_TEMPLE_LEVEL3,
+    ZONE_LOST_TEMPLE_BAD_ENDING,
+    ZONE_LOST_TEMPLE_GOOD_ENDING,
 } eZones;
 
 typedef enum
@@ -174,7 +175,8 @@ typedef enum
     IN_LOST_TEMPLE_ENTRANCE,
     IN_LOST_TEMPLE_LEVEL1,
     IN_LOST_TEMPLE_LEVEL2,
-    IN_LOST_TEMPLE_LEVEL3,
+    IN_LOST_TEMPLE_BAD_ENDING,
+    IN_LOST_TEMPLE_GOOD_ENDING,
 
     PICKING_UP_ITEM,
 } GameState;
@@ -194,7 +196,8 @@ extern sTile sea[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile lostTemple[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile lostTempleLevel1[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile lostTempleLevel2[WORLD_WIDTH][WORLD_HEIGHT];
-extern sTile lostTempleLevel3[WORLD_WIDTH][WORLD_HEIGHT];
+extern sTile lostTempleBadEnding[WORLD_WIDTH][WORLD_HEIGHT];
+extern sTile lostTempleGoodEnding[WORLD_WIDTH][WORLD_HEIGHT];
 extern Camera2D camera;
 extern bool isInventory;
 extern int lastKeyPressed;

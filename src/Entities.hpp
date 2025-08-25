@@ -61,7 +61,7 @@ typedef struct
 
 //externs
 extern sEntity dungeon_gate, plainLands_gate, basementStairs, ladderToIsland, seaExtensionEntrance, lostTempleEntrance, 
-                lostTempleStairsToLevel1, lostTempleStairsToLevel2, lostTempleStairsToLevel3;
+                lostTempleStairsToLevel1, lostTempleStairsToLevel2;
 extern sEntity oldHermit, woundedKnight, villager1, villager2, villager3, basementLockedDoor, weirdMan, islander;
 extern sEntity randomTrinket;
 extern sEntity boat;

@@ -8,7 +8,7 @@ Work In Progress
 <br>
 <h1>Music by Alkakrab
 <hr>
-<h2> 2025
+<h3> 2025
 <br>
 Feb 23 - Added Menu | Fixed Battle UI
 <hr>
@@ -58,4 +58,6 @@ July 14 - Created a basic story line | added more enemies and bosses | created N
 <hr>
 July 29 - Added 3 new zones & more enemies | added boats and sea traversal | 
 <hr>
-August 23(Change Date to latest) - added Sea Zone & Map| added new NPC in basement | added new enemies / boss | added islander merchant and shop | added new potions | Created last zone & Levels to it| Added a special Golem | added 2 more zones (almost finished)
+August 23 - added Sea Zone & Map| added new NPC in basement | added new enemies / boss | added islander merchant and shop | added new potions | Created last zone & Levels to it| Added a special Golem | added 2 more zones (almost finished)
+<hr>
+August 25 - Minor Changes to the ending
