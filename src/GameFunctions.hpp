@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <string>
+#include <vector>
 
 
 //constants
@@ -16,7 +17,7 @@ const int screenHeight = 600;
 #define MAX_PAGE_PICTURES 11
 #define TILE_WIDTH 8
 #define TILE_HEIGHT  8
-#define MAX_SOUNDS 18
+#define MAX_SOUNDS 19
 #define WORLD_WIDTH 25
 #define WORLD_HEIGHT 25
 
@@ -81,6 +82,7 @@ typedef enum
     SOUNDS_ROGUE_SKILL3,
     SOUNDS_ERROR_SOUND,
     SOUNDS_BUY_SOUND,
+    SOUNDS_GUARDIAN_FX,
 } sound_asset;
 
 typedef enum
@@ -132,6 +134,10 @@ typedef enum
     TILE_TYPE_DOOR_LOCKED,
     TILE_TYPE_DOOR_UNLOCEKD,
     TILE_TYPE_SQUARE_RAIL,
+    //NPCS
+    TILE_TYPE_VILLAGE_CHEIF,
+    TILE_TYPE_VILLAGER1,
+    TILE_TYPE_VILLAGER2,
     //island
     TILE_TYPE_STONE_WALL = 98,
     TILE_TYPE_SAND = 99,
@@ -161,6 +167,8 @@ typedef enum
     ZONE_LOST_TEMPLE_LEVEL2,
     ZONE_LOST_TEMPLE_BAD_ENDING,
     ZONE_LOST_TEMPLE_GOOD_ENDING,
+    ZONE_VOID,
+    ZONE_VILLAGE
 } eZones;
 
 typedef enum
@@ -177,7 +185,9 @@ typedef enum
     IN_LOST_TEMPLE_LEVEL2,
     IN_LOST_TEMPLE_BAD_ENDING,
     IN_LOST_TEMPLE_GOOD_ENDING,
+    IN_ENDING_VILLAGE,
 
+    IN_VOID,
     PICKING_UP_ITEM,
 } GameState;
 
@@ -198,6 +208,7 @@ extern sTile lostTempleLevel1[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile lostTempleLevel2[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile lostTempleBadEnding[WORLD_WIDTH][WORLD_HEIGHT];
 extern sTile lostTempleGoodEnding[WORLD_WIDTH][WORLD_HEIGHT];
+extern sTile endingVillage[WORLD_WIDTH][WORLD_HEIGHT];
 extern Camera2D camera;
 extern bool isInventory;
 extern int lastKeyPressed;
@@ -206,6 +217,9 @@ extern GameState currentGameState, prevGameState;
 extern bool isRidingBoat; 
 extern bool isBoatFacingRight; 
 extern eZones lastZone;
+
+extern std::vector<std::string> creditsLines;
+extern float creditsY;
 
 
 //functions
@@ -226,6 +240,10 @@ bool IsBarrierCollision(int x, int y);
 void DrawHotBar();
 void CutDownTree();
 void CheckIfDungeonCompleted();
+
+void InitiateCredits();
+void RenderCredits();
+
 
 
 

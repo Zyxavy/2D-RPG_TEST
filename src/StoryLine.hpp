@@ -32,6 +32,7 @@ extern bool Act3_LostTrinketFound, Act3_MonsterSquidKilled;
 extern bool Act4_LostTempleIntroduced, Act4_OldHermitInteracted;
 extern bool Act4_LostTempleLevel1Cleared, Act4_SpecialGolemKilled;
 extern bool Act4_AllItemsCollected, Act4_WeirdManSecondMeetingInteracted, Act4_BadEndingAchieved, Act4_GoodEndingAchieved;
+extern bool Ending_GuardianKilled;
 
 extern bool dungeonKey, plainsKey;
 
@@ -67,5 +68,10 @@ void Act4_WeirdManSecondMeeting();
 
 void Act4_BadEnding();
 void Act4_GoodEnding();
+
+void Ending_Banished();
+void Ending_Ascended();
+
+void Ending_VillagePraises();
 
 #endif // STORY_LINE_HPP

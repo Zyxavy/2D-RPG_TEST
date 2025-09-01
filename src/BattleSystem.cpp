@@ -119,6 +119,13 @@ void BattleUpdate(Enemy *enemy)
         //spawn chest
         spawnChest(enemy);
 
+        if(Act4_GoodEndingAchieved)
+        {
+            Ending_Ascended();
+            Ending_GuardianKilled = true;
+            return;
+        }
+
         GetRewardFromBosses();
         return;
     } 
@@ -131,7 +138,16 @@ void BattleUpdate(Enemy *enemy)
         resetAllStates();
 
         PlaySound(sounds[SOUND_DEATH]);
-        isDead = true;
+
+        if(Act4_BadEndingAchieved)
+        {
+            Player.SetZone(ZONE_VOID);
+            Player.SetAlive(true);
+            Player.SetHealth(1);
+            currentGameState = IN_VOID;
+            Ending_Banished();
+        }
+        else isDead = true;
     }
 
     if (!playerAnimating && !enemyAnimating) 
@@ -316,7 +332,8 @@ void BattleRender(Enemy *enemy)
         case Enemy::MUTATED_FROG: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 10, 1, 10.0f); break; 
         case Enemy::MONSTER_SQUID: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 11, 1, 10.0f); break; 
         case Enemy::SPECIAL_GOLEM: DrawTextureEx(textures[TEXTURE_SPECIAL_GOLEM], {enemyCurrentPos.x, enemyCurrentPos.y}, 0.0f, 10.0f, WHITE); break;
-        
+        case Enemy::GAURDIAN: DrawTile(enemyCurrentPos.x, enemyCurrentPos.y, 10, 2, 10.0f); break;
+        default: break;
     }
 
 
@@ -927,5 +944,4 @@ void GetRewardFromBosses()
         break;
     }
 }
-
 

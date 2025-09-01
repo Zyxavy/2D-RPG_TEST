@@ -165,10 +165,22 @@ extern Enemy* waterSlime5;
 extern Enemy* waterSlime6;
 
 extern Enemy* crabThing1;
+extern Enemy* crabThing2;
+extern Enemy* crabThing3;
+
 extern Enemy* monsterSquid1;
+extern Enemy* monsterSquid2;
+extern Enemy* monsterSquid3;
+
 extern Enemy* mutatedFrog1;
-extern Enemy* guardian1;
+extern Enemy* mutatedFrog2;
+extern Enemy* mutatedFrog3;
+
 extern Enemy* specialGolem1;
+extern Enemy* specialGolem2;
+extern Enemy* specialGolem3;
+
+extern Enemy* guardian1;
 
 extern Enemy* enemy;
 

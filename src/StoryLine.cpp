@@ -4,6 +4,7 @@
 #include "Items.hpp"
 #include "Heroes.hpp"
 #include "Entities.hpp"
+#include "MusicFunctions.hpp"
 #include <iostream>
 
 bool inDialogue = false;
@@ -29,7 +30,7 @@ bool Act3_LostTrinketFound = false, Act3_MonsterSquidKilled = false;
 bool Act4_LostTempleIntroduced = false, Act4_OldHermitInteracted = false;
 bool Act4_LostTempleLevel1Cleared = false, Act4_SpecialGolemKilled = false;
 bool Act4_AllItemsCollected = false, Act4_WeirdManSecondMeetingInteracted = false, Act4_BadEndingAchieved = false, Act4_GoodEndingAchieved = false;
-
+bool Ending_GuardianKilled = false;
 
 bool dungeonKey = false, plainsKey = false;
 
@@ -495,6 +496,7 @@ void Act4_BadEnding()
     Player.SetZone(ZONE_LOST_TEMPLE_BAD_ENDING);
     currentGameState = IN_LOST_TEMPLE_BAD_ENDING;
 
+
     StartDialogue
     ({
         "????: Foolish mortal...",
@@ -502,6 +504,12 @@ void Act4_BadEnding()
         "????: You are not worthy of the power you seek...",
         "????: You shall suffer the same fate as those before you...",
     });
+
+    guardian1->SetDamageMin(15);
+    guardian1->SetDamageMax(400);
+    guardian1->SetDefense(40);
+    guardian1->SetHealth(3500);
+
 
 }
 
@@ -518,4 +526,54 @@ void Act4_GoodEnding()
         "Guardian: Prepare yourself brave mortal.",
     });
 
+    guardian1->SetZone(ZONE_LOST_TEMPLE_GOOD_ENDING);
+    guardian1->Move(TILE_WIDTH * 12, TILE_HEIGHT * 13);
+
+    PlaySound(sounds[SOUNDS_GUARDIAN_FX]);
+
+}
+
+void Ending_Banished()
+{
+
+    StopCurrentMusic();
+    PlayMusicStream(musicDark[3]);
+
+    StartDialogue
+    ({
+        "Guardian: You have failed the test...",
+        "Guardian: You are not worthy of the power you seek...",
+        "Guardian: You shall suffer in this void for all eternity...",
+        "[You have been banished to the void...]"
+    });
+
+
+
+}
+
+void Ending_Ascended()
+{
+    StopCurrentMusic();
+
+    StartDialogue
+    ({
+        "Guardian: You have proven yourself worthy...",
+        "Guardian: The power you seek is now yours to command...",
+        "Guardian: Use it wisely, for the fate of the world rests in your hands...",
+        "Guardian: Go forth and bring light to the darkness...",
+        "[You have ascended to a higher plane of existence]"
+    });
+
+}
+
+void Ending_VillagePraises()
+{
+
+    StartDialogue
+    ({
+        "Village Cheif: Oh Esteemed One! Accept our deepest gratitude!",
+        "Village Cheif: You have saved the world from impending doom!",
+        "Village Cheif: Praise thee Esteemed One!",
+        "[The village celebrates your heroic deeds...]"
+    });
 }

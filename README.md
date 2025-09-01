@@ -61,3 +61,5 @@ July 29 - Added 3 new zones & more enemies | added boats and sea traversal |
 August 23 - added Sea Zone & Map| added new NPC in basement | added new enemies / boss | added islander merchant and shop | added new potions | Created last zone & Levels to it| Added a special Golem | added 2 more zones (almost finished)
 <hr>
 August 25 - Minor Changes to the ending
+<hr>
+September 1 - Finished the Game | Only a few bugs and some minor balancing remains

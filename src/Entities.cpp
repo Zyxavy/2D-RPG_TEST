@@ -123,8 +123,8 @@ Enemy mutatedFrog(
 Enemy guardian(
     Enemy::GAURDIAN, "The Guardian",
     TILE_WIDTH * 2, TILE_HEIGHT * 5,
-    500, ZONE_WORLD_PLAIN_LANDS, 10, 150, 30,
-    999, 15, "NULL", true, 9000, 10000
+    1000, ZONE_WORLD_PLAIN_LANDS, 10, 400, 45,
+    999, 100, "NULL", true, 9000, 10000
 );
 
 Enemy specialGolem(
@@ -226,10 +226,22 @@ Enemy* waterSlime5 = nullptr;
 Enemy* waterSlime6 = nullptr;
 
 Enemy* crabThing1 = nullptr;
+Enemy* crabThing2 = nullptr;
+Enemy* crabThing3 = nullptr;
+
 Enemy* monsterSquid1 = nullptr;
+Enemy* monsterSquid2 = nullptr;
+Enemy* monsterSquid3 = nullptr;
+
 Enemy* mutatedFrog1 = nullptr;
-Enemy* guardian1 = nullptr;
+Enemy* mutatedFrog2 = nullptr;
+Enemy* mutatedFrog3 = nullptr;
+
 Enemy* specialGolem1 = nullptr;
+Enemy* specialGolem2 = nullptr;
+Enemy* specialGolem3 = nullptr;
+
+Enemy* guardian1 = nullptr;
 
 Enemy* enemy = nullptr;
 
@@ -273,8 +285,8 @@ void EntitiesInit() {
     //gates
     dungeon_gate = (sEntity) 
     {
-        .x = TILE_WIDTH * 3, // 15
-        .y = TILE_HEIGHT * 3, // 17
+        .x = TILE_WIDTH * 15, // 15
+        .y = TILE_HEIGHT * 17, // 17
         .zone1 = ZONE_WORLD,
         .zone2 = ZONE_DUNGEON
     };
@@ -730,6 +742,88 @@ void EntitiesInit() {
     slime7->SetDefense(50);
     slime7->SetExperience(700);
 
+    //Bad Ending
+    guardian1 = new Enemy(guardian);
+    guardian1->SetZone(ZONE_LOST_TEMPLE_BAD_ENDING);
+    guardian1->Move(TILE_WIDTH * 19, TILE_HEIGHT * 7);
+
+    crabThing2 = new Enemy(crabThing);
+    crabThing2->Move(TILE_WIDTH * 18, TILE_HEIGHT * 6);
+    crabThing2->SetZone(ZONE_LOST_TEMPLE_BAD_ENDING);
+    crabThing2->SetHealth(400);
+    crabThing2->SetMaxHealth(400);
+    crabThing2->SetDamageMin(170);
+    crabThing2->SetDamageMax(220);
+    crabThing2->SetDefense(50);
+
+    crabThing3 = new Enemy(crabThing);
+    crabThing3->Move(TILE_WIDTH * 18, TILE_HEIGHT * 5);
+    crabThing3->SetZone(ZONE_LOST_TEMPLE_BAD_ENDING);
+    crabThing3->SetHealth(400);
+    crabThing3->SetMaxHealth(400);
+    crabThing3->SetDamageMin(170);
+    crabThing3->SetDamageMax(220);
+    crabThing3->SetDefense(50);
+
+    monsterSquid2 = new Enemy(monsterSquid);
+    monsterSquid2->Move(TILE_WIDTH * 16, TILE_HEIGHT * 6);
+    monsterSquid2->SetZone(ZONE_LOST_TEMPLE_BAD_ENDING);
+    monsterSquid2->SetHealth(800);
+    monsterSquid2->SetMaxHealth(800);
+    monsterSquid2->SetDamageMin(300);
+    monsterSquid2->SetDamageMax(400);
+    monsterSquid2->SetDefense(70);
+
+    monsterSquid3 = new Enemy(monsterSquid);
+    monsterSquid3->Move(TILE_WIDTH * 16, TILE_HEIGHT * 5);
+    monsterSquid3->SetZone(ZONE_LOST_TEMPLE_BAD_ENDING);
+    monsterSquid3->SetHealth(800);
+    monsterSquid3->SetMaxHealth(800);
+    monsterSquid3->SetDamageMin(300);
+    monsterSquid3->SetDamageMax(400);
+    monsterSquid3->SetDefense(70);
+
+    specialGolem2 = new Enemy(specialGolem);
+    specialGolem2->Move(TILE_WIDTH * 14, TILE_HEIGHT * 6);
+    specialGolem2->SetZone(ZONE_LOST_TEMPLE_BAD_ENDING);
+    specialGolem2->SetHealth(1500);
+    specialGolem2->SetMaxHealth(1500);
+    specialGolem2->SetDamageMin(400);
+    specialGolem2->SetDamageMax(600);
+    specialGolem2->SetDefense(100);
+    specialGolem2->SetExperience(2000);
+
+    specialGolem3 = new Enemy(specialGolem);
+    specialGolem3->Move(TILE_WIDTH * 14, TILE_HEIGHT * 5  );
+    specialGolem3->SetZone(ZONE_LOST_TEMPLE_BAD_ENDING);
+    specialGolem3->SetHealth(1500);
+    specialGolem3->SetMaxHealth(1500);
+    specialGolem3->SetDamageMin(400);
+    specialGolem3->SetDamageMax(600);
+    specialGolem3->SetDefense(100);
+    specialGolem3->SetExperience(2000);
+
+    mutatedFrog2 = new Enemy(mutatedFrog);
+    mutatedFrog2->Move(TILE_WIDTH * 12, TILE_HEIGHT * 6);
+    mutatedFrog2->SetZone(ZONE_LOST_TEMPLE_BAD_ENDING);
+    mutatedFrog2->SetHealth(600);
+    mutatedFrog2->SetMaxHealth(600);
+    mutatedFrog2->SetDamageMin(250);
+    mutatedFrog2->SetDamageMax(350);
+    mutatedFrog2->SetDefense(80);
+    mutatedFrog2->SetExperience(1500);
+
+    mutatedFrog3 = new Enemy(mutatedFrog);
+    mutatedFrog3->Move(TILE_WIDTH * 12, TILE_HEIGHT * 5);
+    mutatedFrog3->SetZone(ZONE_LOST_TEMPLE_BAD_ENDING);
+    mutatedFrog3->SetHealth(600);
+    mutatedFrog3->SetMaxHealth(600);
+    mutatedFrog3->SetDamageMin(250);
+    mutatedFrog3->SetDamageMax(350);
+    mutatedFrog3->SetDefense(80);
+    mutatedFrog3->SetExperience(1500);
+
+    //Good Ending
 
 
     //array of enemies (TO BE OPTIMIZED)
@@ -801,9 +895,22 @@ void EntitiesInit() {
     waterSlimeArr[5] = waterSlime6;
 
     crabArr[0] = crabThing1;
+    crabArr[1] = crabThing2;
+    crabArr[2] = crabThing3;
+
     mutantFrogArr[0] = mutatedFrog1;
+    mutantFrogArr[1] = mutatedFrog2;
+    mutantFrogArr[2] = mutatedFrog3;
+
     squidArr[0] = monsterSquid1;
+    squidArr[1] = monsterSquid2;
+    squidArr[2] = monsterSquid3;
+
     specialGolemArr[0] = specialGolem1;
+    specialGolemArr[1] = specialGolem2;
+    specialGolemArr[2] = specialGolem3;
+
+    guardianArr[0] = guardian1;
 
     Player.SetZone(ZONE_WORLD);
 
@@ -997,6 +1104,19 @@ void EnemyRender()
             }
         }   
     }
+
+    for(int i = 0; i < MAX_GUARDIAN_INSTANCES; i++)
+    {
+        if(guardianArr[i]->GetZone() == Player.GetZone())
+        {
+            if(guardianArr[i]->IsAlive() == true) 
+            {
+                DrawTile(guardianArr[i]->GetX(), guardianArr[i]->GetY(), 10, 2); 
+            }
+        }   
+    }
+
+
 
     //Render chest
     for(int i = 0; i < MAX_CHEST_INSTANCES; i++)
@@ -1415,6 +1535,15 @@ void CheckContactWithEnemies()
         }
     }
 
+    for(int i = 0; i < MAX_GUARDIAN_INSTANCES; i++) //check contact with Guardian
+    {
+        if (guardianArr[i] != nullptr && Player.GetZone() == guardianArr[i]->GetZone() && Player.GetX() == guardianArr[i]->GetX() && Player.GetY() == guardianArr[i]->GetY() && guardianArr[i]->IsAlive() == true) 
+        {
+            enemy = guardianArr[i];
+            battleMode = true;
+        }
+    }
+
 }
 
 void ExecuteEnemyBehaviors()
@@ -1721,6 +1850,57 @@ void ExecuteEnemyBehaviors()
             std::cout << count;
         }
     }
+
+    for(int i = 1; i < MAX_MUTATED_FROG_INSTANCES; i++) 
+    {
+        if(!mutantFrogArr[i]->GetStunStatus()) 
+        {
+            mutantFrogArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            mutantFrogArr[i]->SetStunCounter(count);
+            if(count > 3) 
+            {
+                mutantFrogArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(mutantFrogArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
+    for(int i = 1; i < MAX_MONSTER_SQUID_INSTANCES; i++) 
+    {
+        if(!squidArr[i]->GetStunStatus()) 
+        {
+            squidArr[i]->MoveAI(Player.GetX(), Player.GetY());
+        }
+        else
+        {
+            
+            squidArr[i]->SetStunCounter(count);
+            if(count > 4) 
+            {
+                squidArr[i]->SetStunStatus(false);
+                count = 0;
+                
+            }
+        }
+
+        if(squidArr[i]->GetStunStatus())
+        {
+            count++;
+            std::cout << count;
+        }
+    }
+
 
     
 }

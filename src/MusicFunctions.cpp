@@ -22,14 +22,17 @@ void LoadMusic()
     musicLight[0] = LoadMusicStream("assets/Light Ambience 3.wav");
     musicLight[1] = LoadMusicStream("assets/Light Ambience 1.wav");
     musicLight[2] = LoadMusicStream("assets/Light Ambience 5.wav");
+    musicLight[3] = LoadMusicStream("assets/Ambient 1.wav"); 
 
     musicDark[0] = LoadMusicStream("assets/Dark Ambient 2.wav");
     musicDark[1] = LoadMusicStream("assets/Dark Ambient 4.wav");
     musicDark[2] = LoadMusicStream("assets/Dark Ambient 5.wav");
+    musicDark[3] = LoadMusicStream("assets/Dark Ambient 3.wav");
 
     musicAction[0] = LoadMusicStream("assets/Action 1.wav");
     musicAction[1] = LoadMusicStream("assets/Action 2.wav");
     musicAction[2] = LoadMusicStream("assets/Action 3.wav");
+    musicAction[2] = LoadMusicStream("assets/Action 5.wav");
 }
 
 void UnloadMusic()

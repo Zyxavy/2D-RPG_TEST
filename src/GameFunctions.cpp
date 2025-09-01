@@ -27,10 +27,16 @@ sTile lostTempleLevel1[WORLD_WIDTH][WORLD_HEIGHT];
 sTile lostTempleLevel2[WORLD_WIDTH][WORLD_HEIGHT];
 sTile lostTempleBadEnding[WORLD_WIDTH][WORLD_HEIGHT];
 sTile lostTempleGoodEnding[WORLD_WIDTH][WORLD_HEIGHT];
+sTile endingVillage[WORLD_WIDTH][WORLD_HEIGHT];
 eZones lastZone = ZONE_WORLD;
 bool isInventory = false;
 int count;
 int lastKeyPressed;
+
+std::vector<std::string> creditsLines;
+float creditsY;
+const float creditsScrollSpeed = 30.0f; 
+Rectangle creditsBox;
 
 GameState currentGameState;
 GameState prevGameState;
@@ -38,10 +44,6 @@ bool isRidingBoat = false;
 bool isBoatFacingRight = true; 
 void GameStartup() {
 
-    dungeonKey = true;
-    plainsKey = true;
-    mutantFrogKilled = true;
-    cursedGoldenKey.SetPickedUpState(true); 
 
     InitAudioDevice();
 
@@ -131,6 +133,13 @@ void GameStartup() {
                 .type = zoneLostTempleGoodEnding[y][x]
             };
 
+            endingVillage[x][y] = (sTile) 
+            {
+                .x = x,
+                .y = y,
+                .type = zoneEndingVillage[y][x]
+            };
+
         }
     }
 
@@ -163,6 +172,7 @@ void GameStartup() {
     sounds[SOUNDS_LEVEL_UP] = LoadSound("assets/LevelUp FX.wav");
     sounds[SOUNDS_TREE_CUTTING] = LoadSound("assets/TreeCutting.wav");
     sounds[SOUNDS_ERROR_SOUND] = LoadSound("assets/ErrorSound.wav");
+    sounds[SOUNDS_GUARDIAN_FX] = LoadSound("assets/Fx 3.wav");
     //skils sounds
     sounds[SOUNDS_KNIGHT_SKILL1] = LoadSound("assets/KnightSkill1.wav");
     sounds[SOUNDS_KNIGHT_SKILL2] = LoadSound("assets/KnightSkill2.wav");
@@ -174,6 +184,9 @@ void GameStartup() {
     sounds[SOUNDS_ROGUE_SKILL2] = LoadSound("assets/RogueSkill2.wav");
     sounds[SOUNDS_ROGUE_SKILL3] = LoadSound("assets/RogueSkill3.wav");
     sounds[SOUNDS_BUY_SOUND] = LoadSound("assets/BuySound.wav");
+
+    // Initialize Credits
+   InitiateCredits();
     
     LoadMusic();
 }
@@ -185,9 +198,25 @@ void GameUpdate()
     UpdateMusic();
     if((Player.GetZone() == ZONE_WORLD || Player.GetZone() == ZONE_WORLD_PLAIN_LANDS
     || Player.GetZone() == ZONE_ISLAND || Player.GetZone() == ZONE_SEA || Player.GetZone() == ZONE_LOST_TEMPLE_ENTRANCE) && currentMusicZone != LIGHT) {PlayRandomMusic(LIGHT);}
+
     else if((Player.GetZone() == ZONE_DUNGEON || Player.GetZone() == ZONE_BASEMENT_DUNGEON ||
-             Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL1 || Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL2 ) && currentMusicZone != DARK) {PlayRandomMusic(DARK);}
+             Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL1 || Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL2 ||
+             Player.GetZone() == ZONE_LOST_TEMPLE_BAD_ENDING || Player.GetZone() == ZONE_LOST_TEMPLE_GOOD_ENDING ) && currentMusicZone != DARK) {PlayRandomMusic(DARK);}
+
     else if (Player.GetZone() == ZONE_BATTLE && currentMusicZone != ACTION){ PlayRandomMusic(ACTION);}
+    else if (Player.GetZone() == ZONE_VILLAGE) {PlayMusicStream(musicLight[3]); currentMusicZone = LIGHT;}
+
+    //Update credits if in the right zone
+    if (Player.GetZone() == ZONE_VOID || Player.GetZone() == ZONE_VILLAGE)
+    {
+        creditsY -= creditsScrollSpeed * GetFrameTime();
+       
+        float totalCreditsHeight = creditsLines.size() * 25; 
+        if ((creditsY + totalCreditsHeight) < creditsBox.y)
+        {
+            creditsY = creditsBox.y + creditsBox.height;
+        }
+    }
 
     if(battleMode)
     {
@@ -285,11 +314,23 @@ void GameUpdate()
                 if(Act4_BadEndingAchieved)
                 {
                     Act4_BadEnding();
+                    Act4_WeirdManSecondMeetingInteracted = false;
                 }
                 else if(Act4_GoodEndingAchieved)
                 {
                     Act4_GoodEnding();
+                    Act4_WeirdManSecondMeetingInteracted = false;
                 }
+            }
+
+            if(Ending_GuardianKilled)
+            {
+                Player.SetZone(ZONE_VILLAGE);
+                currentGameState = IN_ENDING_VILLAGE;
+                Player.SetX(TILE_WIDTH * 12);
+                Player.SetY(TILE_HEIGHT * 13);
+                Ending_VillagePraises();
+                Ending_GuardianKilled = false;
             }
         }
         
@@ -500,6 +541,10 @@ void GameRender()
                 {
                     tile = lostTempleGoodEnding[i][j];
                 }
+                else if (Player.GetZone() == ZONE_VILLAGE) 
+                {
+                    tile = endingVillage[i][j];
+                }
 
                 RenderTile(tile, texture_index_x, texture_index_y);
 
@@ -534,6 +579,9 @@ void GameRender()
 
         // Top-left thingy
         DrawHotBar();
+
+        //Render Credits if in final zones
+        RenderCredits();
 
         if(inDialogue) RenderDialogue();
         else RenderDialogueWithOptions();
@@ -633,9 +681,16 @@ void RenderTile(const sTile &tile,int &texture_index_x, int &texture_index_y )
             texture_index_x = 5; texture_index_y = 2; break;
         case TILE_TYPE_SQUARE_RAIL: //42
             texture_index_x = 14; texture_index_y = 2; break;
-        case TILE_TYPE_SAND:
+            //NPCS
+        case TILE_TYPE_VILLAGE_CHEIF: //43
+            texture_index_x = 4; texture_index_y = 0; break;
+        case TILE_TYPE_VILLAGER1: //44
+            texture_index_x = 5; texture_index_y = 0; break;
+        case TILE_TYPE_VILLAGER2: //45
+            texture_index_x = 7; texture_index_y = 0; break;
+        case TILE_TYPE_SAND: //99
             texture_index_x = -1; texture_index_y = -1; break;
-        case TILE_TYPE_STONE_WALL:
+        case TILE_TYPE_STONE_WALL: //98
              texture_index_x = -2; texture_index_y = -2; break;
         default:
             break;
@@ -1126,3 +1181,53 @@ void CheckIfDungeonCompleted()
     }
 
 }
+
+void InitiateCredits()
+{
+    creditsBox = { (float)screenWidth - 260, 40, 250, (float)screenHeight - 80 };
+    creditsY = creditsBox.y + creditsBox.height;
+    creditsLines.push_back("--- The End ---");
+    creditsLines.push_back("");
+    creditsLines.push_back("Developed by");
+    creditsLines.push_back("Zyxavy");
+    creditsLines.push_back("");
+    creditsLines.push_back("Art & Assets:");
+    creditsLines.push_back("raylib");
+    creditsLines.push_back("Kenney.nl");
+    creditsLines.push_back("");
+    creditsLines.push_back("Music & Sound:");
+    creditsLines.push_back("Alkakrab");
+    creditsLines.push_back("");
+    creditsLines.push_back("Special Thanks:");
+    creditsLines.push_back("The raylib Community");
+    creditsLines.push_back("You, the Player!");
+    creditsLines.push_back("");
+    creditsLines.push_back("");
+    creditsLines.push_back("Thanks for Playing!");
+
+}
+
+void RenderCredits()
+{
+    if (Player.GetZone() == ZONE_VOID || Player.GetZone() == ZONE_VILLAGE)
+        {
+            DrawRectangleRec(creditsBox, {10, 10, 10, 190}); 
+            DrawRectangleLinesEx(creditsBox, 2, GRAY);
+
+            BeginScissorMode(creditsBox.x, creditsBox.y, creditsBox.width, creditsBox.height);
+
+            for (size_t i = 0; i < creditsLines.size(); ++i)
+            {
+                const char* text = creditsLines[i].c_str();
+                //Center the text horizontally
+                int textWidth = MeasureText(text, 20);
+                float textX = creditsBox.x + (creditsBox.width - textWidth) / 2;
+                float textY = creditsY + (i * 25); 
+                DrawText(text, textX, textY, 20, WHITE);
+            }
+
+            EndScissorMode();
+        }
+
+}
+

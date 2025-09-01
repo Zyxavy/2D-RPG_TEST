@@ -6,9 +6,9 @@
 #include "BattleSystem.hpp"
 
 //music
-#define MAX_LIGHT_MUSIC 3
-#define MAX_DARK_MUSIC 3
-#define MAX_ACTION_MUSIC 3
+#define MAX_LIGHT_MUSIC 4
+#define MAX_DARK_MUSIC 4
+#define MAX_ACTION_MUSIC 4
 
 
 //enums
