@@ -9,7 +9,7 @@
 #include <string>
 
 #define RAYGUI_IMPLEMENTATION
-#include <raygui.h>
+#include "lib\raygui.h"
 
 //for SoundFx
 static bool hoveringOverItems = false;

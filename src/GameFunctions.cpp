@@ -1138,7 +1138,11 @@ void CutDownTree()
         tile = &plainLands[TileX][TileY];
     }
     else if(Player.GetZone() == ZONE_DUNGEON || Player.GetZone() == ZONE_BASEMENT_DUNGEON ||
-             Player.GetZone() == ZONE_ISLAND || Player.GetZone() == ZONE_SEA)
+             Player.GetZone() == ZONE_ISLAND || Player.GetZone() == ZONE_SEA ||
+             Player.GetZone() == ZONE_LOST_TEMPLE_ENTRANCE ||Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL1 || 
+             Player.GetZone() == ZONE_LOST_TEMPLE_LEVEL2 || Player.GetZone() == ZONE_LOST_TEMPLE_BAD_ENDING || 
+             Player.GetZone() == ZONE_LOST_TEMPLE_GOOD_ENDING || Player.GetZone() == ZONE_VOID ||
+            Player.GetZone() == ZONE_VILLAGE)
     {
         std::cout << "Invalid Zone!\n";
         return;

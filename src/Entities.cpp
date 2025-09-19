@@ -443,14 +443,21 @@ void EntitiesInit() {
         .isPassable = false
     };
 
-    boat = (sEntity)
+    // BUG FIX: Initialize the boat only once to prevent its position from resetting.
+    static bool boatIsInitialized = false;
+    if (!boatIsInitialized)
     {
-        .x = TILE_WIDTH * 14,
-        .y = TILE_HEIGHT * 12,
-        .zone1 = ZONE_ISLAND,
-        .zone2 = ZONE_ISLAND, 
-        .isPassable = false 
-    };
+        boat = (sEntity)
+        {
+            .x = TILE_WIDTH * 14,
+            .y = TILE_HEIGHT * 12,
+            .zone1 = ZONE_ISLAND,
+            .zone2 = ZONE_ISLAND, 
+            .isPassable = false 
+        };
+        boatIsInitialized = true;
+    }
+
 
     //Place enemy instances (TO BE OPTIMIZED)
 
